@@ -7,7 +7,7 @@ import { actions, useStore } from "@/lib/store";
 import { OverdueNotifier } from "@/components/OverdueNotifier";
 import { AccountNav } from "@/components/AccountNav";
 import { useDocumentDirection, useLocale, type Key } from "@/lib/i18n";
-import { allBids, auctionFor, statusOf, topBid, useNow } from "@/lib/auctions";
+import { dbStatus, useDbAuctions, useNow } from "@/lib/auctions";
 
 const nav = [
   { to: "/explore", k: "nav.explore" },
@@ -75,11 +75,11 @@ export function FavButton({ id, className = "" }: { id: string; className?: stri
 
 export function ArtCard({ a }: { a: Artwork }) {
   const { t, pick } = useLocale();
-  const { bids } = useStore();
+  const q = useDbAuctions();
   const now = useNow(30_000);
-  const auc = auctionFor(a.id);
-  const live = auc && now > 0 && statusOf(auc, now) === "live";
-  const top = live ? topBid(allBids(auc, bids[auc.id], now)) : null;
+  const auc = q.data?.auctions.find((x) => x.listing_id === a.id);
+  const live = auc && now > 0 && dbStatus(auc, now) === "live";
+  const top = live ? Math.max(0, ...(q.data?.bids ?? []).filter((b) => b.auction_id === auc.id).map((b) => b.amount)) : 0;
   return (
     <Link to="/artwork/$id" params={{ id: a.id }} className="group block">
       <div className="relative overflow-hidden rounded-sm bg-muted">
@@ -90,7 +90,7 @@ export function ArtCard({ a }: { a: Artwork }) {
       <div className="mt-3 flex items-start justify-between gap-2">
         <div><p className="font-display text-lg">{pick(a, "title")}</p><p className="text-sm text-muted-foreground">{pick(a, "artist")}</p></div>
         <div className="text-end text-sm">
-          {live ? (<><p className="text-primary">{fmt(top?.amount ?? auc.startBid)}</p><p className="text-muted-foreground">{t("auc.live")}</p></>) : <p>{fmt(minPrice(a))}</p>}
+          {live ? (<><p className="text-primary">{fmt(top || auc.start_bid)}</p><p className="text-muted-foreground">{t("auc.live")}</p></>) : <p>{fmt(minPrice(a))}</p>}
         </div>
       </div>
     </Link>

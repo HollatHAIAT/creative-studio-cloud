@@ -1,9 +1,8 @@
 import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
-import { auctions, fmt, toArtwork, seedListings } from "@/lib/data";
-import { useStore } from "@/lib/store";
+import { fmt, toArtwork, seedListings } from "@/lib/data";
 import { useLocale } from "@/lib/i18n";
-import { allBids, countdown, statusOf, times, topBid, useNow } from "@/lib/auctions";
+import { countdown, dbStatus, useDbAuctions, useNow } from "@/lib/auctions";
 
 export const Route = createFileRoute("/auctions")({
   head: () => ({
@@ -27,20 +26,20 @@ function AuctionsLayout() {
 
 function Auctions() {
   const { t, pick, num } = useLocale();
-  const { bids } = useStore();
+  const q = useDbAuctions();
   const now = useNow();
   const order = { live: 0, upcoming: 1, closed: 2 };
-  const list = auctions.map((a) => ({ a, art: toArtwork(seedListings.find((l) => l.id === a.listingId)!) }))
-    .sort((x, y) => (now ? order[statusOf(x.a, now)] - order[statusOf(y.a, now)] : 0));
+  const list = (q.data?.auctions ?? []).map((a) => ({ a, art: toArtwork(seedListings.find((l) => l.id === a.listing_id)!) })).filter((x) => x.art)
+    .sort((x, y) => (now ? order[dbStatus(x.a, now)] - order[dbStatus(y.a, now)] : 0));
   return (
     <SiteShell>
       <PageTitle eyebrow={t("auc.eyebrow")} title={t("auc.title")} sub={t("auc.sub")} />
       <div className="mx-auto grid max-w-7xl gap-8 px-6 md:grid-cols-2 lg:grid-cols-3">
         {list.map(({ a, art }) => {
-          const st = now ? statusOf(a, now) : "live";
-          const all = now ? allBids(a, bids[a.id], now) : [];
-          const top = topBid(all);
-          const tm = now ? times(a, now) : { start: 0, end: 0 };
+          const st = now ? dbStatus(a, now) : "live";
+          const all = (q.data?.bids ?? []).filter((b) => b.auction_id === a.id);
+          const top = all.reduce<(typeof all)[number] | null>((m, b) => (!m || b.amount > m.amount ? b : m), null);
+          const tm = { start: Date.parse(a.starts_at), end: Date.parse(a.ends_at) };
           return (
             <Link key={a.id} to="/auctions/$id" params={{ id: a.id }} className="group block rounded-sm border border-border bg-card hover:border-primary">
               <div className="relative">
@@ -51,13 +50,13 @@ function Auctions() {
                 <p className="font-display text-2xl">{pick(art, "title")}</p>
                 <p className="text-sm text-muted-foreground">{pick(art, "artist")}</p>
                 <div className="mt-4 flex items-end justify-between">
-                  <div><p className="text-xs text-muted-foreground">{top ? t("auc.current") : t("auc.start")}</p><p className="font-display text-2xl">{fmt(top?.amount ?? a.startBid)}</p></div>
+                  <div><p className="text-xs text-muted-foreground">{top ? t("auc.current") : t("auc.start")}</p><p className="font-display text-2xl">{fmt(top?.amount ?? a.start_bid)}</p></div>
                   <div className="text-end text-sm">
                     <p className="text-xs text-muted-foreground">{st === "upcoming" ? t("auc.opens") : st === "live" ? t("auc.endsIn") : t("auc.ended")}</p>
                     <p className="font-mono" dir="ltr">{now ? (st === "upcoming" ? countdown(tm.start - now) : st === "live" ? countdown(tm.end - now) : "—") : "…"}</p>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-muted-foreground">{num(all.length)} {t("auc.bids")} · {top && top.amount >= a.reserve ? t("auc.reserveMet") : t("auc.reserveNot")}</p>
+                <p className="mt-3 text-xs text-muted-foreground">{num(all.length)} {t("auc.bids")}</p>
               </div>
             </Link>
           );
