@@ -98,3 +98,4 @@
 
 - [ ] Fix sign-in page loading + admin access for Alhabaty@gmail.com
 - [ ] Rename platform to أروقة (Arwiqa) + palm & brush logo
+- [ ] Fix white screen: live-update listeners registered after subscribe
