@@ -7,9 +7,9 @@ import { countdown, dbStatus, useDbAuctions, useNow } from "@/lib/auctions";
 export const Route = createFileRoute("/auctions")({
   head: () => ({
     meta: [
-      { title: "Live art auctions — creativestudio" },
+      { title: "Live art auctions — Arwiqa أروقة" },
       { name: "description", content: "Bid live on original artworks with countdowns, reserve prices and full bid history." },
-      { property: "og:title", content: "Live art auctions — creativestudio" },
+      { property: "og:title", content: "Live art auctions — Arwiqa أروقة" },
       { property: "og:description", content: "Bid on originals from artists worldwide." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

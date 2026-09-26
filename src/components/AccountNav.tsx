@@ -26,7 +26,7 @@ export function AccountNav() {
   // Live notifications: toast + refresh counts.
   useEffect(() => {
     if (!user) return;
-    const ch = supabase.channel(`notif-${user.id}`)
+    const ch = supabase.channel(`notif-${user.id}-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, (p) => {
         const n = p.new as { title: string; title_ar: string };
         toast(locale === "ar" ? n.title_ar : n.title);

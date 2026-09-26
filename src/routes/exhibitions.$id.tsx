@@ -18,9 +18,9 @@ export const Route = createFileRoute("/exhibitions/$id")({
     return e;
   },
   head: ({ loaderData: e }) => e ? { meta: [
-    { title: `${e.title} — exhibition on creativestudio` },
+    { title: `${e.title} — exhibition on Arwiqa` },
     { name: "description", content: `${e.description} ${e.venue}.` },
-    { property: "og:title", content: `${e.title} — creativestudio` },
+    { property: "og:title", content: `${e.title} — Arwiqa أروقة` },
     { property: "og:description", content: e.description },
     { property: "og:type", content: "event" }, { name: "twitter:card", content: "summary_large_image" },
   ] } : { meta: [{ title: "Exhibition not found" }, { name: "robots", content: "noindex" }] },

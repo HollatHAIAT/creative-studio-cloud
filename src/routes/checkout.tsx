@@ -14,8 +14,8 @@ import { fmt } from "@/lib/data";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [
-    { title: "Checkout — creativestudio" }, { name: "description", content: "Review your cart and place your order for artworks, prints, licenses and exhibition tickets." },
-    { property: "og:title", content: "Checkout — creativestudio" }, { property: "og:description", content: "Complete your order." },
+    { title: "Checkout — Arwiqa أروقة" }, { name: "description", content: "Review your cart and place your order for artworks, prints, licenses and exhibition tickets." },
+    { property: "og:title", content: "Checkout — Arwiqa أروقة" }, { property: "og:description", content: "Complete your order." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
   component: Checkout,

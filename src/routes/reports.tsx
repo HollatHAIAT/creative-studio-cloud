@@ -9,9 +9,9 @@ import { listingDaily, pct, SOURCES, sourceSplit, totals } from "@/lib/analytics
 export const Route = createFileRoute("/reports")({
   head: () => ({
     meta: [
-      { title: "Scheduled email reports — creativestudio" },
+      { title: "Scheduled email reports — Arwiqa أروقة" },
       { name: "description", content: "Schedule weekly or monthly listing performance emails with referral insights." },
-      { property: "og:title", content: "Email reports — creativestudio" },
+      { property: "og:title", content: "Email reports — Arwiqa أروقة" },
       { property: "og:description", content: "Weekly or monthly performance emails." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -154,7 +154,7 @@ function EmailPreview({ r }: { r: Report }) {
       <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Email preview</p>
       <div className="rounded-sm bg-card p-6 text-sm shadow-sm">
         <p className="text-muted-foreground">To: {r.email || "you@studio.com"}</p>
-        <p className="mb-4 text-muted-foreground">Subject: Your {r.frequency} creativestudio report — {r.name}</p>
+        <p className="mb-4 text-muted-foreground">Subject: Your {r.frequency} Arwiqa report — {r.name}</p>
         <p className="font-display text-2xl">creative<span className="text-primary">studio</span></p>
         <p className="mt-3">Here's how your listings did over the last {days} days.</p>
         <div className="my-4 grid grid-cols-3 gap-2 text-center">

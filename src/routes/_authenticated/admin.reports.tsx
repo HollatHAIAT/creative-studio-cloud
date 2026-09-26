@@ -11,8 +11,8 @@ import { fmt } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/admin/reports")({
   head: () => ({ meta: [
-    { title: "Admin reports — creativestudio" }, { name: "description", content: "Sales, orders, ticket activity and bids with date filters and CSV export." },
-    { property: "og:title", content: "Admin reports — creativestudio" }, { property: "og:description", content: "Staff reports." },
+    { title: "Admin reports — Arwiqa أروقة" }, { name: "description", content: "Sales, orders, ticket activity and bids with date filters and CSV export." },
+    { property: "og:title", content: "Admin reports — Arwiqa أروقة" }, { property: "og:description", content: "Staff reports." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
   component: () => <StaffGate><Reports /></StaffGate>,
@@ -52,7 +52,7 @@ function Reports() {
     d.tickets.forEach((x) => rows.push(["ticket", x.id, x.created_at, x.status, x.ticket_type, ""]));
     d.scans.forEach((x) => rows.push(["scan", x.code, x.created_at, x.result, "", ""]));
     d.bids.forEach((x) => rows.push(["bid", x.auction_id, x.created_at, x.bidder_name, "", Number(x.amount)]));
-    downloadText(toCsv(rows), `creativestudio-report-${from}-${to}.csv`);
+    downloadText(toCsv(rows), `Arwiqa-report-${from}-${to}.csv`);
   };
 
   const card = "rounded-sm border border-border bg-card p-5";

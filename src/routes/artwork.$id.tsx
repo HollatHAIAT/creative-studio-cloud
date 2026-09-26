@@ -11,8 +11,8 @@ import { auctionFor, statusOf, useNow } from "@/lib/auctions";
 export const Route = createFileRoute("/artwork/$id")({
   head: ({ params }) => {
     const a = artworks.find((x) => x.id === params.id);
-    const title = a ? `${a.title} by ${a.artist} — creativestudio` : "Artwork — creativestudio";
-    const desc = a?.description ?? "Original art, prints and licenses on creativestudio.";
+    const title = a ? `${a.title} by ${a.artist} — Arwiqa أروقة` : "Artwork — Arwiqa أروقة";
+    const desc = a?.description ?? "Original art, prints and licenses on Arwiqa.";
     return { meta: [
       { title }, { name: "description", content: desc },
       { property: "og:title", content: title }, { property: "og:description", content: desc },

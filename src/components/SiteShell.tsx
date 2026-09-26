@@ -8,6 +8,8 @@ import { OverdueNotifier } from "@/components/OverdueNotifier";
 import { AccountNav } from "@/components/AccountNav";
 import { useDocumentDirection, useLocale, type Key } from "@/lib/i18n";
 import { dbStatus, useDbAuctions, useNow } from "@/lib/auctions";
+import logoMark from "@/assets/arwiqa-mark.png";
+import logoFull from "@/assets/arwiqa-logo.png";
 
 const nav = [
   { to: "/explore", k: "nav.explore" },
@@ -27,7 +29,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
-          <Link to="/" className="font-display text-2xl tracking-tight" dir="ltr">creative<span className="text-primary">studio</span></Link>
+          <Link to="/" className="flex items-center gap-2 font-display text-2xl tracking-tight" aria-label="Arwiqa أروقة"><img src={logoMark} alt="" width={36} height={36} className="h-9 w-9 object-contain" /><span>{t("brand.name")}</span></Link>
           <nav className="hidden gap-6 text-sm lg:flex">
             {nav.map((n) => (
               <Link key={n.to} to={n.to} className="text-muted-foreground hover:text-foreground" activeProps={{ className: "text-foreground" }}>{t(n.k)}</Link>
@@ -48,7 +50,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <main>{children}</main>
       <footer className="mt-24 border-t border-border">
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 text-sm text-muted-foreground md:grid-cols-4">
-          <div><p className="font-display text-xl text-foreground" dir="ltr">creativestudio</p><p className="mt-2">{t("brand.tagline")}</p></div>
+          <div><img src={logoFull} alt="Arwiqa أروقة" width={96} height={96} loading="lazy" className="h-24 w-24 object-contain" /><p className="mt-2">{t("brand.tagline")}</p></div>
           <div><p className="text-foreground">{t("footer.buy")}</p><p>{t("footer.originals")}</p><p>{t("footer.prints")}</p><p>{t("footer.licenses")}</p></div>
           <div><p className="text-foreground">{t("footer.sell")}</p><p>{t("footer.storefronts")}</p><p>{t("nav.auctions")}</p><p>{t("nav.exhibitions")}</p></div>
           <div><p className="text-foreground">{t("footer.company")}</p><p>{t("footer.about")}</p><p>{t("footer.licensing")}</p><p>{t("footer.support")}</p></div>

@@ -31,15 +31,13 @@ export function useNow(ms = 1000) {
 }
 
 // ---------- Database-backed auctions ----------
-import { useEffect as useEff } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export type DbAuction = { id: string; listing_id: string; start_bid: number; increment: number; starts_at: string; ends_at: string };
 export type DbBid = { id: string; auction_id: string; user_id: string | null; bidder_name: string; amount: number; created_at: string };
 
 export function useDbAuctions() {
-  const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["auctions"],
     queryFn: async () => {
@@ -52,13 +50,7 @@ export function useDbAuctions() {
         bids: (b.data ?? []).map((x) => ({ ...x, amount: Number(x.amount) })) as DbBid[] };
     },
   });
-  // Realtime: any new bid refreshes prices everywhere.
-  useEff(() => {
-    const ch = supabase.channel("bids-live").on("postgres_changes", { event: "INSERT", schema: "public", table: "bids" }, () => {
-      qc.invalidateQueries({ queryKey: ["auctions"] }); qc.invalidateQueries({ queryKey: ["reserve"] });
-    }).subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [qc]);
+  // Live updates arrive via the single <BidsLiveProvider /> which invalidates this cache.
   return q;
 }
 export const dbStatus = (a: DbAuction, now: number): AuctionStatus => now < Date.parse(a.starts_at) ? "upcoming" : now >= Date.parse(a.ends_at) ? "closed" : "live";
@@ -70,4 +62,13 @@ export function bidRejection(message: string): { code: string; min?: number } {
   const m = message.match(/(AUCTION_NOT_FOUND|AUCTION_NOT_STARTED|AUCTION_ENDED|BID_TOO_HIGH|BID_TOO_LOW)(?::([\d.]+))?/);
   if (!m) return { code: "failed" };
   return m[2] ? { code: m[1]!, min: Number(m[2]) } : { code: m[1]! };
+}
+
+type RT = { channel: (name: string) => { on: (...a: never[]) => unknown; subscribe: () => unknown }; removeChannel: (c: never) => unknown };
+/** Opens ONE bids channel: handlers are attached before subscribe(); returns cleanup that removes it. */
+export function subscribeBidsLive(client: RT, onBid: () => void) {
+  const ch = (client.channel(`bids-live-${crypto.randomUUID()}`) as unknown as { on: (e: string, f: object, cb: () => void) => { subscribe: () => unknown } })
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "bids" }, onBid);
+  const sub = ch.subscribe();
+  return () => { client.removeChannel(sub as never); };
 }

@@ -7,8 +7,8 @@ import { fmtDateTime } from "@/lib/orders";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({ meta: [
-    { title: "Notifications — creativestudio" }, { name: "description", content: "Order, ticket and bid alerts." },
-    { property: "og:title", content: "Notifications — creativestudio" }, { property: "og:description", content: "Your alerts." },
+    { title: "Notifications — Arwiqa أروقة" }, { name: "description", content: "Order, ticket and bid alerts." },
+    { property: "og:title", content: "Notifications — Arwiqa أروقة" }, { property: "og:description", content: "Your alerts." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
   component: Notifications,

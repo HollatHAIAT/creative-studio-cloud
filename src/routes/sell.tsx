@@ -5,9 +5,9 @@ import { SiteShell, PageTitle } from "@/components/SiteShell";
 export const Route = createFileRoute("/sell")({
   head: () => ({
     meta: [
-      { title: "Sell on creativestudio" },
+      { title: "Sell on Arwiqa" },
       { name: "description", content: "Open a storefront to sell originals, prints, licenses, auctions and exhibition tickets." },
-      { property: "og:title", content: "Sell on creativestudio" },
+      { property: "og:title", content: "Sell on Arwiqa" },
       { property: "og:description", content: "Open your artist or gallery storefront." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

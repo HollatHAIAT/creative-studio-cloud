@@ -7,9 +7,9 @@ import { dateRange } from "@/lib/exhibitions";
 export const Route = createFileRoute("/exhibitions")({
   head: () => ({
     meta: [
-      { title: "Exhibitions — creativestudio" },
+      { title: "Exhibitions — Arwiqa أروقة" },
       { name: "description", content: "Virtual and physical art exhibitions with schedules, ticket booking and exhibition maps." },
-      { property: "og:title", content: "Exhibitions — creativestudio" },
+      { property: "og:title", content: "Exhibitions — Arwiqa أروقة" },
       { property: "og:description", content: "Virtual rooms and physical shows worldwide." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

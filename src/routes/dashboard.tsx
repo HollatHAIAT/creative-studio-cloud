@@ -11,9 +11,9 @@ import { actions, DEMO_CREATOR, useAllListings } from "@/lib/store";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Creator dashboard — creativestudio" },
+      { title: "Creator dashboard — Arwiqa أروقة" },
       { name: "description", content: "Create, edit and remove your marketplace listings." },
-      { property: "og:title", content: "Creator dashboard — creativestudio" },
+      { property: "og:title", content: "Creator dashboard — Arwiqa أروقة" },
       { property: "og:description", content: "Manage your listings." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

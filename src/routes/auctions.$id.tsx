@@ -16,7 +16,7 @@ export const Route = createFileRoute("/auctions/$id")({
     return { id: a.id, art: toArtwork(seedListings.find((l) => l.id === a.listingId)!) };
   },
   head: ({ loaderData }) => loaderData ? { meta: [
-    { title: `Auction: ${loaderData.art.title} — creativestudio` },
+    { title: `Auction: ${loaderData.art.title} — Arwiqa أروقة` },
     { name: "description", content: `Bid live on ${loaderData.art.title} by ${loaderData.art.artist}.` },
     { property: "og:title", content: `Auction: ${loaderData.art.title}` },
     { property: "og:description", content: `Live bidding on ${loaderData.art.title} by ${loaderData.art.artist}.` },

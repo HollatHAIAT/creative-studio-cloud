@@ -95,3 +95,10 @@
 - [ ] Real payment provider connection (later phase, per owner)
 - [ ] Run concurrent-bid live test (needs two test accounts)
 - [ ] Creator dashboard listings still stored in browser — move to database
+
+- [ ] Fix sign-in page loading + admin access for Alhabaty@gmail.com
+- [x] Rename platform to أروقة (Arwiqa) + palm & brush logo
+- [x] Fix white screen: live-update listeners registered after subscribe
+- [x] Unique bids-live channel + cleanup
+- [x] Shared BidsLive provider (one channel)
+- [x] Strict Mode test for bids-live channel lifecycle

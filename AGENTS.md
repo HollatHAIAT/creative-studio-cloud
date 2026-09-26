@@ -14,3 +14,4 @@
 - Marketplace data (assets, auctions/bids, exhibitions/bookings, orders, tickets, refunds, notifications) lives in Lovable Cloud; business rules are enforced by DB triggers/RPCs (validate_bid, validate_booking, admin_set_order_status, check_in_ticket, admin_decide_refund). Why: rules must hold regardless of client.
 - Orders are priced server-side in `placeOrder` (src/lib/orders.functions.ts) via `priceCart`. Why: clients can't tamper with totals.
 - Staff = admin or moderator role (`is_staff`); staff UI lives under `/_authenticated/admin/*`. Why: one role check for ops screens.
+- Realtime bids use one shared channel via BidsLiveProvider in __root; components read the query cache. Why: one channel per card caused the after-subscribe crash.

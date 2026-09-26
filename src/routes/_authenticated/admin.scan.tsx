@@ -9,8 +9,8 @@ import { fmtDateTime } from "@/lib/orders";
 
 export const Route = createFileRoute("/_authenticated/admin/scan")({
   head: () => ({ meta: [
-    { title: "Ticket check-in — creativestudio" }, { name: "description", content: "Staff QR scanner for exhibition entry." },
-    { property: "og:title", content: "Ticket check-in — creativestudio" }, { property: "og:description", content: "Scan tickets at the door." },
+    { title: "Ticket check-in — Arwiqa أروقة" }, { name: "description", content: "Staff QR scanner for exhibition entry." },
+    { property: "og:title", content: "Ticket check-in — Arwiqa أروقة" }, { property: "og:description", content: "Scan tickets at the door." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
   component: () => <StaffGate><Scan /></StaffGate>,
