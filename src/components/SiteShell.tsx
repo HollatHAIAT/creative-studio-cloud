@@ -95,7 +95,7 @@ export function ArtCard({ a }: { a: Artwork }) {
   );
 }
 
-export function PageTitle({ eyebrow, title, sub }: { eyebrow: string; title: string; sub?: string }) {
+export function PageTitle({ eyebrow, title, sub }: { eyebrow: ReactNode; title: ReactNode; sub?: ReactNode }) {
   return (
     <div className="mx-auto max-w-7xl px-6 pb-10 pt-16">
       <p className="text-xs uppercase tracking-[0.3em] text-primary">{eyebrow}</p>

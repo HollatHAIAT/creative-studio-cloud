@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { T } from "@/lib/i18n";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore, type Delivery, type Report, type ReportMetric } from "@/lib/store";
 import { listingDaily, pct, SOURCES, sourceSplit, totals } from "@/lib/analytics";
@@ -76,7 +77,7 @@ function Reports() {
   const f = "w-full rounded-sm border border-border bg-background px-3 py-2";
   return (
     <SiteShell>
-      <PageTitle eyebrow="Analytics" title="Email reports" sub="Schedules are saved now. Emails will start sending once the email service is connected." />
+      <PageTitle eyebrow="Analytics" title={<T k="reports.title" />} sub="Schedules are saved now. Emails will start sending once the email service is connected." />
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 flex gap-4"><button onClick={() => setForm(blank())} className="rounded-full bg-primary px-6 py-3 text-primary-foreground">New schedule</button><Link to="/analytics" className="self-center text-sm underline">Back to analytics</Link></div>
 

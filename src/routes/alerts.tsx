@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { T } from "@/lib/i18n";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
 import { escalationFor, compliance, daysBetween, daysPast, defaultTargets, durLabel, groupDuration, SEVERITIES, severity, targetFor } from "@/lib/alert-rules";
@@ -100,7 +101,7 @@ function Alerts() {
 
   return (
     <SiteShell>
-      <PageTitle eyebrow="Analytics" title="Drop alerts" sub="Get notified when a listing's views, favorites or purchases fall sharply. Based on sample data until live tracking is connected." />
+      <PageTitle eyebrow="Analytics" title={<T k="alerts.title" />} sub="Get notified when a listing's views, favorites or purchases fall sharply. Based on sample data until live tracking is connected." />
       <div className="mx-auto max-w-7xl space-y-8 px-6">
         <div className="flex gap-4 text-sm"><Link to="/analytics" className="underline">Back to analytics</Link><Link to="/delivery" className="underline">Alert delivery, routing &amp; SLOs</Link></div>
         <div className="grid gap-6 lg:grid-cols-2">

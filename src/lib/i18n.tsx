@@ -129,3 +129,6 @@ export function useDocumentDirection() {
     document.documentElement.dir = dir;
   }, [locale, dir]);
 }
+
+/** Inline translated text, for places that just need a label. */
+export function T({ k }: { k: Key }) { return useLocale().t(k); }

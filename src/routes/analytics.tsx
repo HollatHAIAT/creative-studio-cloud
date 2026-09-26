@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, Download, Trophy, TrendingDown } from "lucide-react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
+import { T } from "@/lib/i18n";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { categories } from "@/lib/data";
 import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
@@ -78,7 +79,7 @@ function Analytics() {
   const sel = "rounded-full border border-border bg-background px-3 py-1.5 text-sm";
   return (
     <SiteShell>
-      <PageTitle eyebrow="Creator analytics" title="Performance" sub="Sample data for now — live tracking starts once accounts are connected." />
+      <PageTitle eyebrow="Creator analytics" title={<T k="an.title" />} sub="Sample data for now — live tracking starts once accounts are connected." />
       <div className="mx-auto max-w-7xl space-y-10 px-6">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex rounded-full border border-border p-1">

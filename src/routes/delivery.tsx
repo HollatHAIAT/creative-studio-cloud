@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { T } from "@/lib/i18n";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
 import { SEVERITIES } from "@/lib/alert-rules";
@@ -102,7 +103,7 @@ function Delivery() {
 
   return (
     <SiteShell>
-      <PageTitle eyebrow="Alerts" title="Delivery" sub="Where alerts go, what happens when a channel fails, and how reliably they arrive. Delivery results are simulated until real channels are connected." />
+      <PageTitle eyebrow="Alerts" title={<T k="delivery.title" />} sub="Where alerts go, what happens when a channel fails, and how reliably they arrive. Delivery results are simulated until real channels are connected." />
       <div className="mx-auto max-w-7xl space-y-8 px-6">
         <Link to="/alerts" className="text-sm underline">Back to alerts</Link>
 
