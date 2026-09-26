@@ -25,6 +25,7 @@ import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
 import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
 import { Route as AuctionsIdRouteImport } from './routes/auctions.$id'
 import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.saudi-banks'
+import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -106,6 +107,11 @@ const CollectionsSaudiBanksRoute = CollectionsSaudiBanksRouteImport.update({
   path: '/collections/saudi-banks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExhibitionsIdRoute = ExhibitionsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ExhibitionsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -115,7 +121,7 @@ export interface FileRoutesByFullPath {
   '/auctions': typeof AuctionsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
-  '/exhibitions': typeof ExhibitionsRoute
+  '/exhibitions': typeof ExhibitionsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/artwork/$id': typeof ArtworkIdRoute
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
+  '/exhibitions/$id': typeof ExhibitionsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -133,7 +140,7 @@ export interface FileRoutesByTo {
   '/auctions': typeof AuctionsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
-  '/exhibitions': typeof ExhibitionsRoute
+  '/exhibitions': typeof ExhibitionsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/artwork/$id': typeof ArtworkIdRoute
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
+  '/exhibitions/$id': typeof ExhibitionsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,7 +160,7 @@ export interface FileRoutesById {
   '/auctions': typeof AuctionsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
-  '/exhibitions': typeof ExhibitionsRoute
+  '/exhibitions': typeof ExhibitionsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/artwork/$id': typeof ArtworkIdRoute
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
+  '/exhibitions/$id': typeof ExhibitionsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/artwork/$id'
     | '/auctions/$id'
     | '/collections/saudi-banks'
+    | '/exhibitions/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/artwork/$id'
     | '/auctions/$id'
     | '/collections/saudi-banks'
+    | '/exhibitions/$id'
   id:
     | '__root__'
     | '/'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/artwork/$id'
     | '/auctions/$id'
     | '/collections/saudi-banks'
+    | '/exhibitions/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -227,7 +239,7 @@ export interface RootRouteChildren {
   AuctionsRoute: typeof AuctionsRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   DeliveryRoute: typeof DeliveryRoute
-  ExhibitionsRoute: typeof ExhibitionsRoute
+  ExhibitionsRoute: typeof ExhibitionsRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   FavoritesRoute: typeof FavoritesRoute
   ReportsRoute: typeof ReportsRoute
@@ -350,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsSaudiBanksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/exhibitions/$id': {
+      id: '/exhibitions/$id'
+      path: '/$id'
+      fullPath: '/exhibitions/$id'
+      preLoaderRoute: typeof ExhibitionsIdRouteImport
+      parentRoute: typeof ExhibitionsRoute
+    }
   }
 }
 
@@ -376,6 +395,18 @@ const AuctionsRouteWithChildren = AuctionsRoute._addFileChildren(
   AuctionsRouteChildren,
 )
 
+interface ExhibitionsRouteChildren {
+  ExhibitionsIdRoute: typeof ExhibitionsIdRoute
+}
+
+const ExhibitionsRouteChildren: ExhibitionsRouteChildren = {
+  ExhibitionsIdRoute: ExhibitionsIdRoute,
+}
+
+const ExhibitionsRouteWithChildren = ExhibitionsRoute._addFileChildren(
+  ExhibitionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlertsRoute: AlertsRoute,
@@ -384,7 +415,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuctionsRoute: AuctionsRouteWithChildren,
   DashboardRoute: DashboardRoute,
   DeliveryRoute: DeliveryRoute,
-  ExhibitionsRoute: ExhibitionsRoute,
+  ExhibitionsRoute: ExhibitionsRouteWithChildren,
   ExploreRoute: ExploreRoute,
   FavoritesRoute: FavoritesRoute,
   ReportsRoute: ReportsRoute,
