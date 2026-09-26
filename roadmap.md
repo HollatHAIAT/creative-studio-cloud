@@ -64,4 +64,6 @@
 - [ ] Fallback channels
 - [ ] Delivery performance view (success, latency, retries)
 - [ ] Time-range comparison + trend charts for delivery
+- [ ] Delivery SLO thresholds (channel, service, severity) + breach alerts
+- [ ] Delivery performance CSV export
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
