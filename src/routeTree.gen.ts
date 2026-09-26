@@ -23,6 +23,8 @@ import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
 import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
+import { Route as AuctionsIdRouteImport } from './routes/auctions.$id'
+import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.saudi-banks'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -94,13 +96,23 @@ const ArtworkIdRoute = ArtworkIdRouteImport.update({
   path: '/artwork/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuctionsIdRoute = AuctionsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuctionsRoute,
+} as any)
+const CollectionsSaudiBanksRoute = CollectionsSaudiBanksRouteImport.update({
+  id: '/collections/saudi-banks',
+  path: '/collections/saudi-banks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
   '/analytics': typeof AnalyticsRoute
   '/artists': typeof ArtistsRouteWithChildren
-  '/auctions': typeof AuctionsRoute
+  '/auctions': typeof AuctionsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRoute
@@ -110,13 +122,15 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
+  '/auctions/$id': typeof AuctionsIdRoute
+  '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alerts': typeof AlertsRoute
   '/analytics': typeof AnalyticsRoute
   '/artists': typeof ArtistsRouteWithChildren
-  '/auctions': typeof AuctionsRoute
+  '/auctions': typeof AuctionsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRoute
@@ -126,6 +140,8 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
+  '/auctions/$id': typeof AuctionsIdRoute
+  '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -133,7 +149,7 @@ export interface FileRoutesById {
   '/alerts': typeof AlertsRoute
   '/analytics': typeof AnalyticsRoute
   '/artists': typeof ArtistsRouteWithChildren
-  '/auctions': typeof AuctionsRoute
+  '/auctions': typeof AuctionsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRoute
@@ -143,6 +159,8 @@ export interface FileRoutesById {
   '/sell': typeof SellRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
+  '/auctions/$id': typeof AuctionsIdRoute
+  '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +179,8 @@ export interface FileRouteTypes {
     | '/sell'
     | '/artists/$id'
     | '/artwork/$id'
+    | '/auctions/$id'
+    | '/collections/saudi-banks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +197,8 @@ export interface FileRouteTypes {
     | '/sell'
     | '/artists/$id'
     | '/artwork/$id'
+    | '/auctions/$id'
+    | '/collections/saudi-banks'
   id:
     | '__root__'
     | '/'
@@ -193,6 +215,8 @@ export interface FileRouteTypes {
     | '/sell'
     | '/artists/$id'
     | '/artwork/$id'
+    | '/auctions/$id'
+    | '/collections/saudi-banks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -200,7 +224,7 @@ export interface RootRouteChildren {
   AlertsRoute: typeof AlertsRoute
   AnalyticsRoute: typeof AnalyticsRoute
   ArtistsRoute: typeof ArtistsRouteWithChildren
-  AuctionsRoute: typeof AuctionsRoute
+  AuctionsRoute: typeof AuctionsRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   DeliveryRoute: typeof DeliveryRoute
   ExhibitionsRoute: typeof ExhibitionsRoute
@@ -209,6 +233,7 @@ export interface RootRouteChildren {
   ReportsRoute: typeof ReportsRoute
   SellRoute: typeof SellRoute
   ArtworkIdRoute: typeof ArtworkIdRoute
+  CollectionsSaudiBanksRoute: typeof CollectionsSaudiBanksRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -311,6 +336,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtworkIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auctions/$id': {
+      id: '/auctions/$id'
+      path: '/$id'
+      fullPath: '/auctions/$id'
+      preLoaderRoute: typeof AuctionsIdRouteImport
+      parentRoute: typeof AuctionsRoute
+    }
+    '/collections/saudi-banks': {
+      id: '/collections/saudi-banks'
+      path: '/collections/saudi-banks'
+      fullPath: '/collections/saudi-banks'
+      preLoaderRoute: typeof CollectionsSaudiBanksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -325,12 +364,24 @@ const ArtistsRouteChildren: ArtistsRouteChildren = {
 const ArtistsRouteWithChildren =
   ArtistsRoute._addFileChildren(ArtistsRouteChildren)
 
+interface AuctionsRouteChildren {
+  AuctionsIdRoute: typeof AuctionsIdRoute
+}
+
+const AuctionsRouteChildren: AuctionsRouteChildren = {
+  AuctionsIdRoute: AuctionsIdRoute,
+}
+
+const AuctionsRouteWithChildren = AuctionsRoute._addFileChildren(
+  AuctionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlertsRoute: AlertsRoute,
   AnalyticsRoute: AnalyticsRoute,
   ArtistsRoute: ArtistsRouteWithChildren,
-  AuctionsRoute: AuctionsRoute,
+  AuctionsRoute: AuctionsRouteWithChildren,
   DashboardRoute: DashboardRoute,
   DeliveryRoute: DeliveryRoute,
   ExhibitionsRoute: ExhibitionsRoute,
@@ -339,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportsRoute: ReportsRoute,
   SellRoute: SellRoute,
   ArtworkIdRoute: ArtworkIdRoute,
+  CollectionsSaudiBanksRoute: CollectionsSaudiBanksRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
