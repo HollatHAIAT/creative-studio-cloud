@@ -9,7 +9,9 @@ export type Report = { id: string; name: string; frequency: "weekly" | "monthly"
   metrics?: ReportMetric[]; sources?: string[]; history?: Delivery[] };
 export type ReportMetric = "views" | "favorites" | "purchases" | "conversion" | "top";
 export type Delivery = { id: string; at: string; status: "sent" | "failed" | "upcoming" | "retrying"; error?: string };
-type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop" | "duration" | "ongoing"; dir: "desc" | "asc" }; alertPresets: AlertPreset[]; overdueNotified: Record<string, number>; owners: Record<string, { name: string; at: number }>; responder: string; maintenance: MaintenanceWindow[]; escalation: Escalation; routes: RouteRule[]; retry: RetryPolicy; manualDeliveries: Record<string, Channel>; slos: Slo[]; breachNotify: { destinations: Channel[]; renotifyHours: number }; breachNotified: Record<string, number>; audit: AuditEvent[] };
+type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop" | "duration" | "ongoing"; dir: "desc" | "asc" }; alertPresets: AlertPreset[]; overdueNotified: Record<string, number>; owners: Record<string, { name: string; at: number }>; responder: string; maintenance: MaintenanceWindow[]; escalation: Escalation; routes: RouteRule[]; retry: RetryPolicy; manualDeliveries: Record<string, Channel>; slos: Slo[]; breachNotify: { destinations: Channel[]; renotifyHours: number }; breachNotified: Record<string, number>; audit: AuditEvent[]; locale: "en" | "ar"; bids: Record<string, Bid[]>; bookings: Booking[] };
+export type Bid = { id: string; bidder: string; amount: number; at: number; mine?: boolean };
+export type Booking = { id: string; exhibitionId: string; date: string; slot: string; tickets: Record<string, number>; total: number; at: number };
 export type AuditEvent = { key: string; at: number; type: "status" | "acknowledged" | "resolved" | "reopened" | "claimed" | "released" | "notification" | "escalation"; actor: string; detail: string };
 export type Escalation = { enabled: boolean; responders: string[]; intervalHours: number };
 export type MaintenanceWindow = { id: string; start: string; end: string; note: string };
@@ -20,7 +22,7 @@ const empty: State = { mine: [], removed: [], favorites: [], views: [], reports:
   routes: [{ id: "r-default", service: "all", severity: "all", responder: "You", primary: "In-app", fallbacks: ["Email"] }, { id: "r-critical", service: "all", severity: "critical", responder: "You", primary: "SMS", fallbacks: ["Slack", "Email"] }],
   retry: defaultRetry, manualDeliveries: {},
   slos: [{ id: "slo-all", channel: "all", service: "all", severity: "all", minSuccess: 85, maxLatency: 8 }, { id: "slo-webhook", channel: "Webhook", service: "all", severity: "all", minSuccess: 90, maxLatency: 3 }],
-  breachNotify: { destinations: ["In-app"], renotifyHours: 0 }, breachNotified: {}, audit: [] };
+  breachNotify: { destinations: ["In-app"], renotifyHours: 0 }, breachNotified: {}, audit: [], locale: "en", bids: {}, bookings: [] };
 let state: State = empty;
 let loaded = false;
 const subs = new Set<() => void>();
@@ -59,6 +61,10 @@ function log(e: Omit<AuditEvent, "at" | "actor"> & { actor?: string }) {
 }
 
 export const actions = {
+  setLocale(l: "en" | "ar") { set({ ...state, locale: l }); },
+  addBid(auctionId: string, b: Bid) { set({ ...state, bids: { ...state.bids, [auctionId]: [...(state.bids[auctionId] ?? []), b] } }); },
+  book(b: Booking) { set({ ...state, bookings: [...state.bookings, b] }); },
+  cancelBooking(id: string) { set({ ...state, bookings: state.bookings.filter((x) => x.id !== id) }); },
   logAudit(e: Omit<AuditEvent, "at" | "actor"> & { actor?: string }) { set({ ...state, audit: log(e) }); },
   setRoutes(r: RouteRule[]) { set({ ...state, routes: r }); },
   setRetry(r: RetryPolicy) { set({ ...state, retry: r }); },
