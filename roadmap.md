@@ -79,3 +79,8 @@
 - [ ] Checkout design & full journey (cart, details, payment UI, confirmation) for tickets, artworks, licenses — no real payment provider yet
 - [ ] Access rules: users only reach their own data/files; admins manage assets
 - [ ] Asset page: upload/replace/delete files, store paths, preview
+- [ ] Realtime updates for bids, prices and ticket status
+- [ ] My orders page (tickets, artworks, licenses) with details, status and receipt link
+- [ ] Server-side bid validation incl. concurrent bids, with clear rejection reasons
+- [ ] In-account notification center: order confirmed, ticket status change, outbid
+- [ ] Wire remaining features end-to-end (frontend + backend)
