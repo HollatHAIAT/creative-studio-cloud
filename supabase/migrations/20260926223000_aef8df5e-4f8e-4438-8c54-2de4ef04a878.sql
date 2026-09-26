@@ -1,0 +1,4 @@
+CREATE POLICY "Anyone can download free digital assets" ON storage.objects FOR SELECT TO anon, authenticated USING (bucket_id = 'digital-downloads');
+CREATE POLICY "Admins upload digital assets" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'digital-downloads' AND public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins replace digital assets" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'digital-downloads' AND public.has_role(auth.uid(), 'admin')) WITH CHECK (bucket_id = 'digital-downloads' AND public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins delete digital assets" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'digital-downloads' AND public.has_role(auth.uid(), 'admin'));
