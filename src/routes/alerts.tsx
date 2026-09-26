@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
+import { daysBetween, daysPast, defaultTargets, durLabel, groupDuration, SEVERITIES, severity, targetFor } from "@/lib/alert-rules";
 import { alertHistory, dayKey, download, evaluate, toCsv, type Metric } from "@/lib/analytics";
 
 export const Route = createFileRoute("/alerts")({
@@ -20,15 +21,6 @@ export const Route = createFileRoute("/alerts")({
   component: Alerts,
 });
 
-const daysBetween = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
-/** First trigger → linked recovery of the latest episode; ongoing groups count to today. */
-function groupDuration(g: { triggers: { date: string; recoveredAt?: string }[] }) {
-  const first = g.triggers.reduce((m, t) => (t.date < m ? t.date : m), g.triggers[0]!.date);
-  const latest = g.triggers.reduce((m, t) => (t.date > m.date ? t : m), g.triggers[0]!);
-  const end = latest.recoveredAt ?? dayKey(Date.now());
-  return { first, end, days: daysBetween(first, end), ongoing: !latest.recoveredAt };
-}
-const durLabel = (d: ReturnType<typeof groupDuration>) => d.ongoing ? `${d.days} days · ongoing` : `${d.days} days`;
 const METRICS: Metric[] = ["views", "favorites", "purchases"];
 const card = "rounded-sm border border-border bg-card p-6";
 const inp = "rounded-sm border border-border bg-background px-3 py-2";
@@ -47,8 +39,8 @@ function Alerts() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [fRecovery, setFRecovery] = useState("all");
-  const target = cfg.recoveryTarget ?? 7;
-  const overdue = (g: Parameters<typeof groupDuration>[0]) => { const d = groupDuration(g); return d.ongoing && d.days > target; };
+  const targets = cfg.recoveryTargets ?? defaultTargets;
+  const overdue = (g: Parameters<typeof groupDuration>[0]) => daysPast(g, cfg) > 0;
 
   const setCfg = (patch: Partial<typeof cfg>) => actions.setAlerts({ ...cfg, ...patch });
   const togglePause = (id: string) => setCfg({ paused: cfg.paused.includes(id) ? cfg.paused.filter((x) => x !== id) : [...cfg.paused, id] });
@@ -91,8 +83,8 @@ function Alerts() {
 
   function exportCsv() {
     const origin = window.location.origin;
-    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Over recovery target", "Analytics link"]];
-    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", overdue(h) ? "yes" : "no", `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
+    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Severity", "Recovery target (days)", "Days past target", "Analytics link"]];
+    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", severity(h), targetFor(h, cfg), daysPast(h, cfg), `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
     download("creativestudio-alert-history.csv", toCsv(rows));
   }
   const DAYS = 30;
@@ -113,9 +105,12 @@ function Alerts() {
                   <span className="flex items-center gap-2"><input type="number" min={5} max={95} className={`${inp} w-20`} value={cfg.thresholds[m]} onChange={(e) => setCfg({ thresholds: { ...cfg.thresholds, [m]: Math.max(5, Math.min(95, +e.target.value || 5)) } })} />%</span>
                 </label>
               ))}
-              <label className="flex items-center justify-between text-sm">Recovery target
-                <span className="flex items-center gap-2"><input type="number" min={1} max={90} className={`${inp} w-20`} value={target} onChange={(e) => setCfg({ recoveryTarget: Math.max(1, Math.min(90, +e.target.value || 1)) })} />days</span>
-              </label>
+              <p className="pt-2 text-sm font-medium">Recovery targets by severity</p>
+              {SEVERITIES.map((sv) => (
+                <label key={sv} className="flex items-center justify-between text-sm capitalize">{sv} <span className="text-xs normal-case text-muted-foreground">{sv === "critical" ? "drop ≥ 60%" : sv === "high" ? "drop 45–60%" : "smaller drops"}</span>
+                  <span className="flex items-center gap-2"><input type="number" min={1} max={90} className={`${inp} w-20`} value={targets[sv]} onChange={(e) => setCfg({ recoveryTargets: { ...targets, [sv]: Math.max(1, Math.min(90, +e.target.value || 1)) } })} />days</span>
+                </label>
+              ))}
               <label className="flex items-center justify-between text-sm">Recent period
                 <select className={inp} value={cfg.recent} onChange={(e) => setCfg({ recent: +e.target.value })}>{[1, 3, 7, 14].map((n) => <option key={n} value={n}>Last {n} day{n > 1 ? "s" : ""}</option>)}</select>
               </label>
@@ -223,7 +218,8 @@ function Alerts() {
                     <p className="font-medium">{h.title} · <span className="capitalize">{h.metric}</span></p>
                     <span className="text-muted-foreground">{h.triggers.length} trigger{h.triggers.length > 1 ? "s" : ""} · {cfg.recent}d vs prior {cfg.prior}d</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${groupDuration(h).ongoing ? "border border-destructive text-destructive" : "border border-border"}`} title="Recovery duration">⏱ {durLabel(groupDuration(h))}</span>
-                    {overdue(h) && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs text-destructive-foreground">Over {target}-day target</span>}
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs capitalize">{severity(h)}</span>
+                    {overdue(h) && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs text-destructive-foreground">{daysPast(h, cfg)}d past {targetFor(h, cfg)}-day target</span>}
                     <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-destructive/10 text-destructive" : "bg-muted"}`}>{active ? "Still dropping" : "Recovered"}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs ${st === "open" ? "border border-border" : st === "resolved" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{st}</span>
                     <span className="ml-auto space-x-3">
@@ -235,7 +231,7 @@ function Alerts() {
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">{recoveryInfo(h)}</p>
                   <button onClick={() => setOpen(open.includes(h.key) ? open.filter((k) => k !== h.key) : [...open, h.key])} className="mt-2 text-xs underline" aria-expanded={open.includes(h.key)}>{open.includes(h.key) ? "Hide details" : "Show details"}</button>
-                  {open.includes(h.key) && <p className="mt-2 text-xs font-medium">Recovery duration: {durLabel(groupDuration(h))}{groupDuration(h).ongoing ? ` (elapsed since ${groupDuration(h).first})` : ` (${groupDuration(h).first} → ${groupDuration(h).end})`}</p>}
+                  {open.includes(h.key) && <p className="mt-2 text-xs font-medium">Recovery duration: {durLabel(groupDuration(h))}{groupDuration(h).ongoing ? ` (elapsed since ${groupDuration(h).first})` : ` (${groupDuration(h).first} → ${groupDuration(h).end})`} · <span className="capitalize">{severity(h)}</span> target {targetFor(h, cfg)} days{groupDuration(h).ongoing && (daysPast(h, cfg) > 0 ? <span className="text-destructive"> · {daysPast(h, cfg)} days past target</span> : <span> · {targetFor(h, cfg) - groupDuration(h).days} days left</span>)}</p>}
                   {open.includes(h.key) && <ol className="mt-2 border-l-2 border-border pl-4">
                     {h.triggers.flatMap((t) => [{ d: t.date, kind: "drop" as const, c: t.change, ref: t.date }, ...(t.recoveredAt ? [{ d: t.recoveredAt, kind: "recovery" as const, c: t.recoveryChange!, ref: t.date }] : [])]).sort((a, b) => a.d.localeCompare(b.d)).map((ev) => (
                       <li key={ev.kind + ev.d} className="relative py-1"><span className={`absolute -left-[21px] top-2 h-2.5 w-2.5 rounded-full ${ev.kind === "drop" ? "bg-destructive" : "bg-chart-2"}`} />

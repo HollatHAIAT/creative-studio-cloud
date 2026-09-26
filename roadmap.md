@@ -44,6 +44,9 @@
 - [ ] Sort ongoing groups by elapsed time (longest first)
 - [ ] Recovery-status filter (ongoing / recovered)
 - [ ] Recovery target threshold that flags overdue groups
+- [ ] Notify when ongoing group exceeds recovery target (uses notification prefs)
+- [ ] Days past target in details + CSV
+- [ ] Recovery targets per alert severity
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
