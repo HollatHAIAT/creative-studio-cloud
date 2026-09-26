@@ -128,7 +128,7 @@ function Alerts() {
           <div className={card}>
             <h2 className="font-display text-2xl">Notifications</h2>
             <div className="mt-4 space-y-3 text-sm">
-              <label className="flex items-center gap-2"><input type="checkbox" checked={notify.inApp} onChange={(e) => actions.setNotify({ ...notify, inApp: e.target.checked })} />In-app (banner on analytics)</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={notify.inApp} onChange={(e) => actions.setNotify({ ...notify, inApp: e.target.checked })} />In-app (pop-up and banner on analytics)</label>
               <label className="flex items-center gap-2"><input type="checkbox" checked={notify.email} onChange={(e) => actions.setNotify({ ...notify, email: e.target.checked })} />Email</label>
               {notify.email && (
                 <>
@@ -205,7 +205,7 @@ function Alerts() {
               <p className="mb-2 text-sm font-medium">By week</p>
               <div className="flex h-32 items-end gap-2">
                 {c.weeks.map((w) => (
-                  <div key={w.week} className="flex flex-1 flex-col items-center gap-1 text-xs" title={`${w.met}/${w.total} met`}>
+                  <div key={w.week} className="flex h-full flex-1 flex-col items-center justify-end gap-1 text-xs" title={`${w.met}/${w.total} met`}>
                     <span>{w.pct.toFixed(0)}%</span>
                     <div className="w-full rounded-t-sm bg-primary" style={{ height: `${Math.max(4, w.pct)}%` }} />
                     <span className="text-muted-foreground">{w.week.slice(5)}</span>
