@@ -5,7 +5,7 @@ import { en2, ar2 } from "./i18n-extra";
 export type Locale = "en" | "ar";
 
 const en = {
-  "brand.tagline": "The global marketplace for art, prints, auctions and exhibitions.",
+  "brand.name": "Arwiqa", "brand.tagline": "The global marketplace for art, prints, auctions and exhibitions.",
   "nav.explore": "Explore", "nav.auctions": "Auctions", "nav.exhibitions": "Exhibitions", "nav.artists": "Artists",
   "nav.collections": "Saudi Banks", "nav.dashboard": "Dashboard", "nav.analytics": "Analytics", "nav.sell": "Start selling",
   "nav.favorites": "Favorites", "lang.switch": "العربية",
@@ -59,7 +59,7 @@ const en = {
 export type Key = keyof typeof en;
 
 const ar: Record<Key, string> = {
-  "brand.tagline": "السوق العالمي للفن والمطبوعات والمزادات والمعارض.",
+  "brand.name": "أروقة", "brand.tagline": "السوق العالمي للفن والمطبوعات والمزادات والمعارض.",
   "nav.explore": "استكشف", "nav.auctions": "المزادات", "nav.exhibitions": "المعارض", "nav.artists": "الفنانون",
   "nav.collections": "البنوك السعودية", "nav.dashboard": "لوحة التحكم", "nav.analytics": "التحليلات", "nav.sell": "ابدأ البيع",
   "nav.favorites": "المفضلة", "lang.switch": "English",
