@@ -55,18 +55,18 @@
 - [x] Compliance date-range + listing/metric filters
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
-- [ ] Escalation policies for unacknowledged alert groups
-- [ ] Audit timeline per alert group (+ filters: type, responder, time)
-- [ ] Escalation dry-run preview
-- [ ] Notification routing by listing (service) + severity
-- [ ] Per-channel delivery status + retry
-- [ ] Retry interval + max attempts, exhausted outcome
-- [ ] Fallback channels
-- [ ] Delivery performance view (success, latency, retries)
-- [ ] Time-range comparison + trend charts for delivery
-- [ ] Delivery SLO thresholds (channel, service, severity) + breach alerts
-- [ ] Delivery performance CSV export
-- [ ] SLO breach history (start/recovery, channel, service, severity) + filters
-- [ ] Breach notification destinations + deduplication
-- [ ] Error budget + burn rate metrics
+- [x] Escalation policies for unacknowledged alert groups
+- [x] Audit timeline per alert group (+ filters: type, responder, time)
+- [x] Escalation dry-run preview
+- [x] Notification routing by listing (service) + severity
+- [x] Per-channel delivery status + retry
+- [x] Retry interval + max attempts, exhausted outcome
+- [x] Fallback channels
+- [x] Delivery performance view (success, latency, retries)
+- [x] Time-range comparison + trend charts for delivery
+- [x] Delivery SLO thresholds (channel, service, severity) + breach alerts
+- [x] Delivery performance CSV export
+- [x] SLO breach history (start/recovery, channel, service, severity) + filters
+- [x] Breach notification destinations + deduplication
+- [x] Error budget + burn rate metrics
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
