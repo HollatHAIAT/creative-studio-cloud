@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { actions, useStore } from "./store";
+import { en2, ar2 } from "./i18n-extra";
 
 export type Locale = "en" | "ar";
 
@@ -53,6 +54,7 @@ const en = {
   "form.addPrint": "Add print option", "form.size": "Size", "form.material": "Material", "form.price": "Price", "form.edition": "Edition size (0 = open)",
   "form.licenses": "Digital licenses", "form.personal": "Personal", "form.commercial": "Commercial", "form.extended": "Extended",
   "form.remove": "Remove", "form.needOption": "Add at least one option to sell (original, print or license)",
+  ...en2,
 };
 export type Key = keyof typeof en;
 
@@ -106,6 +108,7 @@ const ar: Record<Key, string> = {
   "form.addPrint": "أضف خيار طباعة", "form.size": "المقاس", "form.material": "الخامة", "form.price": "السعر", "form.edition": "حجم الإصدار (0 = مفتوح)",
   "form.licenses": "التراخيص الرقمية", "form.personal": "شخصي", "form.commercial": "تجاري", "form.extended": "موسّع",
   "form.remove": "إزالة", "form.needOption": "أضف خيار بيع واحدًا على الأقل (أصلي أو مطبوعة أو ترخيص)",
+  ...ar2,
 };
 
 const dicts = { en, ar };

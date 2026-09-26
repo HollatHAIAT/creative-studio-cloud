@@ -3,9 +3,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/SiteShell";
 import { exhibitions, fmt, seedListings, toArtwork } from "@/lib/data";
-import { actions, useStore } from "@/lib/store";
+import { actions } from "@/lib/store";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/lib/auth";
 import { useLocale, type Key } from "@/lib/i18n";
-import { dateRange, fmtDate, openDates, taken } from "@/lib/exhibitions";
+import { dateRange, fmtDate, openDates } from "@/lib/exhibitions";
 
 export const Route = createFileRoute("/exhibitions/$id")({
   loader: ({ params }) => {
@@ -29,16 +33,25 @@ const ticketKey: Record<"adult" | "student" | "vip", Key> = { adult: "ex.adult",
 function ExhibitionPage() {
   const e = Route.useLoaderData();
   const { t, pick, locale, num } = useLocale();
-  const { bookings } = useStore();
   const dates = openDates(e);
   const [date, setDate] = useState(dates[0] ?? "");
   const [slot, setSlot] = useState<string | null>(null);
   const [qty, setQty] = useState<Record<string, number>>({ [e.tickets[0]!.id]: 1 });
   const [room, setRoom] = useState(e.rooms[0]!.id);
   const [virtual, setVirtual] = useState(false);
-  const mine = bookings.filter((b) => b.exhibitionId === e.id);
-  const bookedHere = (d: string, s: string) => mine.filter((b) => b.date === d && b.slot === s).reduce((n, b) => n + Object.values(b.tickets).reduce((x, y) => x + y, 0), 0);
-  const left = (s: string) => e.capacity - taken(e, date, s) - bookedHere(date, s);
+  const navigate = useNavigate();
+  const { user } = useSession();
+  // Live availability from the database (refreshes every 15s).
+  const avail = useQuery({
+    queryKey: ["slots", e.id, date], enabled: !!date, refetchInterval: 15000,
+    queryFn: async () => { const { data } = await supabase.rpc("slot_bookings", { _exhibition_id: e.id, _date: date }); return Object.fromEntries((data ?? []).map((r) => [r.slot, r.booked])) as Record<string, number>; },
+  });
+  const mineQ = useQuery({
+    queryKey: ["orders", "bookings", e.id, user?.id], enabled: !!user,
+    queryFn: async () => (await supabase.from("bookings").select("id, reference, visit_date, slot, quantity, total, status, order_id").eq("exhibition_id", e.id).order("created_at", { ascending: false })).data ?? [],
+  });
+  const mine = mineQ.data ?? [];
+  const left = (s: string) => e.capacity - (avail.data?.[s] ?? 0);
   const count = Object.values(qty).reduce((a, b) => a + b, 0);
   const total = e.tickets.reduce((s, tk) => s + tk.price * (qty[tk.id] ?? 0), 0);
   const activeRoom = e.rooms.find((r) => r.id === room)!;
@@ -49,10 +62,9 @@ function ExhibitionPage() {
     if (!slot) return;
     if (count < 1) return;
     if (count > left(slot)) { toast.error(t("ex.soldOut")); return; }
-    const ref = `CS-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-    actions.book({ id: ref, exhibitionId: e.id, date, slot, tickets: qty, total, at: Date.now() });
-    toast.success(`${t("ex.booked")} · ${ref}`);
-    setSlot(null);
+    actions.addToCart({ key: `${e.id}:${date}:${slot}`, kind: "ticket", exhibitionId: e.id, date, slot, tickets: qty });
+    toast.success(t("cart.added"));
+    navigate({ to: "/checkout" });
   }
 
   return (
@@ -123,7 +135,7 @@ function ExhibitionPage() {
                 ))}
               </div>
               <div className="mt-4 flex justify-between border-t border-border pt-4"><span>{t("ex.total")}</span><span className="font-display text-2xl">{fmt(total)}</span></div>
-              <button disabled={!slot || count < 1} onClick={confirm} className="mt-4 w-full rounded-full bg-primary py-3 text-primary-foreground disabled:opacity-50">{t("ex.confirm")}</button>
+              <button disabled={!slot || count < 1} onClick={confirm} className="mt-4 w-full rounded-full bg-primary py-3 text-primary-foreground disabled:opacity-50">{t("ex.addToCart")}</button>
             </div>
           )}
 
@@ -133,8 +145,8 @@ function ExhibitionPage() {
               <ul className="mt-3 space-y-3 text-sm">
                 {mine.map((b) => (
                   <li key={b.id} className="flex items-center justify-between gap-2">
-                    <span>{fmtDate(b.date, locale)} · <span dir="ltr">{b.slot}</span> · {num(Object.values(b.tickets).reduce((x, y) => x + y, 0))} · {fmt(b.total)}<br /><span className="text-xs text-muted-foreground">{t("ex.ref")}: {b.id}</span></span>
-                    <button onClick={() => actions.cancelBooking(b.id)} className="text-xs text-destructive underline">{t("ex.cancel")}</button>
+                    <span>{fmtDate(b.visit_date, locale)} · <span dir="ltr">{b.slot}</span> · {num(b.quantity)} · {fmt(Number(b.total))}<br /><span className="text-xs text-muted-foreground">{t("ex.ref")}: {b.reference} · {t(`st.${b.status}` as Key)}</span></span>
+                    {b.order_id && <Link to="/orders/$id" params={{ id: b.order_id }} className="text-xs underline">{t("co.viewOrder")}</Link>}
                   </li>
                 ))}
               </ul>

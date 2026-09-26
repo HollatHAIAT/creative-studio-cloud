@@ -29,3 +29,45 @@ export function useNow(ms = 1000) {
   useEffect(() => { setNow(Date.now()); const i = setInterval(() => setNow(Date.now()), ms); return () => clearInterval(i); }, [ms]);
   return now;
 }
+
+// ---------- Database-backed auctions ----------
+import { useEffect as useEff } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+export type DbAuction = { id: string; listing_id: string; start_bid: number; increment: number; starts_at: string; ends_at: string };
+export type DbBid = { id: string; auction_id: string; user_id: string | null; bidder_name: string; amount: number; created_at: string };
+
+export function useDbAuctions() {
+  const qc = useQueryClient();
+  const q = useQuery({
+    queryKey: ["auctions"],
+    queryFn: async () => {
+      const [a, b] = await Promise.all([
+        supabase.from("auctions").select("id, listing_id, start_bid, increment, starts_at, ends_at"),
+        supabase.from("bids").select("id, auction_id, user_id, bidder_name, amount, created_at").order("created_at", { ascending: false }),
+      ]);
+      if (a.error) throw a.error;
+      return { auctions: (a.data ?? []).map((x) => ({ ...x, start_bid: Number(x.start_bid), increment: Number(x.increment) })) as DbAuction[],
+        bids: (b.data ?? []).map((x) => ({ ...x, amount: Number(x.amount) })) as DbBid[] };
+    },
+  });
+  // Realtime: any new bid refreshes prices everywhere.
+  useEff(() => {
+    const ch = supabase.channel("bids-live").on("postgres_changes", { event: "INSERT", schema: "public", table: "bids" }, () => {
+      qc.invalidateQueries({ queryKey: ["auctions"] }); qc.invalidateQueries({ queryKey: ["reserve"] });
+    }).subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [qc]);
+  return q;
+}
+export const dbStatus = (a: DbAuction, now: number): AuctionStatus => now < Date.parse(a.starts_at) ? "upcoming" : now >= Date.parse(a.ends_at) ? "closed" : "live";
+export function useReserveMet(id: string) {
+  return useQuery({ queryKey: ["reserve", id], queryFn: async () => !!(await supabase.rpc("auction_reserve_met", { _auction_id: id })).data });
+}
+/** Maps database rejection codes to a reason the bidder can understand. */
+export function bidRejection(message: string): { code: string; min?: number } {
+  const m = message.match(/(AUCTION_NOT_FOUND|AUCTION_NOT_STARTED|AUCTION_ENDED|BID_TOO_HIGH|BID_TOO_LOW)(?::([\d.]+))?/);
+  if (!m) return { code: "failed" };
+  return m[2] ? { code: m[1]!, min: Number(m[2]) } : { code: m[1]! };
+}
