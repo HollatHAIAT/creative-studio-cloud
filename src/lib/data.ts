@@ -11,7 +11,9 @@ export type Listing = {
   images: string[]; price: number; medium: string; year: number;
   description: string; formats: string[]; createdAt: number;
   auction?: { currentBid: number; endsIn: string; bids: number };
+  status?: ListingStatus;
 };
+export type ListingStatus = "draft" | "published" | "archived";
 export type Artwork = Listing & { image: string; artist: string; artistId: string };
 
 export type Creator = { id: string; name: string; city: string; discipline: string; image: string; bio: string; followers: number };
@@ -33,7 +35,7 @@ export const seedListings: Listing[] = [
 ];
 
 export const creatorOf = (id: string) => artists.find((a) => a.id === id);
-export const toArtwork = (l: Listing): Artwork => ({ ...l, image: l.images[0] ?? "", artist: creatorOf(l.creatorId)?.name ?? "Unknown", artistId: l.creatorId });
+export const toArtwork = (l: Listing): Artwork => ({ ...l, status: l.status ?? "published", image: l.images[0] ?? "", artist: creatorOf(l.creatorId)?.name ?? "Unknown", artistId: l.creatorId });
 export const artworks: Artwork[] = seedListings.map(toArtwork);
 
 export const exhibitions = [

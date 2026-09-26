@@ -17,4 +17,6 @@
 - [ ] Alerts for sudden drops
 - [ ] Saved analytics views
 - [ ] Scheduled email reports (weekly/monthly, send time, time zone)
+- [ ] Report email preview before saving
+- [ ] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

@@ -1,10 +1,12 @@
 import { useSyncExternalStore } from "react";
-import { seedListings, toArtwork, type Listing } from "./data";
+import { seedListings, toArtwork, type Listing, type ListingStatus } from "./data";
 
 // Demo persistence in the browser; to be replaced by Lovable Cloud with accounts.
-type State = { mine: Listing[]; removed: string[]; favorites: string[] };
+export type SavedView = { id: string; name: string; days: number; category: string; status: string };
+export type Report = { id: string; name: string; frequency: "weekly" | "monthly"; weekday: number; monthday: number; time: string; timezone: string; email: string; paused: boolean; includeSources: boolean };
+type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[] };
 const KEY = "creativestudio:v1";
-const empty: State = { mine: [], removed: [], favorites: [] };
+const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [] };
 let state: State = empty;
 let loaded = false;
 const subs = new Set<() => void>();
@@ -24,12 +26,19 @@ function subscribe(f: () => void) { load(); subs.add(f); queueMicrotask(f); retu
 export function useStore() {
   return useSyncExternalStore(subscribe, () => state, () => empty);
 }
-export function useListings() {
+/** Every listing the store knows about, any status (creator views). */
+export function useAllListings() {
   const s = useStore();
   const seed = seedListings.filter((l) => !s.removed.includes(l.id) && !s.mine.some((m) => m.id === l.id));
   return [...s.mine, ...seed].map(toArtwork);
 }
+/** Public marketplace: published only. */
+export function useListings() {
+  return useAllListings().filter((l) => l.status === "published");
+}
 export const DEMO_CREATOR = "layla-haddad";
+
+const findListing = (id: string) => state.mine.find((m) => m.id === id) ?? seedListings.find((l) => l.id === id);
 
 export const actions = {
   toggleFavorite(id: string) {
@@ -37,7 +46,21 @@ export const actions = {
     set({ ...state, favorites: f });
   },
   save(l: Listing) { set({ ...state, mine: [l, ...state.mine.filter((m) => m.id !== l.id)] }); },
-  remove(id: string) {
-    set({ ...state, mine: state.mine.filter((m) => m.id !== id), removed: [...state.removed, id], favorites: state.favorites.filter((x) => x !== id) });
+  remove(id: string) { actions.removeMany([id]); },
+  /** Returns an undo function. */
+  removeMany(ids: string[]) {
+    const prev = state;
+    set({ ...state, mine: state.mine.filter((m) => !ids.includes(m.id)), removed: [...state.removed, ...ids], favorites: state.favorites.filter((x) => !ids.includes(x)) });
+    return () => set({ ...state, mine: prev.mine, removed: prev.removed, favorites: prev.favorites });
   },
+  setStatus(ids: string[], status: ListingStatus) {
+    const prev = state.mine;
+    const updated = ids.map(findListing).filter(Boolean).map((l) => ({ ...l!, status }));
+    set({ ...state, mine: [...updated, ...state.mine.filter((m) => !ids.includes(m.id))] });
+    return () => set({ ...state, mine: prev });
+  },
+  saveView(v: SavedView) { set({ ...state, views: [...state.views.filter((x) => x.id !== v.id), v] }); },
+  deleteView(id: string) { set({ ...state, views: state.views.filter((x) => x.id !== id) }); },
+  saveReport(r: Report) { set({ ...state, reports: [...state.reports.filter((x) => x.id !== r.id), r] }); },
+  deleteReport(id: string) { set({ ...state, reports: state.reports.filter((x) => x.id !== id) }); },
 };
