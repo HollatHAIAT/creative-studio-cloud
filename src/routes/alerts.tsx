@@ -20,6 +20,15 @@ export const Route = createFileRoute("/alerts")({
   component: Alerts,
 });
 
+const daysBetween = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
+/** First trigger → linked recovery of the latest episode; ongoing groups count to today. */
+function groupDuration(g: { triggers: { date: string; recoveredAt?: string }[] }) {
+  const first = g.triggers.reduce((m, t) => (t.date < m ? t.date : m), g.triggers[0]!.date);
+  const latest = g.triggers.reduce((m, t) => (t.date > m.date ? t : m), g.triggers[0]!);
+  const end = latest.recoveredAt ?? dayKey(Date.now());
+  return { first, end, days: daysBetween(first, end), ongoing: !latest.recoveredAt };
+}
+const durLabel = (d: ReturnType<typeof groupDuration>) => d.ongoing ? `${d.days} days · ongoing` : `${d.days} days`;
 const METRICS: Metric[] = ["views", "favorites", "purchases"];
 const card = "rounded-sm border border-border bg-card p-6";
 const inp = "rounded-sm border border-border bg-background px-3 py-2";
@@ -50,18 +59,16 @@ function Alerts() {
       const st = review[h.key] ?? "open";
       return h.triggers.length > 0 && (fListing === "all" || h.listingId === fListing) && (fMetric === "all" || h.metric === fMetric) && (fStatus === "all" || st === fStatus);
     })
-    .sort((x, y) => dir * (sortBy === "repeats" ? y.triggers.length - x.triggers.length
+    .sort((x, y) => dir * (sortBy === "duration" ? groupDuration(y).days - groupDuration(x).days : sortBy === "repeats" ? y.triggers.length - x.triggers.length
       : sortBy === "drop" ? Math.min(...x.triggers.map((t) => t.change)) - Math.min(...y.triggers.map((t) => t.change))
       : y.triggers[0]!.date.localeCompare(x.triggers[0]!.date)));
 
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE));
   const curPage = Math.min(page, pages);
   const pageItems = filtered.slice((curPage - 1) * PAGE, curPage * PAGE);
-  const daysBetween = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
   const recoveryInfo = (h: (typeof filtered)[number]) => {
-    const first = [...h.triggers].sort((a, b) => a.date.localeCompare(b.date))[0]!;
-    const latest = h.triggers[0]!;
-    return latest.recoveredAt ? `Recovered in ${daysBetween(first.date, latest.recoveredAt)} days (first trigger ${first.date} → recovery ${latest.recoveredAt})` : `Ongoing for ${daysBetween(first.date, dayKey(Date.now()))} days since ${first.date}`;
+    const d = groupDuration(h);
+    return d.ongoing ? `Ongoing — ${d.days} days since first trigger on ${d.first}, not yet recovered` : `Recovered in ${d.days} days (first trigger ${d.first} → recovery ${d.end})`;
   };
   function savePreset() {
     const name = prompt("Name this preset")?.trim();
@@ -80,8 +87,8 @@ function Alerts() {
 
   function exportCsv() {
     const origin = window.location.origin;
-    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Analytics link"]];
-    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
+    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Analytics link"]];
+    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
     download("creativestudio-alert-history.csv", toCsv(rows));
   }
   const DAYS = 30;
@@ -180,7 +187,7 @@ function Alerts() {
             <select className={inp} value={fStatus} onChange={(e) => { setFStatus(e.target.value); setPage(1); }}><option value="all">All statuses</option><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select>
             <input type="date" className={inp} value={from} onChange={(e) => { setFrom(e.target.value); setPage(1); }} aria-label="From date" />
             <input type="date" className={inp} value={to} onChange={(e) => { setTo(e.target.value); setPage(1); }} aria-label="To date" />
-            <select className={inp} value={sortBy} onChange={(e) => actions.setAlertSort({ ...alertSort, by: e.target.value as typeof sortBy })} aria-label="Sort"><option value="latest">Latest trigger</option><option value="repeats">Most repeats</option><option value="drop">Largest drop</option></select>
+            <select className={inp} value={sortBy} onChange={(e) => actions.setAlertSort({ ...alertSort, by: e.target.value as typeof sortBy })} aria-label="Sort"><option value="latest">Latest trigger</option><option value="repeats">Most repeats</option><option value="drop">Largest drop</option><option value="duration">Longest recovery</option></select>
             <button className={inp} onClick={() => actions.setAlertSort({ ...alertSort, dir: alertSort.dir === "desc" ? "asc" : "desc" })} aria-label="Toggle sort direction">{alertSort.dir === "desc" ? "↓ Desc" : "↑ Asc"}</button>
             <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("acknowledged")}>Acknowledge all ({filtered.length})</button>
             <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("resolved")}>Resolve all ({filtered.length})</button>
@@ -207,6 +214,7 @@ function Alerts() {
                   <div className="flex flex-wrap items-center gap-3">
                     <p className="font-medium">{h.title} · <span className="capitalize">{h.metric}</span></p>
                     <span className="text-muted-foreground">{h.triggers.length} trigger{h.triggers.length > 1 ? "s" : ""} · {cfg.recent}d vs prior {cfg.prior}d</span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${groupDuration(h).ongoing ? "border border-destructive text-destructive" : "border border-border"}`} title="Recovery duration">⏱ {durLabel(groupDuration(h))}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-destructive/10 text-destructive" : "bg-muted"}`}>{active ? "Still dropping" : "Recovered"}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs ${st === "open" ? "border border-border" : st === "resolved" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{st}</span>
                     <span className="ml-auto space-x-3">
@@ -218,6 +226,7 @@ function Alerts() {
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">{recoveryInfo(h)}</p>
                   <button onClick={() => setOpen(open.includes(h.key) ? open.filter((k) => k !== h.key) : [...open, h.key])} className="mt-2 text-xs underline" aria-expanded={open.includes(h.key)}>{open.includes(h.key) ? "Hide details" : "Show details"}</button>
+                  {open.includes(h.key) && <p className="mt-2 text-xs font-medium">Recovery duration: {durLabel(groupDuration(h))}{groupDuration(h).ongoing ? ` (elapsed since ${groupDuration(h).first})` : ` (${groupDuration(h).first} → ${groupDuration(h).end})`}</p>}
                   {open.includes(h.key) && <ol className="mt-2 border-l-2 border-border pl-4">
                     {h.triggers.flatMap((t) => [{ d: t.date, kind: "drop" as const, c: t.change, ref: t.date }, ...(t.recoveredAt ? [{ d: t.recoveredAt, kind: "recovery" as const, c: t.recoveryChange!, ref: t.date }] : [])]).sort((a, b) => a.d.localeCompare(b.d)).map((ev) => (
                       <li key={ev.kind + ev.d} className="relative py-1"><span className={`absolute -left-[21px] top-2 h-2.5 w-2.5 rounded-full ${ev.kind === "drop" ? "bg-destructive" : "bg-chart-2"}`} />

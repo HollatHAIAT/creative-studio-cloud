@@ -38,6 +38,9 @@
 - [ ] Saved alert filter presets
 - [ ] Alert history pagination (keeps filters + sort)
 - [ ] Recovery duration per alert group
+- [ ] Recovery-duration column + sort by longest
+- [ ] Duration in CSV + detail view
+- [ ] Ongoing elapsed time for unrecovered groups
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
