@@ -70,3 +70,43 @@ export function perf(records: DeliveryRecord[], by: (r: DeliveryRecord, a: Attem
 }
 export function inRange(r: DeliveryRecord, from: number, to: number) { const t = Date.parse(r.date); return t >= from && t < to; }
 export const today = () => Date.parse(dayKey(Date.now())) + 86400000;
+
+const matches = (s: Slo, r: DeliveryRecord, a: Attempt) =>
+  (s.channel === "all" || s.channel === a.channel) && (s.service === "all" || s.service === r.service) && (s.severity === "all" || s.severity === r.severity);
+
+/** Daily success % and latency for attempts an SLO covers. */
+export function sloDaily(s: Slo, records: DeliveryRecord[]) {
+  const m = new Map<string, { sent: number; ok: number; lat: number }>();
+  for (const r of records) for (const a of r.attempts) if (matches(s, r, a)) {
+    const d = dayKey(a.at); const x = m.get(d) ?? { sent: 0, ok: 0, lat: 0 };
+    x.sent++; if (a.ok) { x.ok++; x.lat += a.latency; } m.set(d, x);
+  }
+  return [...m.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, x]) => ({ date, sent: x.sent, success: (x.ok / x.sent) * 100, latency: x.ok ? x.lat / x.ok : 0 }));
+}
+export type Breach = { id: string; slo: Slo; start: string; end?: string; kind: ("success" | "latency")[]; worstSuccess: number; worstLatency: number };
+/** Consecutive days violating an SLO form one breach episode; the first compliant day is its recovery. */
+export function breaches(slos: Slo[], records: DeliveryRecord[]): Breach[] {
+  const out: Breach[] = [];
+  for (const s of slos) {
+    let cur: Breach | undefined;
+    for (const d of sloDaily(s, records)) {
+      const kind: Breach["kind"] = [];
+      if (d.success < s.minSuccess) kind.push("success");
+      if (d.latency > s.maxLatency) kind.push("latency");
+      if (kind.length) {
+        if (!cur) { cur = { id: `${s.id}:${d.date}`, slo: s, start: d.date, kind: [], worstSuccess: 100, worstLatency: 0 }; out.push(cur); }
+        cur.kind = [...new Set([...cur.kind, ...kind])]; cur.worstSuccess = Math.min(cur.worstSuccess, d.success); cur.worstLatency = Math.max(cur.worstLatency, d.latency);
+      } else if (cur) { cur.end = d.date; cur = undefined; }
+    }
+  }
+  return out.sort((a, b) => b.start.localeCompare(a.start));
+}
+/** Error budget over a window: allowed failures = (1 − target) × attempts. Burn rate 1 = consuming budget exactly as fast as allowed. */
+export function errorBudget(s: Slo, records: DeliveryRecord[]) {
+  let sent = 0, failed = 0;
+  for (const r of records) for (const a of r.attempts) if (matches(s, r, a)) { sent++; if (!a.ok) failed++; }
+  const allowed = sent * (1 - s.minSuccess / 100);
+  const consumed = allowed ? (failed / allowed) * 100 : failed ? Infinity : 0;
+  const burn = sent && s.minSuccess < 100 ? (failed / sent) / (1 - s.minSuccess / 100) : 0;
+  return { sent, failed, allowed: Math.round(allowed), consumed, remaining: Math.max(0, 100 - consumed), burn };
+}

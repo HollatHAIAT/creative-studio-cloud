@@ -66,4 +66,7 @@
 - [ ] Time-range comparison + trend charts for delivery
 - [ ] Delivery SLO thresholds (channel, service, severity) + breach alerts
 - [ ] Delivery performance CSV export
+- [ ] SLO breach history (start/recovery, channel, service, severity) + filters
+- [ ] Breach notification destinations + deduplication
+- [ ] Error budget + burn rate metrics
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
