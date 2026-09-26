@@ -95,3 +95,6 @@
 - [ ] Real payment provider connection (later phase, per owner)
 - [ ] Run concurrent-bid live test (needs two test accounts)
 - [ ] Creator dashboard listings still stored in browser — move to database
+
+- [ ] Fix sign-in page loading + admin access for Alhabaty@gmail.com
+- [ ] Rename platform to أروقة (Arwiqa) + palm & brush logo
