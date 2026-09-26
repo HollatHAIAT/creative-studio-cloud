@@ -3,9 +3,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { BankTile } from "@/components/BankTile";
-import { saudiBanks } from "@/lib/data";
+import { Link } from "@tanstack/react-router";
+import { useAssets, resolveBlob } from "@/lib/assets-db";
 import { useLocale } from "@/lib/i18n";
-import { FORMATS, assetBlob, fileName, metadataCsv, save, zip, type AssetFormat } from "@/lib/bank-assets";
+import { FORMATS, metadataCsv, save, type AssetFormat } from "@/lib/bank-assets";
 
 export const Route = createFileRoute("/collections/saudi-banks")({
   head: () => ({
@@ -27,6 +28,9 @@ function Banks() {
   const [fmtSel, setFmt] = useState<AssetFormat | "best">("best");
   const [busy, setBusy] = useState(false);
   const f: AssetFormat = fmtSel === "best" ? "svg" : fmtSel;
+  const q = useAssets();
+  const saudiBanks = q.data?.banks ?? [];
+  const files = q.data?.files ?? [];
   const chosen = saudiBanks.filter((b) => sel.includes(b.id));
 
   async function run(fn: () => Promise<void>) {
@@ -36,8 +40,13 @@ function Banks() {
   }
   const downloadSelected = () => run(async () => {
     const one = chosen.length === 1 ? chosen[0] : undefined;
-    if (one) save(await assetBlob(one, f), fileName(one, f));
-    else save(await zip(chosen, f), `saudi-banks-${f}.zip`);
+    if (one) { const r = await resolveBlob(one, f, files); save(r.blob, r.name); return; }
+    const JSZip = (await import("jszip")).default;
+    const z = new JSZip();
+    for (const b of chosen) { const r = await resolveBlob(b, f, files); z.file(r.name, r.blob); }
+    z.file("metadata.csv", metadataCsv(chosen, f));
+    z.file("LICENSE.txt", "Free for editorial and personal use. Trademarks belong to their owners; commercial use needs the owner's permission. Files marked placeholder are NOT official logos.\n");
+    save(await z.generateAsync({ type: "blob" }), `saudi-banks-${f}.zip`);
   });
 
   return (
@@ -63,7 +72,7 @@ function Banks() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-          {saudiBanks.map((b) => <BankTile key={b.id} b={b} selected={sel.includes(b.id)} onToggle={() => setSel((s) => (s.includes(b.id) ? s.filter((x) => x !== b.id) : [...s, b.id]))} />)}
+          {saudiBanks.map((b) => (<div key={b.id}><BankTile b={b} selected={sel.includes(b.id)} onToggle={() => setSel((s) => (s.includes(b.id) ? s.filter((x) => x !== b.id) : [...s, b.id]))} /><Link to="/assets/$id" params={{ id: b.id }} className="mt-1 block text-xs underline">{t("asset.files")} ({files.filter((x) => x.asset_id === b.id).length})</Link></div>))}
         </div>
 
         <section className="mt-12 grid gap-6 md:grid-cols-3">

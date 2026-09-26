@@ -31,6 +31,9 @@ import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
 import { Route as AuctionsIdRouteImport } from './routes/auctions.$id'
 import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.saudi-banks'
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
+import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminScanRouteImport } from './routes/_authenticated/admin.scan'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 
@@ -144,6 +147,23 @@ const ExhibitionsIdRoute = ExhibitionsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ExhibitionsRoute,
 } as any)
+const AuthenticatedAdminOrdersRoute =
+  AuthenticatedAdminOrdersRouteImport.update({
+    id: '/admin/orders',
+    path: '/admin/orders',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/admin/reports',
+    path: '/admin/reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminScanRoute = AuthenticatedAdminScanRouteImport.update({
+  id: '/admin/scan',
+  path: '/admin/scan',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOrdersIndexRoute =
   AuthenticatedOrdersIndexRouteImport.update({
     id: '/orders/',
@@ -178,6 +198,9 @@ export interface FileRoutesByFullPath {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/scan': typeof AuthenticatedAdminScanRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
 }
@@ -203,6 +226,9 @@ export interface FileRoutesByTo {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/scan': typeof AuthenticatedAdminScanRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
 }
@@ -230,6 +256,9 @@ export interface FileRoutesById {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/scan': typeof AuthenticatedAdminScanRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
 }
@@ -257,6 +286,9 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/admin/orders'
+    | '/admin/reports'
+    | '/admin/scan'
     | '/orders/$id'
     | '/orders/'
   fileRoutesByTo: FileRoutesByTo
@@ -282,6 +314,9 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/admin/orders'
+    | '/admin/reports'
+    | '/admin/scan'
     | '/orders/$id'
     | '/orders'
   id:
@@ -308,6 +343,9 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/_authenticated/admin/orders'
+    | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/scan'
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/'
   fileRoutesById: FileRoutesById
@@ -488,6 +526,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExhibitionsIdRouteImport
       parentRoute: typeof ExhibitionsRoute
     }
+    '/_authenticated/admin/orders': {
+      id: '/_authenticated/admin/orders'
+      path: '/admin/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/scan': {
+      id: '/_authenticated/admin/scan'
+      path: '/admin/scan'
+      fullPath: '/admin/scan'
+      preLoaderRoute: typeof AuthenticatedAdminScanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/': {
       id: '/_authenticated/orders/'
       path: '/orders'
@@ -508,6 +567,9 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminScanRoute: typeof AuthenticatedAdminScanRoute
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
 }
@@ -515,6 +577,9 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedAdminScanRoute: AuthenticatedAdminScanRoute,
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
 }
