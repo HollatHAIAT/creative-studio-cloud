@@ -17,42 +17,42 @@
 - [x] Alerts for sudden drops
 - [x] Saved analytics views
 - [~] Scheduled email reports: schedules, weekly/monthly, time zone done — actual sending waits on connecting an email service
-- [ ] Delivery history (sent/failed/upcoming) + retry
-- [ ] Choose metrics + sources per report
-- [ ] Alert thresholds + comparison periods
-- [ ] Alert trigger preview
-- [ ] Alert history
-- [ ] Per-listing pause/resume alerts
-- [ ] Acknowledge / resolve alerts
-- [ ] Alert notification preferences (email, in-app)
-- [ ] Alert history filters (listing, metric, status, dates)
-- [ ] Recovery events linked to original alert
-- [ ] Group repeated alerts per listing + metric
-- [ ] Link alert entries to listing analytics for same period
-- [ ] Timeline of alert groups vs recovery events
-- [ ] CSV export of filtered alert history
-- [ ] Sort alert groups (latest, repeats, largest drop)
-- [ ] Bulk acknowledge / resolve alerts (confirm + undo)
-- [ ] Expandable chronological alert detail
-- [ ] Remember alert sort order + direction
-- [ ] Saved alert filter presets
-- [ ] Alert history pagination (keeps filters + sort)
-- [ ] Recovery duration per alert group
-- [ ] Recovery-duration column + sort by longest
-- [ ] Duration in CSV + detail view
-- [ ] Ongoing elapsed time for unrecovered groups
-- [ ] Sort ongoing groups by elapsed time (longest first)
-- [ ] Recovery-status filter (ongoing / recovered)
-- [ ] Recovery target threshold that flags overdue groups
-- [ ] Notify when ongoing group exceeds recovery target (uses notification prefs)
-- [ ] Days past target in details + CSV
-- [ ] Recovery targets per alert severity
-- [ ] Recovery-target compliance summary (over time + by severity)
-- [ ] Notification cooldown for overdue groups
-- [ ] Compliance CSV export (weekly + severity)
-- [ ] Claim / ownership of ongoing alert groups
-- [ ] Maintenance windows pausing overdue notifications
-- [ ] Compliance date-range + listing/metric filters
+- [x] Delivery history (sent/failed/upcoming) + retry
+- [x] Choose metrics + sources per report
+- [x] Alert thresholds + comparison periods
+- [x] Alert trigger preview
+- [x] Alert history
+- [x] Per-listing pause/resume alerts
+- [x] Acknowledge / resolve alerts
+- [x] Alert notification preferences (email, in-app)
+- [x] Alert history filters (listing, metric, status, dates)
+- [x] Recovery events linked to original alert
+- [x] Group repeated alerts per listing + metric
+- [x] Link alert entries to listing analytics for same period
+- [x] Timeline of alert groups vs recovery events
+- [x] CSV export of filtered alert history
+- [x] Sort alert groups (latest, repeats, largest drop)
+- [x] Bulk acknowledge / resolve alerts (confirm + undo)
+- [x] Expandable chronological alert detail
+- [x] Remember alert sort order + direction
+- [x] Saved alert filter presets
+- [x] Alert history pagination (keeps filters + sort)
+- [x] Recovery duration per alert group
+- [x] Recovery-duration column + sort by longest
+- [x] Duration in CSV + detail view
+- [x] Ongoing elapsed time for unrecovered groups
+- [x] Sort ongoing groups by elapsed time (longest first)
+- [x] Recovery-status filter (ongoing / recovered)
+- [x] Recovery target threshold that flags overdue groups
+- [x] Notify when ongoing group exceeds recovery target (uses notification prefs)
+- [x] Days past target in details + CSV
+- [x] Recovery targets per alert severity
+- [x] Recovery-target compliance summary (over time + by severity)
+- [x] Notification cooldown for overdue groups
+- [x] Compliance CSV export (weekly + severity)
+- [x] Claim / ownership of ongoing alert groups
+- [x] Maintenance windows pausing overdue notifications
+- [x] Compliance date-range + listing/metric filters
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
