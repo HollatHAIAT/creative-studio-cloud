@@ -84,3 +84,9 @@
 - [ ] Server-side bid validation incl. concurrent bids, with clear rejection reasons
 - [ ] In-account notification center: order confirmed, ticket status change, outbid
 - [ ] Wire remaining features end-to-end (frontend + backend)
+- [ ] Admin orders panel: review tickets/artworks/licenses orders, update status, change log
+- [ ] Integration tests for concurrent bids (price stays correct, rejection reason shown)
+- [ ] Ticket issuing + check-in validation at entry, usage status
+- [ ] Cancel/refund requests: eligibility rules, admin review, decision log, buyer notified
+- [ ] Admin reports: sales, orders, ticket activity, bids; date filters; CSV export
+- [ ] Notification settings: choose order / ticket / bid alerts
