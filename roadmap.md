@@ -56,4 +56,12 @@
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Escalation policies for unacknowledged alert groups
+- [ ] Audit timeline per alert group (+ filters: type, responder, time)
+- [ ] Escalation dry-run preview
+- [ ] Notification routing by listing (service) + severity
+- [ ] Per-channel delivery status + retry
+- [ ] Retry interval + max attempts, exhausted outcome
+- [ ] Fallback channels
+- [ ] Delivery performance view (success, latency, retries)
+- [ ] Time-range comparison + trend charts for delivery
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
