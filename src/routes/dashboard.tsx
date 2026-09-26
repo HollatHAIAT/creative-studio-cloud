@@ -2,9 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
-import { categories, creatorOf, fmt, type Category, type Listing } from "@/lib/data";
-import { actions, DEMO_CREATOR, useListings } from "@/lib/store";
+import { categories, creatorOf, fmt, type Category, type Listing, type ListingStatus } from "@/lib/data";
+import { actions, DEMO_CREATOR, useAllListings } from "@/lib/store";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -22,8 +23,8 @@ export const Route = createFileRoute("/dashboard")({
 
 const MAX_FILES = 5, MAX_MB = 5, TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-type Form = { id?: string; title: string; category: Category; price: string; medium: string; year: string; description: string; formats: string; images: string[] };
-const blank: Form = { title: "", category: "Painting", price: "", medium: "", year: String(new Date().getFullYear()), description: "", formats: "Original, Print", images: [] };
+type Form = { id?: string; title: string; category: Category; price: string; medium: string; year: string; description: string; formats: string; images: string[]; status: ListingStatus };
+const blank: Form = { title: "", category: "Painting", price: "", medium: "", year: String(new Date().getFullYear()), description: "", formats: "Original, Print", images: [], status: "draft" };
 
 function shrink(file: File): Promise<string> {
   return new Promise((res, rej) => {
@@ -42,10 +43,26 @@ function shrink(file: File): Promise<string> {
 }
 
 function Dashboard() {
-  const mine = useListings().filter((l) => l.creatorId === DEMO_CREATOR);
+  const [sel, setSel] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const mine = useAllListings().filter((l) => l.creatorId === DEMO_CREATOR);
   const [form, setForm] = useState<Form | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const creator = creatorOf(DEMO_CREATOR)!;
+  const [confirmDel, setConfirmDel] = useState(false);
+  const shown = mine.filter((l) => statusFilter === "all" || l.status === statusFilter);
+  function bulk(status: ListingStatus) {
+    const n = sel.length;
+    const undo = actions.setStatus(sel, status);
+    setSel([]);
+    toast.success(`${n} listing${n > 1 ? "s" : ""} set to ${status}`, { action: { label: "Undo", onClick: undo }, duration: 8000 });
+  }
+  function bulkDelete() {
+    const n = sel.length;
+    const undo = actions.removeMany(sel);
+    setSel([]); setConfirmDel(false);
+    toast(`${n} listing${n > 1 ? "s" : ""} deleted`, { action: { label: "Undo", onClick: undo }, duration: 10000 });
+  }
 
   async function onFiles(files: FileList | null) {
     if (!files || !form) return;
@@ -80,14 +97,14 @@ function Dashboard() {
       title: form.title.trim(), creatorId: DEMO_CREATOR, category: form.category, images: form.images,
       price, medium: form.medium.trim(), year: Number(form.year) || new Date().getFullYear(),
       description: form.description.trim(), formats: form.formats.split(",").map((s) => s.trim()).filter(Boolean),
-      createdAt: existing?.createdAt ?? Date.now(), auction: existing?.auction,
+      createdAt: existing?.createdAt ?? Date.now(), auction: existing?.auction, status: form.status,
     };
     actions.save(listing);
     toast.success(form.id ? "Listing updated" : "Listing published");
     setForm(null);
   }
 
-  const edit = (l: Listing) => { setErrors([]); setForm({ id: l.id, title: l.title, category: l.category, price: String(l.price), medium: l.medium, year: String(l.year), description: l.description, formats: l.formats.join(", "), images: l.images }); };
+  const edit = (l: Listing) => { setErrors([]); setForm({ id: l.id, title: l.title, category: l.category, price: String(l.price), medium: l.medium, year: String(l.year), description: l.description, formats: l.formats.join(", "), images: l.images, status: l.status ?? "published" }); };
   const field = "w-full rounded-sm border border-border bg-background px-3 py-2";
 
   return (
@@ -104,6 +121,7 @@ function Dashboard() {
             <label className="text-sm">Price (USD)<input type="number" min="1" className={field} value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label>
             <label className="text-sm">Year<input type="number" className={field} value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} /></label>
             <label className="text-sm">Medium<input className={field} value={form.medium} maxLength={100} onChange={(e) => setForm({ ...form, medium: e.target.value })} /></label>
+            <label className="text-sm">Visibility<select className={field} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as ListingStatus })}><option value="draft">Draft — only you</option><option value="published">Published — on marketplace</option><option value="archived">Archived — hidden</option></select></label>
             <label className="text-sm">Formats (comma separated)<input className={field} value={form.formats} onChange={(e) => setForm({ ...form, formats: e.target.value })} /></label>
             <label className="text-sm md:col-span-2">Description<textarea rows={4} maxLength={2000} className={field} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
             <div className="md:col-span-2">
@@ -125,26 +143,55 @@ function Dashboard() {
             </div>
             {errors.length > 0 && <ul className="text-sm text-destructive md:col-span-2">{errors.map((e) => <li key={e}>• {e}</li>)}</ul>}
             <div className="flex gap-3 md:col-span-2">
-              <button className="rounded-full bg-primary px-6 py-3 text-primary-foreground">{form.id ? "Save changes" : "Publish"}</button>
+              <button className="rounded-full bg-primary px-6 py-3 text-primary-foreground">{form.id ? "Save changes" : form.status === "published" ? "Publish" : "Save"}</button>
               <button type="button" onClick={() => setForm(null)} className="rounded-full border border-border px-6 py-3">Cancel</button>
             </div>
           </form>
         )}
 
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={shown.length > 0 && sel.length === shown.length} onChange={(e) => setSel(e.target.checked ? shown.map((l) => l.id) : [])} /> Select all</label>
+          <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setSel([]); }} className="rounded-full border border-border bg-background px-3 py-1.5 text-sm">
+            <option value="all">All states</option><option value="draft">Drafts</option><option value="published">Published</option><option value="archived">Archived</option>
+          </select>
+          {sel.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 rounded-full bg-muted px-4 py-1.5 text-sm">
+              <span>{sel.length} selected</span>
+              <button onClick={() => bulk("published")} className="underline">Publish</button>
+              <button onClick={() => bulk("archived")} className="underline">Archive</button>
+              <button onClick={() => bulk("draft")} className="underline">Move to draft</button>
+              <button onClick={() => setConfirmDel(true)} className="text-destructive underline">Delete</button>
+            </div>
+          )}
+          <Link to="/analytics" className="ml-auto text-sm underline">View analytics</Link>
+        </div>
         <div className="divide-y divide-border border-y border-border">
-          {mine.map((l) => (
+          {shown.map((l) => (
             <div key={l.id} className="flex items-center gap-4 py-4">
+              <input type="checkbox" aria-label={`Select ${l.title}`} checked={sel.includes(l.id)} onChange={(e) => setSel(e.target.checked ? [...sel, l.id] : sel.filter((x) => x !== l.id))} />
               <img src={l.image} alt="" className="h-16 w-16 rounded-sm object-cover" />
               <div className="flex-1">
                 <Link to="/artwork/$id" params={{ id: l.id }} className="font-display text-xl hover:underline">{l.title}</Link>
                 <p className="text-sm text-muted-foreground">{l.category} · {fmt(l.price)}</p>
               </div>
+              <span className={`rounded-full px-3 py-1 text-xs ${l.status === "published" ? "bg-primary text-primary-foreground" : l.status === "draft" ? "bg-muted" : "bg-secondary text-secondary-foreground"}`}>{l.status}</span>
               <button onClick={() => edit(l)} className="rounded-full border border-border px-4 py-2 text-sm">Edit</button>
-              <button onClick={() => { if (confirm(`Remove “${l.title}”?`)) { actions.remove(l.id); toast("Listing removed"); } }} className="rounded-full border border-destructive px-4 py-2 text-sm text-destructive">Remove</button>
             </div>
           ))}
-          {mine.length === 0 && <p className="py-6 text-muted-foreground">No listings yet.</p>}
+          {shown.length === 0 && <p className="py-6 text-muted-foreground">No listings here.</p>}
         </div>
+        <AlertDialog open={confirmDel} onOpenChange={setConfirmDel}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete {sel.length} listing{sel.length > 1 ? "s" : ""}?</AlertDialogTitle>
+              <AlertDialogDescription>They'll be removed from the marketplace and your dashboard. You can undo right after.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={bulkDelete} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </SiteShell>
   );

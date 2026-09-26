@@ -11,6 +11,7 @@ const nav = [
   { to: "/exhibitions", label: "Exhibitions" },
   { to: "/artists", label: "Artists" },
   { to: "/dashboard", label: "Dashboard" },
+  { to: "/analytics", label: "Analytics" },
 ] as const;
 
 export function SiteShell({ children }: { children: ReactNode }) {
