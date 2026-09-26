@@ -22,6 +22,8 @@ export function useStaff() {
     queryKey: ["staff", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      // Grants a reserved role (if any) to this confirmed email; no-op otherwise.
+      await supabase.rpc("claim_pending_role" as never);
       const [a, m] = await Promise.all([
         supabase.rpc("has_role", { _user_id: user!.id, _role: "admin" }),
         supabase.rpc("has_role", { _user_id: user!.id, _role: "moderator" }),
