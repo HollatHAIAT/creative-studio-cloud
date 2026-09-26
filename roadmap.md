@@ -100,5 +100,5 @@
 - [x] Rename platform to أروقة (Arwiqa) + palm & brush logo
 - [x] Fix white screen: live-update listeners registered after subscribe
 - [x] Unique bids-live channel + cleanup
-- [ ] Shared BidsLive provider (one channel)
-- [ ] Strict Mode test for bids-live channel lifecycle
+- [x] Shared BidsLive provider (one channel)
+- [x] Strict Mode test for bids-live channel lifecycle
