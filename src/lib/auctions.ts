@@ -31,7 +31,6 @@ export function useNow(ms = 1000) {
 }
 
 // ---------- Database-backed auctions ----------
-import { useEffect as useEff } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -39,7 +38,6 @@ export type DbAuction = { id: string; listing_id: string; start_bid: number; inc
 export type DbBid = { id: string; auction_id: string; user_id: string | null; bidder_name: string; amount: number; created_at: string };
 
 export function useDbAuctions() {
-  const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["auctions"],
     queryFn: async () => {
