@@ -35,7 +35,8 @@ function Banks() {
     try { await fn(); toast.success(t("banks.download"), { id }); } catch { toast.error("Download failed", { id }); } finally { setBusy(false); }
   }
   const downloadSelected = () => run(async () => {
-    if (chosen.length === 1) save(await assetBlob(chosen[0], f), fileName(chosen[0], f));
+    const one = chosen.length === 1 ? chosen[0] : undefined;
+    if (one) save(await assetBlob(one, f), fileName(one, f));
     else save(await zip(chosen, f), `saudi-banks-${f}.zip`);
   });
 

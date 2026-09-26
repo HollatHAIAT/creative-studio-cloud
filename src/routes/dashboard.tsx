@@ -118,7 +118,7 @@ function Dashboard() {
   const edit = (l: Listing) => { setErrors([]); const vs = variantsOf(l); const o = vs.find((v) => v.kind === "original");
     setForm({ id: l.id, title: l.title, category: l.category, medium: l.medium, year: String(l.year), description: l.description, images: l.images, status: l.status ?? "published",
       original: !!o, originalPrice: o ? String(o.price) : "",
-      prints: vs.filter((v) => v.kind === "print").map((v) => ({ size: v.size ?? PRINT_SIZES[0], material: v.material ?? PRINT_MATERIALS[0], price: String(v.price), edition: String(v.edition ?? 0) })),
+      prints: vs.filter((v) => v.kind === "print").map((v) => ({ size: v.size ?? PRINT_SIZES[0]!, material: v.material ?? PRINT_MATERIALS[0]!, price: String(v.price), edition: String(v.edition ?? 0) })),
       licenses: Object.fromEntries(LICS.map((k) => [k, String(vs.find((v) => v.license === k)?.price ?? "")])) as Record<Lic, string> }); };
   const field = "w-full rounded-sm border border-border bg-background px-3 py-2";
 
@@ -173,7 +173,7 @@ function Dashboard() {
                   </div>
                 );
               })}
-              <button type="button" onClick={() => setForm({ ...form, prints: [...form.prints, { size: PRINT_SIZES[0], material: PRINT_MATERIALS[0], price: "", edition: "50" }] })} className="mt-3 rounded-full border border-border px-4 py-2 text-sm">+ {tr("form.addPrint")}</button>
+              <button type="button" onClick={() => setForm({ ...form, prints: [...form.prints, { size: PRINT_SIZES[0]!, material: PRINT_MATERIALS[0]!, price: "", edition: "50" }] })} className="mt-3 rounded-full border border-border px-4 py-2 text-sm">+ {tr("form.addPrint")}</button>
               <p className="mt-5 text-sm font-medium">{tr("form.licenses")}</p>
               <div className="mt-2 grid gap-2 md:grid-cols-3">
                 {LICS.map((k) => <label key={k} className="text-xs">{tr(`form.${k}`)} — {tr("form.price")}<input type="number" min="1" placeholder="—" className={field} value={form.licenses[k]} onChange={(e) => setForm({ ...form, licenses: { ...form.licenses, [k]: e.target.value } })} /></label>)}

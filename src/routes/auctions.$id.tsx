@@ -47,7 +47,7 @@ function AuctionPage() {
       const cur = allBids(a, actions.get().bids[a.id], Date.now());
       const tp = topBid(cur);
       if (!tp?.mine || Math.random() > 0.35 || tp.amount >= a.reserve * 1.4) return;
-      actions.addBid(a.id, { id: crypto.randomUUID(), bidder: RIVALS[Math.floor(Math.random() * RIVALS.length)], amount: tp.amount + a.increment * (1 + Math.floor(Math.random() * 3)), at: Date.now() });
+      actions.addBid(a.id, { id: crypto.randomUUID(), bidder: RIVALS[Math.floor(Math.random() * RIVALS.length)] ?? "Collector", amount: tp.amount + a.increment * (1 + Math.floor(Math.random() * 3)), at: Date.now() });
     }, 12000);
     return () => clearInterval(i);
   }, [a, st]);

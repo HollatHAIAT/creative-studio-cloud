@@ -24,17 +24,17 @@ export const Route = createFileRoute("/exhibitions/$id")({
   component: ExhibitionPage,
 });
 
-const ticketKey: Record<string, Key> = { adult: "ex.adult", student: "ex.student", vip: "ex.vip" };
+const ticketKey: Record<"adult" | "student" | "vip", Key> = { adult: "ex.adult", student: "ex.student", vip: "ex.vip" };
 
 function ExhibitionPage() {
   const e = Route.useLoaderData();
   const { t, pick, locale, num } = useLocale();
   const { bookings } = useStore();
   const dates = openDates(e);
-  const [date, setDate] = useState(dates[0]);
+  const [date, setDate] = useState(dates[0] ?? "");
   const [slot, setSlot] = useState<string | null>(null);
-  const [qty, setQty] = useState<Record<string, number>>({ [e.tickets[0].id]: 1 });
-  const [room, setRoom] = useState(e.rooms[0].id);
+  const [qty, setQty] = useState<Record<string, number>>({ [e.tickets[0]!.id]: 1 });
+  const [room, setRoom] = useState(e.rooms[0]!.id);
   const [virtual, setVirtual] = useState(false);
   const mine = bookings.filter((b) => b.exhibitionId === e.id);
   const bookedHere = (d: string, s: string) => mine.filter((b) => b.date === d && b.slot === s).reduce((n, b) => n + Object.values(b.tickets).reduce((x, y) => x + y, 0), 0);
