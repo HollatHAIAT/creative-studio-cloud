@@ -404,6 +404,21 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_admins: {
+        Row: {
+          created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
       refund_requests: {
         Row: {
           created_at: string
@@ -580,6 +595,7 @@ export type Database = {
           visit_date: string
         }[]
       }
+      claim_pending_role: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
