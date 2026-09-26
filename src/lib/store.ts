@@ -61,6 +61,7 @@ function log(e: Omit<AuditEvent, "at" | "actor"> & { actor?: string }) {
 }
 
 export const actions = {
+  get() { return state; },
   setLocale(l: "en" | "ar") { set({ ...state, locale: l }); },
   addBid(auctionId: string, b: Bid) { set({ ...state, bids: { ...state.bids, [auctionId]: [...(state.bids[auctionId] ?? []), b] } }); },
   book(b: Booking) { set({ ...state, bookings: [...state.bookings, b] }); },
