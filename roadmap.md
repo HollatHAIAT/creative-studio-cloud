@@ -90,3 +90,4 @@
 - [ ] Cancel/refund requests: eligibility rules, admin review, decision log, buyer notified
 - [ ] Admin reports: sales, orders, ticket activity, bids; date filters; CSV export
 - [ ] Notification settings: choose order / ticket / bid alerts
+- [ ] Staff QR scan screen: instant validity, no reuse, scan time logged
