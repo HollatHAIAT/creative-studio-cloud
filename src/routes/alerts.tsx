@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
 import { alertHistory, dayKey, download, evaluate, toCsv, type Metric } from "@/lib/analytics";
@@ -24,14 +25,16 @@ const card = "rounded-sm border border-border bg-card p-6";
 const inp = "rounded-sm border border-border bg-background px-3 py-2";
 
 function Alerts() {
-  const { alerts: cfg, review, notify } = useStore();
+  const { alerts: cfg, review, notify, alertSort } = useStore();
+  const sortBy = alertSort.by, dir = alertSort.dir === "asc" ? -1 : 1;
+  const [open, setOpen] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<"acknowledged" | "resolved" | null>(null);
   const listings = useAllListings().filter((l) => l.creatorId === DEMO_CREATOR && l.status !== "archived");
   const [fListing, setFListing] = useState("all");
   const [fMetric, setFMetric] = useState("all");
   const [fStatus, setFStatus] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [sortBy, setSortBy] = useState<"latest" | "repeats" | "drop">("latest");
 
   const setCfg = (patch: Partial<typeof cfg>) => actions.setAlerts({ ...cfg, ...patch });
   const togglePause = (id: string) => setCfg({ paused: cfg.paused.includes(id) ? cfg.paused.filter((x) => x !== id) : [...cfg.paused, id] });
@@ -45,9 +48,17 @@ function Alerts() {
       const st = review[h.key] ?? "open";
       return h.triggers.length > 0 && (fListing === "all" || h.listingId === fListing) && (fMetric === "all" || h.metric === fMetric) && (fStatus === "all" || st === fStatus);
     })
-    .sort((x, y) => sortBy === "repeats" ? y.triggers.length - x.triggers.length
+    .sort((x, y) => dir * (sortBy === "repeats" ? y.triggers.length - x.triggers.length
       : sortBy === "drop" ? Math.min(...x.triggers.map((t) => t.change)) - Math.min(...y.triggers.map((t) => t.change))
-      : y.triggers[0]!.date.localeCompare(x.triggers[0]!.date));
+      : y.triggers[0]!.date.localeCompare(x.triggers[0]!.date)));
+
+  function runBulk() {
+    if (!bulkAction) return;
+    const keys = filtered.map((h) => h.key);
+    const undo = actions.setReviewMany(keys, bulkAction);
+    toast.success(`${keys.length} alert group${keys.length > 1 ? "s" : ""} marked ${bulkAction}`, { action: { label: "Undo", onClick: undo }, duration: 10000 });
+    setBulkAction(null);
+  }
 
   function exportCsv() {
     const origin = window.location.origin;
@@ -151,7 +162,10 @@ function Alerts() {
             <select className={inp} value={fStatus} onChange={(e) => setFStatus(e.target.value)}><option value="all">All statuses</option><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select>
             <input type="date" className={inp} value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From date" />
             <input type="date" className={inp} value={to} onChange={(e) => setTo(e.target.value)} aria-label="To date" />
-            <select className={inp} value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)} aria-label="Sort"><option value="latest">Latest trigger</option><option value="repeats">Most repeats</option><option value="drop">Largest drop</option></select>
+            <select className={inp} value={sortBy} onChange={(e) => actions.setAlertSort({ ...alertSort, by: e.target.value as typeof sortBy })} aria-label="Sort"><option value="latest">Latest trigger</option><option value="repeats">Most repeats</option><option value="drop">Largest drop</option></select>
+            <button className={inp} onClick={() => actions.setAlertSort({ ...alertSort, dir: alertSort.dir === "desc" ? "asc" : "desc" })} aria-label="Toggle sort direction">{alertSort.dir === "desc" ? "↓ Desc" : "↑ Asc"}</button>
+            <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("acknowledged")}>Acknowledge all ({filtered.length})</button>
+            <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("resolved")}>Resolve all ({filtered.length})</button>
             <button onClick={exportCsv} disabled={!filtered.length} className="ml-auto rounded-full bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">Export CSV</button>
           </div>
           <div className="mt-4 divide-y divide-border border-y border-border">
@@ -172,7 +186,14 @@ function Alerts() {
                       {st !== "open" && <button onClick={() => actions.setReview(h.key, null)} className="text-muted-foreground underline">Reopen</button>}
                     </span>
                   </div>
-                  <ul className="mt-2 space-y-1 pl-4">
+                  <button onClick={() => setOpen(open.includes(h.key) ? open.filter((k) => k !== h.key) : [...open, h.key])} className="mt-2 text-xs underline" aria-expanded={open.includes(h.key)}>{open.includes(h.key) ? "Hide details" : "Show details"}</button>
+                  {open.includes(h.key) && <ol className="mt-2 border-l-2 border-border pl-4">
+                    {h.triggers.flatMap((t) => [{ d: t.date, kind: "drop" as const, c: t.change, ref: t.date }, ...(t.recoveredAt ? [{ d: t.recoveredAt, kind: "recovery" as const, c: t.recoveryChange!, ref: t.date }] : [])]).sort((a, b) => a.d.localeCompare(b.d)).map((ev) => (
+                      <li key={ev.kind + ev.d} className="relative py-1"><span className={`absolute -left-[21px] top-2 h-2.5 w-2.5 rounded-full ${ev.kind === "drop" ? "bg-destructive" : "bg-chart-2"}`} />
+                        <b>{ev.d}</b> — {ev.kind === "drop" ? `Drop triggered: ${(ev.c * 100).toFixed(0)}% (threshold −${cfg.thresholds[h.metric]}%)` : `Recovered: ${ev.c >= 0 ? "+" : ""}${(ev.c * 100).toFixed(0)}%, linked to drop on ${ev.ref}`}</li>
+                    ))}
+                  </ol>}
+                  <ul className="mt-2 hidden space-y-1 pl-4">
                     {h.triggers.map((t) => (
                       <li key={t.date} className="flex flex-wrap gap-x-4">
                         <span>{t.date}: <span className="text-destructive">{(t.change * 100).toFixed(0)}%</span></span>
@@ -189,6 +210,15 @@ function Alerts() {
           {filtered.length === 0 && <p className="py-4 text-sm text-muted-foreground">No alerts match these filters.</p>}
         </div>
       </div>
+      <AlertDialog open={!!bulkAction} onOpenChange={(o) => !o && setBulkAction(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Mark {filtered.length} alert group{filtered.length > 1 ? "s" : ""} as {bulkAction}?</AlertDialogTitle>
+            <AlertDialogDescription>This applies to every group matching your current filters. You can undo right after.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={runBulk}>Confirm</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SiteShell>
   );
 }
