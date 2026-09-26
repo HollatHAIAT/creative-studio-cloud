@@ -55,4 +55,5 @@
 - [x] Compliance date-range + listing/metric filters
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
+- [ ] Escalation policies for unacknowledged alert groups
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

@@ -46,3 +46,14 @@ export function compliance(groups: G[], cfg: AlertConfig) {
   const bySeverity = SEVERITIES.map((sv) => ({ severity: sv, target: t[sv], ...rate(rows.filter((r) => r.sev === sv)) }));
   return { overall: rate(rows), weeks, bySeverity };
 }
+
+/** Who an unacknowledged, unclaimed ongoing group is currently routed to. Steps to the next responder every interval since the first trigger. */
+export function escalationFor(g: G, policy: { enabled: boolean; responders: string[]; intervalHours: number }, handled: boolean) {
+  if (!policy.enabled || handled || policy.responders.length === 0) return null;
+  const d = groupDuration(g);
+  if (!d.ongoing) return null;
+  const hours = (Date.now() - Date.parse(d.first)) / 3600000;
+  const level = Math.min(policy.responders.length - 1, Math.floor(hours / Math.max(1, policy.intervalHours)));
+  const nextIn = level < policy.responders.length - 1 ? Math.ceil((level + 1) * policy.intervalHours - hours) : null;
+  return { level: level + 1, responder: policy.responders[level]!, nextIn, next: policy.responders[level + 1] };
+}

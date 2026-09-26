@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
-import { compliance, daysBetween, daysPast, defaultTargets, durLabel, groupDuration, SEVERITIES, severity, targetFor } from "@/lib/alert-rules";
+import { escalationFor, compliance, daysBetween, daysPast, defaultTargets, durLabel, groupDuration, SEVERITIES, severity, targetFor } from "@/lib/alert-rules";
 import { alertHistory, dayKey, download, evaluate, toCsv, type Metric } from "@/lib/analytics";
 
 export const Route = createFileRoute("/alerts")({
@@ -26,7 +26,9 @@ const card = "rounded-sm border border-border bg-card p-6";
 const inp = "rounded-sm border border-border bg-background px-3 py-2";
 
 function Alerts() {
-  const { alerts: cfg, review, notify, alertSort, alertPresets, owners, responder, maintenance } = useStore();
+  const { alerts: cfg, review, notify, alertSort, alertPresets, owners, responder, maintenance, escalation } = useStore();
+  const [newResp, setNewResp] = useState("");
+  const esc = (h: { key: string; triggers: { date: string; change: number; recoveredAt?: string }[] }) => escalationFor(h, escalation, !!owners[h.key] || (review[h.key] ?? "open") !== "open");
   const [cFrom, setCFrom] = useState("");
   const [cTo, setCTo] = useState("");
   const [cListing, setCListing] = useState("all");
@@ -89,8 +91,8 @@ function Alerts() {
 
   function exportCsv() {
     const origin = window.location.origin;
-    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Severity", "Recovery target (days)", "Days past target", "Owner", "Analytics link"]];
-    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", severity(h), targetFor(h, cfg), daysPast(h, cfg), owners[h.key]?.name ?? "", `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
+    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Severity", "Recovery target (days)", "Days past target", "Owner", "Escalated to", "Analytics link"]];
+    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", severity(h), targetFor(h, cfg), daysPast(h, cfg), owners[h.key]?.name ?? "", esc(h)?.responder ?? "", `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
     download("creativestudio-alert-history.csv", toCsv(rows));
   }
   const DAYS = 30;
@@ -156,6 +158,31 @@ function Alerts() {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className={card}>
+          <h2 className="font-display text-2xl">Escalation policy</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Ongoing alert groups nobody has acknowledged or claimed move to the next responder after each interval.</p>
+          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+            <label className="flex items-center gap-2"><input type="checkbox" checked={escalation.enabled} onChange={(e) => actions.setEscalation({ ...escalation, enabled: e.target.checked })} />Enabled</label>
+            <label className="flex items-center gap-2">Escalate every
+              <select className={inp} value={escalation.intervalHours} onChange={(e) => actions.setEscalation({ ...escalation, intervalHours: +e.target.value })}>{[1, 4, 12, 24, 48, 72].map((h) => <option key={h} value={h}>{h < 24 ? `${h} hours` : `${h / 24} day${h > 24 ? "s" : ""}`}</option>)}</select>
+            </label>
+          </div>
+          <ol className="mt-4 space-y-2 text-sm">
+            {escalation.responders.map((r, i) => (
+              <li key={r + i} className="flex items-center gap-3">
+                <span className="w-16 text-muted-foreground">Level {i + 1}</span><span className="flex-1">{r}</span>
+                <button disabled={i === 0} onClick={() => { const a = [...escalation.responders]; [a[i - 1], a[i]] = [a[i]!, a[i - 1]!]; actions.setEscalation({ ...escalation, responders: a }); }} className="underline disabled:opacity-30">Up</button>
+                <button onClick={() => actions.setEscalation({ ...escalation, responders: escalation.responders.filter((_, j) => j !== i) })} className="text-muted-foreground underline">Remove</button>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-3 flex gap-2">
+            <input className={inp} placeholder="Responder name" maxLength={40} value={newResp} onChange={(e) => setNewResp(e.target.value)} />
+            <button className={inp} onClick={() => { const n = newResp.trim(); if (!n) return; actions.setEscalation({ ...escalation, responders: [...escalation.responders, n] }); setNewResp(""); }}>Add responder</button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">Responders are names for now; they'll get notified directly once accounts and email are connected.</p>
         </div>
 
         <div className={card}>
@@ -296,6 +323,7 @@ function Alerts() {
                     <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-destructive/10 text-destructive" : "bg-muted"}`}>{active ? "Still dropping" : "Recovered"}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs ${st === "open" ? "border border-border" : st === "resolved" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{st}</span>
                     {owners[h.key] ? <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">Handled by {owners[h.key]!.name} · since {new Date(owners[h.key]!.at).toLocaleDateString()}</span> : groupDuration(h).ongoing && <span className="rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-muted-foreground">Unclaimed</span>}
+                    {esc(h) && <span className="rounded-full bg-chart-4/30 px-2 py-0.5 text-xs" title="Escalation">Escalated to {esc(h)!.responder} (level {esc(h)!.level}){esc(h)!.nextIn != null ? ` · ${esc(h)!.next} in ${esc(h)!.nextIn}h` : " · final level"}</span>}
                     <span className="ml-auto space-x-3">
                       {groupDuration(h).ongoing && (owners[h.key]
                         ? <button onClick={() => actions.release(h.key)} className="underline">Release</button>
