@@ -8,8 +8,8 @@ export type Report = { id: string; name: string; frequency: "weekly" | "monthly"
   metrics?: ReportMetric[]; sources?: string[]; history?: Delivery[] };
 export type ReportMetric = "views" | "favorites" | "purchases" | "conversion" | "top";
 export type Delivery = { id: string; at: string; status: "sent" | "failed" | "upcoming" | "retrying"; error?: string };
-type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop" | "duration"; dir: "desc" | "asc" }; alertPresets: AlertPreset[] };
-export type AlertPreset = { id: string; name: string; listing: string; metric: string; status: string; from: string; to: string };
+type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop" | "duration" | "ongoing"; dir: "desc" | "asc" }; alertPresets: AlertPreset[] };
+export type AlertPreset = { id: string; name: string; listing: string; metric: string; status: string; from: string; to: string; recovery?: string };
 export type NotifyPrefs = { inApp: boolean; email: boolean; address: string; digest: "instant" | "daily" };
 const KEY = "creativestudio:v1";
 const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [], alerts: defaultAlertConfig, review: {}, notify: { inApp: true, email: false, address: "", digest: "instant" }, alertSort: { by: "latest", dir: "desc" }, alertPresets: [] };

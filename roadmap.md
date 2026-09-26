@@ -41,6 +41,9 @@
 - [ ] Recovery-duration column + sort by longest
 - [ ] Duration in CSV + detail view
 - [ ] Ongoing elapsed time for unrecovered groups
+- [ ] Sort ongoing groups by elapsed time (longest first)
+- [ ] Recovery-status filter (ongoing / recovered)
+- [ ] Recovery target threshold that flags overdue groups
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

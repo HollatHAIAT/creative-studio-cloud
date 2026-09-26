@@ -41,8 +41,8 @@ export function totals(d: DayStat[]) {
 export const pct = (a: number, b: number) => (b ? (a / b) * 100 : 0);
 
 export type Metric = "views" | "favorites" | "purchases";
-export type AlertConfig = { thresholds: Record<Metric, number>; recent: number; prior: number; paused: string[] };
-export const defaultAlertConfig: AlertConfig = { thresholds: { views: 30, favorites: 30, purchases: 40 }, recent: 3, prior: 7, paused: [] };
+export type AlertConfig = { thresholds: Record<Metric, number>; recent: number; prior: number; paused: string[]; recoveryTarget?: number };
+export const defaultAlertConfig: AlertConfig = { thresholds: { views: 30, favorites: 30, purchases: 40 }, recent: 3, prior: 7, paused: [], recoveryTarget: 7 };
 export type Alert = { listingId: string; metric: Metric; change: number; threshold: number; triggered: boolean; date: string };
 /** Compare the average of the last `recent` days vs the `prior` days before, ending `offset` days ago. */
 export function evaluate(id: string, cfg: AlertConfig, offset = 0): Alert[] {

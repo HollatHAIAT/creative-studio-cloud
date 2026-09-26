@@ -46,6 +46,9 @@ function Alerts() {
   const [fStatus, setFStatus] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [fRecovery, setFRecovery] = useState("all");
+  const target = cfg.recoveryTarget ?? 7;
+  const overdue = (g: Parameters<typeof groupDuration>[0]) => { const d = groupDuration(g); return d.ongoing && d.days > target; };
 
   const setCfg = (patch: Partial<typeof cfg>) => actions.setAlerts({ ...cfg, ...patch });
   const togglePause = (id: string) => setCfg({ paused: cfg.paused.includes(id) ? cfg.paused.filter((x) => x !== id) : [...cfg.paused, id] });
@@ -57,9 +60,10 @@ function Alerts() {
     .map((h) => ({ ...h, triggers: h.triggers.filter((t) => (!from || t.date >= from) && (!to || t.date <= to)) }))
     .filter((h) => {
       const st = review[h.key] ?? "open";
-      return h.triggers.length > 0 && (fListing === "all" || h.listingId === fListing) && (fMetric === "all" || h.metric === fMetric) && (fStatus === "all" || st === fStatus);
+      const rec = groupDuration(h).ongoing ? "ongoing" : "recovered";
+      return h.triggers.length > 0 && (fRecovery === "all" || rec === fRecovery) && (fListing === "all" || h.listingId === fListing) && (fMetric === "all" || h.metric === fMetric) && (fStatus === "all" || st === fStatus);
     })
-    .sort((x, y) => dir * (sortBy === "duration" ? groupDuration(y).days - groupDuration(x).days : sortBy === "repeats" ? y.triggers.length - x.triggers.length
+    .sort((x, y) => dir * (sortBy === "ongoing" ? (Number(groupDuration(y).ongoing) - Number(groupDuration(x).ongoing)) * 1000 + groupDuration(y).days - groupDuration(x).days : sortBy === "duration" ? groupDuration(y).days - groupDuration(x).days : sortBy === "repeats" ? y.triggers.length - x.triggers.length
       : sortBy === "drop" ? Math.min(...x.triggers.map((t) => t.change)) - Math.min(...y.triggers.map((t) => t.change))
       : y.triggers[0]!.date.localeCompare(x.triggers[0]!.date)));
 
@@ -73,7 +77,7 @@ function Alerts() {
   function savePreset() {
     const name = prompt("Name this preset")?.trim();
     if (!name) return;
-    actions.saveAlertPreset({ id: Date.now().toString(36), name: name.slice(0, 60), listing: fListing, metric: fMetric, status: fStatus, from, to });
+    actions.saveAlertPreset({ id: Date.now().toString(36), name: name.slice(0, 60), listing: fListing, metric: fMetric, status: fStatus, from, to, recovery: fRecovery });
     toast.success("Preset saved");
   }
 
@@ -87,8 +91,8 @@ function Alerts() {
 
   function exportCsv() {
     const origin = window.location.origin;
-    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Analytics link"]];
-    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
+    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Over recovery target", "Analytics link"]];
+    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", overdue(h) ? "yes" : "no", `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
     download("creativestudio-alert-history.csv", toCsv(rows));
   }
   const DAYS = 30;
@@ -109,6 +113,9 @@ function Alerts() {
                   <span className="flex items-center gap-2"><input type="number" min={5} max={95} className={`${inp} w-20`} value={cfg.thresholds[m]} onChange={(e) => setCfg({ thresholds: { ...cfg.thresholds, [m]: Math.max(5, Math.min(95, +e.target.value || 5)) } })} />%</span>
                 </label>
               ))}
+              <label className="flex items-center justify-between text-sm">Recovery target
+                <span className="flex items-center gap-2"><input type="number" min={1} max={90} className={`${inp} w-20`} value={target} onChange={(e) => setCfg({ recoveryTarget: Math.max(1, Math.min(90, +e.target.value || 1)) })} />days</span>
+              </label>
               <label className="flex items-center justify-between text-sm">Recent period
                 <select className={inp} value={cfg.recent} onChange={(e) => setCfg({ recent: +e.target.value })}>{[1, 3, 7, 14].map((n) => <option key={n} value={n}>Last {n} day{n > 1 ? "s" : ""}</option>)}</select>
               </label>
@@ -187,10 +194,11 @@ function Alerts() {
             <select className={inp} value={fStatus} onChange={(e) => { setFStatus(e.target.value); setPage(1); }}><option value="all">All statuses</option><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select>
             <input type="date" className={inp} value={from} onChange={(e) => { setFrom(e.target.value); setPage(1); }} aria-label="From date" />
             <input type="date" className={inp} value={to} onChange={(e) => { setTo(e.target.value); setPage(1); }} aria-label="To date" />
-            <select className={inp} value={sortBy} onChange={(e) => actions.setAlertSort({ ...alertSort, by: e.target.value as typeof sortBy })} aria-label="Sort"><option value="latest">Latest trigger</option><option value="repeats">Most repeats</option><option value="drop">Largest drop</option><option value="duration">Longest recovery</option></select>
+            <select className={inp} value={sortBy} onChange={(e) => actions.setAlertSort({ ...alertSort, by: e.target.value as typeof sortBy })} aria-label="Sort"><option value="latest">Latest trigger</option><option value="repeats">Most repeats</option><option value="drop">Largest drop</option><option value="duration">Longest recovery</option><option value="ongoing">Ongoing, longest-running first</option></select>
             <button className={inp} onClick={() => actions.setAlertSort({ ...alertSort, dir: alertSort.dir === "desc" ? "asc" : "desc" })} aria-label="Toggle sort direction">{alertSort.dir === "desc" ? "↓ Desc" : "↑ Asc"}</button>
             <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("acknowledged")}>Acknowledge all ({filtered.length})</button>
             <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("resolved")}>Resolve all ({filtered.length})</button>
+            <select className={inp} value={fRecovery} onChange={(e) => { setFRecovery(e.target.value); setPage(1); }} aria-label="Recovery status"><option value="all">Ongoing + recovered</option><option value="ongoing">Ongoing only</option><option value="recovered">Recovered only</option></select>
             <button className={inp} onClick={savePreset}>Save preset</button>
             <button onClick={exportCsv} disabled={!filtered.length} className="ml-auto rounded-full bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">Export CSV</button>
           </div>
@@ -199,7 +207,7 @@ function Alerts() {
               <span className="text-muted-foreground">Presets:</span>
               {alertPresets.map((p) => (
                 <span key={p.id} className="flex items-center gap-2 rounded-full bg-muted px-3 py-1">
-                  <button onClick={() => { setFListing(p.listing); setFMetric(p.metric); setFStatus(p.status); setFrom(p.from); setTo(p.to); setPage(1); }}>{p.name}</button>
+                  <button onClick={() => { setFListing(p.listing); setFMetric(p.metric); setFStatus(p.status); setFrom(p.from); setTo(p.to); setFRecovery(p.recovery ?? "all"); setPage(1); }}>{p.name}</button>
                   <button aria-label="Delete preset" onClick={() => actions.deleteAlertPreset(p.id)} className="text-muted-foreground">×</button>
                 </span>
               ))}
@@ -210,11 +218,12 @@ function Alerts() {
               const st = review[h.key] ?? "open";
               const active = h.triggers.some((t) => !t.recoveredAt);
               return (
-                <div key={h.key} className="py-4 text-sm">
+                <div key={h.key} className={`py-4 text-sm ${overdue(h) ? "border-l-4 border-destructive pl-3" : ""}`}>
                   <div className="flex flex-wrap items-center gap-3">
                     <p className="font-medium">{h.title} · <span className="capitalize">{h.metric}</span></p>
                     <span className="text-muted-foreground">{h.triggers.length} trigger{h.triggers.length > 1 ? "s" : ""} · {cfg.recent}d vs prior {cfg.prior}d</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${groupDuration(h).ongoing ? "border border-destructive text-destructive" : "border border-border"}`} title="Recovery duration">⏱ {durLabel(groupDuration(h))}</span>
+                    {overdue(h) && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs text-destructive-foreground">Over {target}-day target</span>}
                     <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-destructive/10 text-destructive" : "bg-muted"}`}>{active ? "Still dropping" : "Recovered"}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs ${st === "open" ? "border border-border" : st === "resolved" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{st}</span>
                     <span className="ml-auto space-x-3">
