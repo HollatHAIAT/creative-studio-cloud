@@ -17,11 +17,20 @@ export function openDates(e: Exhibition, limit = 14) {
   return out;
 }
 
-export const fmtDate = (s: string, locale: string, opts: Intl.DateTimeFormatOptions = { weekday: "short", day: "numeric", month: "short" }) =>
-  new Date(`${s}T00:00:00Z`).toLocaleDateString(locale === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", { ...opts, timeZone: "UTC" });
+const EN_M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const AR_M = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+const EN_D = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const AR_D = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+/** Hand-rolled so server and browser render identical text (no locale-data differences). */
+export const fmtDate = (s: string, locale: string, opts: { weekday?: boolean; year?: boolean } = { weekday: true }) => {
+  const d = new Date(`${s}T00:00:00Z`);
+  const ar = locale === "ar";
+  const parts = [opts.weekday ? (ar ? AR_D : EN_D)[d.getUTCDay()] : "", String(d.getUTCDate()), (ar ? AR_M : EN_M)[d.getUTCMonth()], opts.year ? String(d.getUTCFullYear()) : ""];
+  return parts.filter(Boolean).join(" ");
+};
 
 export const dateRange = (e: Exhibition, locale: string) => {
-  const o = { day: "numeric", month: "short", year: "numeric" } as const;
+  const o = { year: true };
   return `${fmtDate(iso(startOf(e)), locale, o)} – ${fmtDate(iso(startOf(e) + (e.days - 1) * DAY), locale, o)}`;
 };
 
