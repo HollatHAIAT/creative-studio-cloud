@@ -25,7 +25,9 @@ const card = "rounded-sm border border-border bg-card p-6";
 const inp = "rounded-sm border border-border bg-background px-3 py-2";
 
 function Alerts() {
-  const { alerts: cfg, review, notify, alertSort } = useStore();
+  const { alerts: cfg, review, notify, alertSort, alertPresets } = useStore();
+  const [page, setPage] = useState(1);
+  const PAGE = 5;
   const sortBy = alertSort.by, dir = alertSort.dir === "asc" ? -1 : 1;
   const [open, setOpen] = useState<string[]>([]);
   const [bulkAction, setBulkAction] = useState<"acknowledged" | "resolved" | null>(null);
@@ -51,6 +53,22 @@ function Alerts() {
     .sort((x, y) => dir * (sortBy === "repeats" ? y.triggers.length - x.triggers.length
       : sortBy === "drop" ? Math.min(...x.triggers.map((t) => t.change)) - Math.min(...y.triggers.map((t) => t.change))
       : y.triggers[0]!.date.localeCompare(x.triggers[0]!.date)));
+
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE));
+  const curPage = Math.min(page, pages);
+  const pageItems = filtered.slice((curPage - 1) * PAGE, curPage * PAGE);
+  const daysBetween = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
+  const recoveryInfo = (h: (typeof filtered)[number]) => {
+    const first = [...h.triggers].sort((a, b) => a.date.localeCompare(b.date))[0]!;
+    const latest = h.triggers[0]!;
+    return latest.recoveredAt ? `Recovered in ${daysBetween(first.date, latest.recoveredAt)} days (first trigger ${first.date} → recovery ${latest.recoveredAt})` : `Ongoing for ${daysBetween(first.date, dayKey(Date.now()))} days since ${first.date}`;
+  };
+  function savePreset() {
+    const name = prompt("Name this preset")?.trim();
+    if (!name) return;
+    actions.saveAlertPreset({ id: Date.now().toString(36), name: name.slice(0, 60), listing: fListing, metric: fMetric, status: fStatus, from, to });
+    toast.success("Preset saved");
+  }
 
   function runBulk() {
     if (!bulkAction) return;
@@ -157,19 +175,31 @@ function Alerts() {
         <div className={card}>
           <h2 className="font-display text-2xl">Alert history</h2>
           <div className="mt-4 flex flex-wrap gap-2 text-sm">
-            <select className={inp} value={fListing} onChange={(e) => setFListing(e.target.value)}><option value="all">All listings</option>{listings.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}</select>
-            <select className={inp} value={fMetric} onChange={(e) => setFMetric(e.target.value)}><option value="all">All metrics</option>{METRICS.map((m) => <option key={m} value={m}>{m}</option>)}</select>
-            <select className={inp} value={fStatus} onChange={(e) => setFStatus(e.target.value)}><option value="all">All statuses</option><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select>
-            <input type="date" className={inp} value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From date" />
-            <input type="date" className={inp} value={to} onChange={(e) => setTo(e.target.value)} aria-label="To date" />
+            <select className={inp} value={fListing} onChange={(e) => { setFListing(e.target.value); setPage(1); }}><option value="all">All listings</option>{listings.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}</select>
+            <select className={inp} value={fMetric} onChange={(e) => { setFMetric(e.target.value); setPage(1); }}><option value="all">All metrics</option>{METRICS.map((m) => <option key={m} value={m}>{m}</option>)}</select>
+            <select className={inp} value={fStatus} onChange={(e) => { setFStatus(e.target.value); setPage(1); }}><option value="all">All statuses</option><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select>
+            <input type="date" className={inp} value={from} onChange={(e) => { setFrom(e.target.value); setPage(1); }} aria-label="From date" />
+            <input type="date" className={inp} value={to} onChange={(e) => { setTo(e.target.value); setPage(1); }} aria-label="To date" />
             <select className={inp} value={sortBy} onChange={(e) => actions.setAlertSort({ ...alertSort, by: e.target.value as typeof sortBy })} aria-label="Sort"><option value="latest">Latest trigger</option><option value="repeats">Most repeats</option><option value="drop">Largest drop</option></select>
             <button className={inp} onClick={() => actions.setAlertSort({ ...alertSort, dir: alertSort.dir === "desc" ? "asc" : "desc" })} aria-label="Toggle sort direction">{alertSort.dir === "desc" ? "↓ Desc" : "↑ Asc"}</button>
             <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("acknowledged")}>Acknowledge all ({filtered.length})</button>
             <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("resolved")}>Resolve all ({filtered.length})</button>
+            <button className={inp} onClick={savePreset}>Save preset</button>
             <button onClick={exportCsv} disabled={!filtered.length} className="ml-auto rounded-full bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">Export CSV</button>
           </div>
+          {alertPresets.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2 text-sm">
+              <span className="text-muted-foreground">Presets:</span>
+              {alertPresets.map((p) => (
+                <span key={p.id} className="flex items-center gap-2 rounded-full bg-muted px-3 py-1">
+                  <button onClick={() => { setFListing(p.listing); setFMetric(p.metric); setFStatus(p.status); setFrom(p.from); setTo(p.to); setPage(1); }}>{p.name}</button>
+                  <button aria-label="Delete preset" onClick={() => actions.deleteAlertPreset(p.id)} className="text-muted-foreground">×</button>
+                </span>
+              ))}
+            </div>
+          )}
           <div className="mt-4 divide-y divide-border border-y border-border">
-            {filtered.map((h) => {
+            {pageItems.map((h) => {
               const st = review[h.key] ?? "open";
               const active = h.triggers.some((t) => !t.recoveredAt);
               return (
@@ -186,11 +216,12 @@ function Alerts() {
                       {st !== "open" && <button onClick={() => actions.setReview(h.key, null)} className="text-muted-foreground underline">Reopen</button>}
                     </span>
                   </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{recoveryInfo(h)}</p>
                   <button onClick={() => setOpen(open.includes(h.key) ? open.filter((k) => k !== h.key) : [...open, h.key])} className="mt-2 text-xs underline" aria-expanded={open.includes(h.key)}>{open.includes(h.key) ? "Hide details" : "Show details"}</button>
                   {open.includes(h.key) && <ol className="mt-2 border-l-2 border-border pl-4">
                     {h.triggers.flatMap((t) => [{ d: t.date, kind: "drop" as const, c: t.change, ref: t.date }, ...(t.recoveredAt ? [{ d: t.recoveredAt, kind: "recovery" as const, c: t.recoveryChange!, ref: t.date }] : [])]).sort((a, b) => a.d.localeCompare(b.d)).map((ev) => (
                       <li key={ev.kind + ev.d} className="relative py-1"><span className={`absolute -left-[21px] top-2 h-2.5 w-2.5 rounded-full ${ev.kind === "drop" ? "bg-destructive" : "bg-chart-2"}`} />
-                        <b>{ev.d}</b> — {ev.kind === "drop" ? `Drop triggered: ${(ev.c * 100).toFixed(0)}% (threshold −${cfg.thresholds[h.metric]}%)` : `Recovered: ${ev.c >= 0 ? "+" : ""}${(ev.c * 100).toFixed(0)}%, linked to drop on ${ev.ref}`}</li>
+                        <b>{ev.d}</b> — {ev.kind === "drop" ? `Drop triggered: ${(ev.c * 100).toFixed(0)}% (threshold −${cfg.thresholds[h.metric]}%)` : `Recovered: ${ev.c >= 0 ? "+" : ""}${(ev.c * 100).toFixed(0)}%, linked to drop on ${ev.ref} (${daysBetween(ev.ref, ev.d)} days)`}</li>
                     ))}
                   </ol>}
                   <ul className="mt-2 hidden space-y-1 pl-4">
@@ -207,6 +238,13 @@ function Alerts() {
               );
             })}
           </div>
+          {pages > 1 && (
+            <div className="mt-4 flex items-center justify-center gap-3 text-sm">
+              <button disabled={curPage === 1} onClick={() => setPage(curPage - 1)} className={`${inp} disabled:opacity-40`}>Previous</button>
+              <span>Page {curPage} of {pages} · {filtered.length} groups</span>
+              <button disabled={curPage === pages} onClick={() => setPage(curPage + 1)} className={`${inp} disabled:opacity-40`}>Next</button>
+            </div>
+          )}
           {filtered.length === 0 && <p className="py-4 text-sm text-muted-foreground">No alerts match these filters.</p>}
         </div>
       </div>

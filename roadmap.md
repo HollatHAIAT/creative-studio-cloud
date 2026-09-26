@@ -35,6 +35,9 @@
 - [ ] Bulk acknowledge / resolve alerts (confirm + undo)
 - [ ] Expandable chronological alert detail
 - [ ] Remember alert sort order + direction
+- [ ] Saved alert filter presets
+- [ ] Alert history pagination (keeps filters + sort)
+- [ ] Recovery duration per alert group
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

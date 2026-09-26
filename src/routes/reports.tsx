@@ -65,9 +65,9 @@ function Reports() {
 
   function save() {
     if (!form) return;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return toast.error("Enter a valid email address");
-    if (!form.name.trim()) return toast.error("Give the report a name");
-    if (metricsOf(form).length === 0) return toast.error("Pick at least one metric");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { toast.error("Enter a valid email address"); return; }
+    if (!form.name.trim()) { toast.error("Give the report a name"); return; }
+    if (metricsOf(form).length === 0) { toast.error("Pick at least one metric"); return; }
     actions.saveReport({ ...form, id: form.id || Date.now().toString(36), name: form.name.trim().slice(0, 80) });
     toast.success(form.id ? "Schedule updated" : "Report scheduled");
     setForm(null);

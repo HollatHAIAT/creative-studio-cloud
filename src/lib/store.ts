@@ -8,10 +8,11 @@ export type Report = { id: string; name: string; frequency: "weekly" | "monthly"
   metrics?: ReportMetric[]; sources?: string[]; history?: Delivery[] };
 export type ReportMetric = "views" | "favorites" | "purchases" | "conversion" | "top";
 export type Delivery = { id: string; at: string; status: "sent" | "failed" | "upcoming" | "retrying"; error?: string };
-type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop"; dir: "desc" | "asc" } };
+type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop"; dir: "desc" | "asc" }; alertPresets: AlertPreset[] };
+export type AlertPreset = { id: string; name: string; listing: string; metric: string; status: string; from: string; to: string };
 export type NotifyPrefs = { inApp: boolean; email: boolean; address: string; digest: "instant" | "daily" };
 const KEY = "creativestudio:v1";
-const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [], alerts: defaultAlertConfig, review: {}, notify: { inApp: true, email: false, address: "", digest: "instant" }, alertSort: { by: "latest", dir: "desc" } };
+const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [], alerts: defaultAlertConfig, review: {}, notify: { inApp: true, email: false, address: "", digest: "instant" }, alertSort: { by: "latest", dir: "desc" }, alertPresets: [] };
 let state: State = empty;
 let loaded = false;
 const subs = new Set<() => void>();
@@ -74,6 +75,8 @@ export const actions = {
     set({ ...state, review: r });
     return () => set({ ...state, review: prev });
   },
+  saveAlertPreset(p: AlertPreset) { set({ ...state, alertPresets: [...state.alertPresets, p] }); },
+  deleteAlertPreset(id: string) { set({ ...state, alertPresets: state.alertPresets.filter((x) => x.id !== id) }); },
   setAlertSort(s: State["alertSort"]) { set({ ...state, alertSort: s }); },
   setNotify(n: NotifyPrefs) { set({ ...state, notify: n }); },
   setAlerts(a: AlertConfig) { set({ ...state, alerts: a }); },
