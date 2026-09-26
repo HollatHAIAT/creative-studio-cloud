@@ -5,6 +5,7 @@ import type { Artwork } from "@/lib/data";
 import { fmt, minPrice } from "@/lib/data";
 import { actions, useStore } from "@/lib/store";
 import { OverdueNotifier } from "@/components/OverdueNotifier";
+import { AccountNav } from "@/components/AccountNav";
 import { useDocumentDirection, useLocale, type Key } from "@/lib/i18n";
 import { allBids, auctionFor, statusOf, topBid, useNow } from "@/lib/auctions";
 
@@ -35,6 +36,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-4 text-sm">
             <button onClick={toggle} className="flex items-center gap-1 rounded-full border border-border px-3 py-1.5" aria-label="Switch language"><Languages className="h-4 w-4" />{t("lang.switch")}</button>
             <Link to="/favorites" className="flex items-center gap-1" aria-label={t("nav.favorites")}><Heart className="h-5 w-5" />{favorites.length > 0 && <span>{favorites.length}</span>}</Link>
+            <AccountNav />
             <Link to="/sell" className="hidden rounded-full bg-primary px-4 py-2 text-primary-foreground hover:opacity-90 sm:inline-block">{t("nav.sell")}</Link>
           </div>
         </div>
