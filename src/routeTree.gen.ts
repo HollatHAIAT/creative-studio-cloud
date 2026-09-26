@@ -10,33 +10,205 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AlertsRouteImport } from './routes/alerts'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as ArtistsRouteImport } from './routes/artists'
+import { Route as AuctionsRouteImport } from './routes/auctions'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DeliveryRouteImport } from './routes/delivery'
+import { Route as ExhibitionsRouteImport } from './routes/exhibitions'
+import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as SellRouteImport } from './routes/sell'
+import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
+import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlertsRoute = AlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtistsRoute = ArtistsRouteImport.update({
+  id: '/artists',
+  path: '/artists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuctionsRoute = AuctionsRouteImport.update({
+  id: '/auctions',
+  path: '/auctions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeliveryRoute = DeliveryRouteImport.update({
+  id: '/delivery',
+  path: '/delivery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExhibitionsRoute = ExhibitionsRouteImport.update({
+  id: '/exhibitions',
+  path: '/exhibitions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellRoute = SellRouteImport.update({
+  id: '/sell',
+  path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtistsIdRoute = ArtistsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ArtistsRoute,
+} as any)
+const ArtworkIdRoute = ArtworkIdRouteImport.update({
+  id: '/artwork/$id',
+  path: '/artwork/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
+  '/analytics': typeof AnalyticsRoute
+  '/artists': typeof ArtistsRouteWithChildren
+  '/auctions': typeof AuctionsRoute
+  '/dashboard': typeof DashboardRoute
+  '/delivery': typeof DeliveryRoute
+  '/exhibitions': typeof ExhibitionsRoute
+  '/explore': typeof ExploreRoute
+  '/favorites': typeof FavoritesRoute
+  '/reports': typeof ReportsRoute
+  '/sell': typeof SellRoute
+  '/artists/$id': typeof ArtistsIdRoute
+  '/artwork/$id': typeof ArtworkIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
+  '/analytics': typeof AnalyticsRoute
+  '/artists': typeof ArtistsRouteWithChildren
+  '/auctions': typeof AuctionsRoute
+  '/dashboard': typeof DashboardRoute
+  '/delivery': typeof DeliveryRoute
+  '/exhibitions': typeof ExhibitionsRoute
+  '/explore': typeof ExploreRoute
+  '/favorites': typeof FavoritesRoute
+  '/reports': typeof ReportsRoute
+  '/sell': typeof SellRoute
+  '/artists/$id': typeof ArtistsIdRoute
+  '/artwork/$id': typeof ArtworkIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alerts': typeof AlertsRoute
+  '/analytics': typeof AnalyticsRoute
+  '/artists': typeof ArtistsRouteWithChildren
+  '/auctions': typeof AuctionsRoute
+  '/dashboard': typeof DashboardRoute
+  '/delivery': typeof DeliveryRoute
+  '/exhibitions': typeof ExhibitionsRoute
+  '/explore': typeof ExploreRoute
+  '/favorites': typeof FavoritesRoute
+  '/reports': typeof ReportsRoute
+  '/sell': typeof SellRoute
+  '/artists/$id': typeof ArtistsIdRoute
+  '/artwork/$id': typeof ArtworkIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/alerts'
+    | '/analytics'
+    | '/artists'
+    | '/auctions'
+    | '/dashboard'
+    | '/delivery'
+    | '/exhibitions'
+    | '/explore'
+    | '/favorites'
+    | '/reports'
+    | '/sell'
+    | '/artists/$id'
+    | '/artwork/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/alerts'
+    | '/analytics'
+    | '/artists'
+    | '/auctions'
+    | '/dashboard'
+    | '/delivery'
+    | '/exhibitions'
+    | '/explore'
+    | '/favorites'
+    | '/reports'
+    | '/sell'
+    | '/artists/$id'
+    | '/artwork/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/alerts'
+    | '/analytics'
+    | '/artists'
+    | '/auctions'
+    | '/dashboard'
+    | '/delivery'
+    | '/exhibitions'
+    | '/explore'
+    | '/favorites'
+    | '/reports'
+    | '/sell'
+    | '/artists/$id'
+    | '/artwork/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AlertsRoute: typeof AlertsRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  ArtistsRoute: typeof ArtistsRouteWithChildren
+  AuctionsRoute: typeof AuctionsRoute
+  DashboardRoute: typeof DashboardRoute
+  DeliveryRoute: typeof DeliveryRoute
+  ExhibitionsRoute: typeof ExhibitionsRoute
+  ExploreRoute: typeof ExploreRoute
+  FavoritesRoute: typeof FavoritesRoute
+  ReportsRoute: typeof ReportsRoute
+  SellRoute: typeof SellRoute
+  ArtworkIdRoute: typeof ArtworkIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +220,125 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alerts': {
+      id: '/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artists': {
+      id: '/artists'
+      path: '/artists'
+      fullPath: '/artists'
+      preLoaderRoute: typeof ArtistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auctions': {
+      id: '/auctions'
+      path: '/auctions'
+      fullPath: '/auctions'
+      preLoaderRoute: typeof AuctionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delivery': {
+      id: '/delivery'
+      path: '/delivery'
+      fullPath: '/delivery'
+      preLoaderRoute: typeof DeliveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exhibitions': {
+      id: '/exhibitions'
+      path: '/exhibitions'
+      fullPath: '/exhibitions'
+      preLoaderRoute: typeof ExhibitionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sell': {
+      id: '/sell'
+      path: '/sell'
+      fullPath: '/sell'
+      preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artists/$id': {
+      id: '/artists/$id'
+      path: '/$id'
+      fullPath: '/artists/$id'
+      preLoaderRoute: typeof ArtistsIdRouteImport
+      parentRoute: typeof ArtistsRoute
+    }
+    '/artwork/$id': {
+      id: '/artwork/$id'
+      path: '/artwork/$id'
+      fullPath: '/artwork/$id'
+      preLoaderRoute: typeof ArtworkIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface ArtistsRouteChildren {
+  ArtistsIdRoute: typeof ArtistsIdRoute
+}
+
+const ArtistsRouteChildren: ArtistsRouteChildren = {
+  ArtistsIdRoute: ArtistsIdRoute,
+}
+
+const ArtistsRouteWithChildren =
+  ArtistsRoute._addFileChildren(ArtistsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AlertsRoute: AlertsRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  ArtistsRoute: ArtistsRouteWithChildren,
+  AuctionsRoute: AuctionsRoute,
+  DashboardRoute: DashboardRoute,
+  DeliveryRoute: DeliveryRoute,
+  ExhibitionsRoute: ExhibitionsRoute,
+  ExploreRoute: ExploreRoute,
+  FavoritesRoute: FavoritesRoute,
+  ReportsRoute: ReportsRoute,
+  SellRoute: SellRoute,
+  ArtworkIdRoute: ArtworkIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

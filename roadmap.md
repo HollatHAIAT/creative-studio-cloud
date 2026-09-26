@@ -1,0 +1,72 @@
+# creativestudio roadmap
+- [x] Foundation: home, explore, auctions, exhibitions, artists, sell
+- [x] Listing data model + cards (image, price, category, creator)
+- [x] Search, category filters, sorting
+- [x] Creator profile pages (bio + listings)
+- [x] Listing detail: gallery, description, creator link, purchase
+- [x] Favorites
+- [x] Creator dashboard: create/edit/remove listings
+- [x] Image uploads with previews + validation
+- [x] Draft / published / archived listing states
+- [x] Bulk select: publish, archive, delete (confirm + undo)
+- [x] Analytics: views, favorites, conversions metrics
+- [x] Date-range filters + trend charts
+- [x] Listing-level funnel breakdown, strongest/weakest highlighted
+- [x] CSV export of breakdown
+- [x] Referral source attribution
+- [x] Alerts for sudden drops
+- [x] Saved analytics views
+- [~] Scheduled email reports: schedules, weekly/monthly, time zone done — actual sending waits on connecting an email service
+- [x] Delivery history (sent/failed/upcoming) + retry
+- [x] Choose metrics + sources per report
+- [x] Alert thresholds + comparison periods
+- [x] Alert trigger preview
+- [x] Alert history
+- [x] Per-listing pause/resume alerts
+- [x] Acknowledge / resolve alerts
+- [x] Alert notification preferences (email, in-app)
+- [x] Alert history filters (listing, metric, status, dates)
+- [x] Recovery events linked to original alert
+- [x] Group repeated alerts per listing + metric
+- [x] Link alert entries to listing analytics for same period
+- [x] Timeline of alert groups vs recovery events
+- [x] CSV export of filtered alert history
+- [x] Sort alert groups (latest, repeats, largest drop)
+- [x] Bulk acknowledge / resolve alerts (confirm + undo)
+- [x] Expandable chronological alert detail
+- [x] Remember alert sort order + direction
+- [x] Saved alert filter presets
+- [x] Alert history pagination (keeps filters + sort)
+- [x] Recovery duration per alert group
+- [x] Recovery-duration column + sort by longest
+- [x] Duration in CSV + detail view
+- [x] Ongoing elapsed time for unrecovered groups
+- [x] Sort ongoing groups by elapsed time (longest first)
+- [x] Recovery-status filter (ongoing / recovered)
+- [x] Recovery target threshold that flags overdue groups
+- [x] Notify when ongoing group exceeds recovery target (uses notification prefs)
+- [x] Days past target in details + CSV
+- [x] Recovery targets per alert severity
+- [x] Recovery-target compliance summary (over time + by severity)
+- [x] Notification cooldown for overdue groups
+- [x] Compliance CSV export (weekly + severity)
+- [x] Claim / ownership of ongoing alert groups
+- [x] Maintenance windows pausing overdue notifications
+- [x] Compliance date-range + listing/metric filters
+- [x] Report email preview before saving
+- [x] Pause / edit / delete reports + next send time
+- [x] Escalation policies for unacknowledged alert groups
+- [x] Audit timeline per alert group (+ filters: type, responder, time)
+- [x] Escalation dry-run preview
+- [x] Notification routing by listing (service) + severity
+- [x] Per-channel delivery status + retry
+- [x] Retry interval + max attempts, exhausted outcome
+- [x] Fallback channels
+- [x] Delivery performance view (success, latency, retries)
+- [x] Time-range comparison + trend charts for delivery
+- [x] Delivery SLO thresholds (channel, service, severity) + breach alerts
+- [x] Delivery performance CSV export
+- [x] SLO breach history (start/recovery, channel, service, severity) + filters
+- [x] Breach notification destinations + deduplication
+- [x] Error budget + burn rate metrics
+- [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
