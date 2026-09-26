@@ -8,9 +8,10 @@ export type Report = { id: string; name: string; frequency: "weekly" | "monthly"
   metrics?: ReportMetric[]; sources?: string[]; history?: Delivery[] };
 export type ReportMetric = "views" | "favorites" | "purchases" | "conversion" | "top";
 export type Delivery = { id: string; at: string; status: "sent" | "failed" | "upcoming" | "retrying"; error?: string };
-type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig };
+type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs };
+export type NotifyPrefs = { inApp: boolean; email: boolean; address: string; digest: "instant" | "daily" };
 const KEY = "creativestudio:v1";
-const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [], alerts: defaultAlertConfig };
+const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [], alerts: defaultAlertConfig, review: {}, notify: { inApp: true, email: false, address: "", digest: "instant" } };
 let state: State = empty;
 let loaded = false;
 const subs = new Set<() => void>();
@@ -66,6 +67,8 @@ export const actions = {
   saveView(v: SavedView) { set({ ...state, views: [...state.views.filter((x) => x.id !== v.id), v] }); },
   deleteView(id: string) { set({ ...state, views: state.views.filter((x) => x.id !== id) }); },
   saveReport(r: Report) { set({ ...state, reports: [...state.reports.filter((x) => x.id !== r.id), r] }); },
+  setReview(key: string, v: "acknowledged" | "resolved" | null) { const r = { ...state.review }; if (v) r[key] = v; else delete r[key]; set({ ...state, review: r }); },
+  setNotify(n: NotifyPrefs) { set({ ...state, notify: n }); },
   setAlerts(a: AlertConfig) { set({ ...state, alerts: a }); },
   deleteReport(id: string) { set({ ...state, reports: state.reports.filter((x) => x.id !== id) }); },
 };

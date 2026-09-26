@@ -26,7 +26,7 @@ const RANGES = [7, 30, 90];
 
 function Analytics() {
   const all = useAllListings().filter((l) => l.creatorId === DEMO_CREATOR);
-  const { views: saved } = useStore();
+  const { views: saved, alerts: alertCfg } = useStore();
   const [days, setDays] = useState(30);
   const [category, setCategory] = useState("All");
   const [status, setStatus] = useState("all");
@@ -54,7 +54,7 @@ function Analytics() {
     return { per, trend, sum, sources, best: ranked[0]?.l.id, worst: ranked.length > 1 ? ranked[ranked.length - 1].l.id : undefined };
   }, [listings.map((l) => l.id).join(), days]);
 
-  const alerts = listings.flatMap((l) => detectDrops(l.id).map((a) => ({ ...a, title: l.title })));
+  const alerts = listings.flatMap((l) => detectDrops(l.id, alertCfg).map((a) => ({ ...a, title: l.title })));
 
   function exportCsv() {
     const rows = [["Listing", "Status", "Category", "Views", "Favorites", "Purchases", "View→Favorite %", "Favorite→Purchase %", "View→Purchase %"],
@@ -83,6 +83,7 @@ function Analytics() {
           <button onClick={saveView} className={sel}>Save view</button>
           <button onClick={exportCsv} className="ml-auto flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"><Download className="h-4 w-4" />Export CSV</button>
           <Link to="/reports" className="text-sm underline">Email reports</Link>
+          <Link to="/alerts" className="text-sm underline">Alerts</Link>
         </div>
         {saved.length > 0 && (
           <div className="flex flex-wrap gap-2 text-sm">
@@ -98,8 +99,8 @@ function Analytics() {
 
         {alerts.length > 0 && (
           <div className="rounded-sm border border-destructive/40 bg-destructive/5 p-5">
-            <p className="flex items-center gap-2 font-medium text-destructive"><AlertTriangle className="h-4 w-4" />Sudden drops in the last 3 days</p>
-            <ul className="mt-2 space-y-1 text-sm">{alerts.map((a) => <li key={a.listingId + a.metric}><b>{a.title}</b>: {a.metric} down {Math.round(-a.change * 100)}% vs the previous week</li>)}</ul>
+            <p className="flex items-center gap-2 font-medium text-destructive"><AlertTriangle className="h-4 w-4" />Sudden drops in the last {alertCfg.recent} days <Link to="/alerts" className="ml-auto text-sm font-normal underline">Manage alerts</Link></p>
+            <ul className="mt-2 space-y-1 text-sm">{alerts.map((a) => <li key={a.listingId + a.metric}><b>{a.title}</b>: {a.metric} down {Math.round(-a.change * 100)}% vs the previous {alertCfg.prior} days</li>)}</ul>
           </div>
         )}
 

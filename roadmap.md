@@ -23,6 +23,9 @@
 - [ ] Alert trigger preview
 - [ ] Alert history
 - [ ] Per-listing pause/resume alerts
+- [ ] Acknowledge / resolve alerts
+- [ ] Alert notification preferences (email, in-app)
+- [ ] Alert history filters (listing, metric, status, dates)
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
