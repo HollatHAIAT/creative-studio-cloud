@@ -9,6 +9,10 @@ import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
 import { detectDrops, download, listingDaily, pct, SOURCES, sourceSplit, toCsv, totals } from "@/lib/analytics";
 
 export const Route = createFileRoute("/analytics")({
+  validateSearch: (s: Record<string, unknown>): { listing?: string; days?: number } => ({
+    ...(typeof s["listing"] === "string" ? { listing: s["listing"] } : {}),
+    ...(Number(s["days"]) > 0 ? { days: Number(s["days"]) } : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Listing analytics — creativestudio" },
@@ -22,15 +26,17 @@ export const Route = createFileRoute("/analytics")({
   component: Analytics,
 });
 
-const RANGES = [7, 30, 90];
+const RANGES = [7, 14, 30, 90];
 
 function Analytics() {
   const all = useAllListings().filter((l) => l.creatorId === DEMO_CREATOR);
   const { views: saved, alerts: alertCfg } = useStore();
-  const [days, setDays] = useState(30);
+  const search = Route.useSearch();
+  const [days, setDays] = useState(search.days ?? 30);
+  const [only, setOnly] = useState(search.listing);
   const [category, setCategory] = useState("All");
   const [status, setStatus] = useState("all");
-  const listings = all.filter((l) => (category === "All" || l.category === category) && (status === "all" || l.status === status));
+  const listings = all.filter((l) => (category === "All" || l.category === category) && (status === "all" || l.status === status) && (!only || l.id === only));
 
   const data = useMemo(() => {
     const per = listings.map((l) => {
@@ -76,10 +82,11 @@ function Analytics() {
       <div className="mx-auto max-w-7xl space-y-10 px-6">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex rounded-full border border-border p-1">
-            {RANGES.map((r) => <button key={r} onClick={() => setDays(r)} className={`rounded-full px-4 py-1 text-sm ${days === r ? "bg-primary text-primary-foreground" : ""}`}>{r} days</button>)}
+            {[...new Set([...RANGES, days])].sort((a, b) => a - b).map((r) => <button key={r} onClick={() => setDays(r)} className={`rounded-full px-4 py-1 text-sm ${days === r ? "bg-primary text-primary-foreground" : ""}`}>{r} days</button>)}
           </div>
           <select className={sel} value={category} onChange={(e) => setCategory(e.target.value)}>{["All", ...categories].map((c) => <option key={c}>{c}</option>)}</select>
           <select className={sel} value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All states</option><option value="published">Published</option><option value="draft">Drafts</option><option value="archived">Archived</option></select>
+          {only && <button onClick={() => setOnly(undefined)} className="rounded-full bg-muted px-3 py-1.5 text-sm">Only: {all.find((l) => l.id === only)?.title ?? only} ×</button>}
           <button onClick={saveView} className={sel}>Save view</button>
           <button onClick={exportCsv} className="ml-auto flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"><Download className="h-4 w-4" />Export CSV</button>
           <Link to="/reports" className="text-sm underline">Email reports</Link>

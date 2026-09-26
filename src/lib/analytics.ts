@@ -58,17 +58,26 @@ export function evaluate(id: string, cfg: AlertConfig, offset = 0): Alert[] {
 export function detectDrops(id: string, cfg: AlertConfig = defaultAlertConfig) {
   return cfg.paused.includes(id) ? [] : evaluate(id, cfg).filter((a) => a.triggered);
 }
-/** Triggered alerts over the past `days` days (first day of each episode). */
-export function alertHistory(id: string, cfg: AlertConfig, days = 21) {
-  const out: Alert[] = [];
-  const active = new Set<string>();
+export type Trigger = { date: string; change: number; recoveredAt?: string; recoveryChange?: number };
+export type AlertGroup = { listingId: string; metric: Metric; triggers: Trigger[] };
+/** Alert episodes over the past `days` days, grouped per listing + metric, each with its recovery event. */
+export function alertHistory(id: string, cfg: AlertConfig, days = 30): AlertGroup[] {
+  const groups: Record<string, AlertGroup> = {};
+  const open: Partial<Record<Metric, Trigger>> = {};
   for (let o = days; o >= 0; o--) {
     for (const a of evaluate(id, cfg, o)) {
-      if (a.triggered && !active.has(a.metric)) out.push(a);
-      if (a.triggered) active.add(a.metric); else active.delete(a.metric);
+      const cur = open[a.metric];
+      if (a.triggered && !cur) {
+        const t: Trigger = { date: a.date, change: a.change };
+        (groups[a.metric] ??= { listingId: id, metric: a.metric, triggers: [] }).triggers.push(t);
+        open[a.metric] = t;
+      } else if (!a.triggered && cur) {
+        cur.recoveredAt = a.date; cur.recoveryChange = a.change;
+        delete open[a.metric];
+      }
     }
   }
-  return out;
+  return Object.values(groups).map((g) => ({ ...g, triggers: [...g.triggers].reverse() }));
 }
 
 export function toCsv(rows: (string | number)[][]) {

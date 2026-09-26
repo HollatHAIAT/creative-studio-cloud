@@ -26,6 +26,9 @@
 - [ ] Acknowledge / resolve alerts
 - [ ] Alert notification preferences (email, in-app)
 - [ ] Alert history filters (listing, metric, status, dates)
+- [ ] Recovery events linked to original alert
+- [ ] Group repeated alerts per listing + metric
+- [ ] Link alert entries to listing analytics for same period
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

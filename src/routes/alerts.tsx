@@ -35,12 +35,16 @@ function Alerts() {
   const setCfg = (patch: Partial<typeof cfg>) => actions.setAlerts({ ...cfg, ...patch });
   const togglePause = (id: string) => setCfg({ paused: cfg.paused.includes(id) ? cfg.paused.filter((x) => x !== id) : [...cfg.paused, id] });
 
-  const history = useMemo(() => listings.flatMap((l) => cfg.paused.includes(l.id) ? [] : alertHistory(l.id, cfg).map((a) => ({ ...a, title: l.title, key: `${l.id}:${a.metric}:${a.date}` }))).sort((a, b) => b.date.localeCompare(a.date)),
+  const history = useMemo(() => listings.flatMap((l) => cfg.paused.includes(l.id) ? [] : alertHistory(l.id, cfg).map((g) => ({ ...g, title: l.title, key: `${l.id}:${g.metric}` }))),
     [listings.map((l) => l.id).join(), JSON.stringify(cfg)]);
-  const filtered = history.filter((h) => {
-    const st = review[h.key] ?? "open";
-    return (fListing === "all" || h.listingId === fListing) && (fMetric === "all" || h.metric === fMetric) && (fStatus === "all" || st === fStatus) && (!from || h.date >= from) && (!to || h.date <= to);
-  });
+  const periodDays = Math.max(7, cfg.recent + cfg.prior);
+  const filtered = history
+    .map((h) => ({ ...h, triggers: h.triggers.filter((t) => (!from || t.date >= from) && (!to || t.date <= to)) }))
+    .filter((h) => {
+      const st = review[h.key] ?? "open";
+      return h.triggers.length > 0 && (fListing === "all" || h.listingId === fListing) && (fMetric === "all" || h.metric === fMetric) && (fStatus === "all" || st === fStatus);
+    })
+    .sort((x, y) => y.triggers[0]!.date.localeCompare(x.triggers[0]!.date));
 
   return (
     <SiteShell>
@@ -111,27 +115,38 @@ function Alerts() {
             <input type="date" className={inp} value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From date" />
             <input type="date" className={inp} value={to} onChange={(e) => setTo(e.target.value)} aria-label="To date" />
           </div>
-          <table className="mt-4 w-full text-sm">
-            <thead className="text-left text-muted-foreground"><tr><th className="py-2">Date</th><th>Listing</th><th>Metric</th><th>Change</th><th>Comparison</th><th>Status</th><th /></tr></thead>
-            <tbody>
-              {filtered.map((h) => {
-                const st = review[h.key] ?? "open";
-                return (
-                  <tr key={h.key} className="border-t border-border">
-                    <td className="py-3">{h.date}</td><td>{h.title}</td><td className="capitalize">{h.metric}</td>
-                    <td className="text-destructive">{(h.change * 100).toFixed(0)}%</td>
-                    <td>{cfg.recent}d vs prior {cfg.prior}d</td>
-                    <td><span className={`rounded-full px-2 py-0.5 text-xs ${st === "open" ? "bg-destructive/10 text-destructive" : st === "resolved" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{st}</span></td>
-                    <td className="space-x-2 text-right">
+          <div className="mt-4 divide-y divide-border border-y border-border">
+            {filtered.map((h) => {
+              const st = review[h.key] ?? "open";
+              const active = h.triggers.some((t) => !t.recoveredAt);
+              return (
+                <div key={h.key} className="py-4 text-sm">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <p className="font-medium">{h.title} · <span className="capitalize">{h.metric}</span></p>
+                    <span className="text-muted-foreground">{h.triggers.length} trigger{h.triggers.length > 1 ? "s" : ""} · {cfg.recent}d vs prior {cfg.prior}d</span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-destructive/10 text-destructive" : "bg-muted"}`}>{active ? "Still dropping" : "Recovered"}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs ${st === "open" ? "border border-border" : st === "resolved" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{st}</span>
+                    <span className="ml-auto space-x-3">
+                      <Link to="/analytics" search={{ listing: h.listingId, days: periodDays }} className="underline">View analytics</Link>
                       {st === "open" && <button onClick={() => actions.setReview(h.key, "acknowledged")} className="underline">Acknowledge</button>}
                       {st !== "resolved" && <button onClick={() => actions.setReview(h.key, "resolved")} className="underline">Resolve</button>}
                       {st !== "open" && <button onClick={() => actions.setReview(h.key, null)} className="text-muted-foreground underline">Reopen</button>}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </span>
+                  </div>
+                  <ul className="mt-2 space-y-1 pl-4">
+                    {h.triggers.map((t) => (
+                      <li key={t.date} className="flex flex-wrap gap-x-4">
+                        <span>{t.date}: <span className="text-destructive">{(t.change * 100).toFixed(0)}%</span></span>
+                        {t.recoveredAt
+                          ? <span className="text-primary">↳ Recovered {t.recoveredAt} ({t.recoveryChange! >= 0 ? "+" : ""}{(t.recoveryChange! * 100).toFixed(0)}%, back above −{cfg.thresholds[h.metric]}%)</span>
+                          : <span className="text-muted-foreground">↳ Not yet recovered</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
           {filtered.length === 0 && <p className="py-4 text-sm text-muted-foreground">No alerts match these filters.</p>}
         </div>
       </div>
