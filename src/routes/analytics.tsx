@@ -46,9 +46,9 @@ function Analytics() {
     });
     const trend = (per[0]?.daily ?? []).map((d, i) => ({
       date: d.date.slice(5),
-      views: per.reduce((a, p) => a + p.daily[i].views, 0),
-      favorites: per.reduce((a, p) => a + p.daily[i].favorites, 0),
-      purchases: per.reduce((a, p) => a + p.daily[i].purchases, 0),
+      views: per.reduce((a, p) => a + p.daily[i]!.views, 0),
+      favorites: per.reduce((a, p) => a + p.daily[i]!.favorites, 0),
+      purchases: per.reduce((a, p) => a + p.daily[i]!.purchases, 0),
     }));
     const sum = per.reduce((a, p) => ({ views: a.views + p.views, favorites: a.favorites + p.favorites, purchases: a.purchases + p.purchases }), { views: 0, favorites: 0, purchases: 0 });
     const sources = SOURCES.map((s) => {
@@ -57,7 +57,7 @@ function Analytics() {
       return { source: s, views: Math.round(v), favorites: Math.round(f), purchases: Math.round(b) };
     });
     const ranked = [...per].sort((a, b) => b.conv - a.conv);
-    return { per, trend, sum, sources, best: ranked[0]?.l.id, worst: ranked.length > 1 ? ranked[ranked.length - 1].l.id : undefined };
+    return { per, trend, sum, sources, best: ranked[0]?.l.id, worst: ranked.length > 1 ? ranked[ranked.length - 1]!.l.id : undefined };
   }, [listings.map((l) => l.id).join(), days]);
 
   const alerts = listings.flatMap((l) => detectDrops(l.id, alertCfg).map((a) => ({ ...a, title: l.title })));
