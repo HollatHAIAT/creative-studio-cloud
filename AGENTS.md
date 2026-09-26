@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Translations live in `src/lib/i18n.tsx` (`useLocale().t/pick`); data carries `*Ar` fields; `<html dir/lang>` is set by SiteShell. Why: one switch flips the whole app to Arabic RTL.
+- Use logical Tailwind utilities (ms-/me-/ps-/start-/end-/text-end), never left/right. Why: layouts must mirror in RTL.
+- Listing pricing comes from `variants` (original/print/license); `price` is the minimum. Why: one artwork sells in many forms.
