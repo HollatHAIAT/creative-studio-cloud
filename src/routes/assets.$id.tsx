@@ -14,7 +14,7 @@ import { useLocale } from "@/lib/i18n";
 export const Route = createFileRoute("/assets/$id")({
   head: ({ params }) => {
     const b = saudiBanks.find((x) => x.id === params.id);
-    const title = b ? `${b.name} digital assets — creativestudio` : "Digital asset — creativestudio";
+    const title = b ? `${b.name} digital assets — Arwiqa أروقة` : "Digital asset — Arwiqa أروقة";
     return { meta: [
       { title }, { name: "description", content: `Download ${b?.name ?? "asset"} files in PNG, JPG, SVG or PDF with license details.` },
       { property: "og:title", content: title }, { property: "og:description", content: "Free digital asset files and license details." },

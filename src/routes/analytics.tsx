@@ -16,9 +16,9 @@ export const Route = createFileRoute("/analytics")({
   }),
   head: () => ({
     meta: [
-      { title: "Listing analytics — creativestudio" },
+      { title: "Listing analytics — Arwiqa أروقة" },
       { name: "description", content: "Views, favorites, purchase conversions, trends and referral sources for your listings." },
-      { property: "og:title", content: "Listing analytics — creativestudio" },
+      { property: "og:title", content: "Listing analytics — Arwiqa أروقة" },
       { property: "og:description", content: "Track how your listings perform." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -67,7 +67,7 @@ function Analytics() {
     const rows = [["Listing", "Status", "Category", "Views", "Favorites", "Purchases", "View→Favorite %", "Favorite→Purchase %", "View→Purchase %"],
       ...data.per.map((p) => [p.l.title, p.l.status ?? "", p.l.category, p.views, p.favorites, p.purchases, p.favRate.toFixed(1), p.buyRate.toFixed(1), p.conv.toFixed(2)]),
       [], ["Source", "Views", "Favorites", "Purchases"], ...data.sources.map((s) => [s.source, s.views, s.favorites, s.purchases])];
-    download(`creativestudio-analytics-${days}d.csv`, toCsv(rows));
+    download(`Arwiqa-analytics-${days}d.csv`, toCsv(rows));
   }
   function saveView() {
     const name = prompt("Name this view", `${days} days · ${category} · ${status}`)?.trim();

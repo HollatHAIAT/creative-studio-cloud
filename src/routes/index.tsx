@@ -8,9 +8,9 @@ import { BankTile } from "@/components/BankTile";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "creativestudio — Global marketplace for art & creative assets" },
+      { title: "Arwiqa — Global marketplace for art & creative assets" },
       { name: "description", content: "Buy originals, prints and digital licenses, bid in auctions and visit exhibitions from artists worldwide — in English and Arabic." },
-      { property: "og:title", content: "creativestudio — Global art marketplace" },
+      { property: "og:title", content: "Arwiqa — Global art marketplace" },
       { property: "og:description", content: "Originals, prints, auctions and exhibitions in one place." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

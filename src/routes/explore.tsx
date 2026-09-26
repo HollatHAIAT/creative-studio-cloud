@@ -8,9 +8,9 @@ import { useLocale, type Key } from "@/lib/i18n";
 export const Route = createFileRoute("/explore")({
   head: () => ({
     meta: [
-      { title: "Explore artworks — creativestudio" },
+      { title: "Explore artworks — Arwiqa أروقة" },
       { name: "description", content: "Search paintings, photography, calligraphy, prints and digital assets." },
-      { property: "og:title", content: "Explore artworks — creativestudio" },
+      { property: "og:title", content: "Explore artworks — Arwiqa أروقة" },
       { property: "og:description", content: "Search paintings, photography, prints and digital assets." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

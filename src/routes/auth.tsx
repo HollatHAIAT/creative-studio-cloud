@@ -11,8 +11,8 @@ import { safeNext } from "@/lib/auth";
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>) => ({ next: typeof s["next"] === "string" ? (s["next"] as string) : undefined }),
   head: () => ({ meta: [
-    { title: "Sign in — creativestudio" }, { name: "description", content: "Sign in or create your creativestudio account to bid, book tickets and buy art." },
-    { property: "og:title", content: "Sign in — creativestudio" }, { property: "og:description", content: "Your creativestudio account." },
+    { title: "Sign in — Arwiqa أروقة" }, { name: "description", content: "Sign in or create your Arwiqa account to bid, book tickets and buy art." },
+    { property: "og:title", content: "Sign in — Arwiqa أروقة" }, { property: "og:description", content: "Your Arwiqa account." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
   component: AuthPage,

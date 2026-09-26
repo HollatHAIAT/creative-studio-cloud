@@ -8,8 +8,8 @@ import { useLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [
-    { title: "Notification settings — creativestudio" }, { name: "description", content: "Choose which order, ticket and bid alerts you receive." },
-    { property: "og:title", content: "Settings — creativestudio" }, { property: "og:description", content: "Notification settings." },
+    { title: "Notification settings — Arwiqa أروقة" }, { name: "description", content: "Choose which order, ticket and bid alerts you receive." },
+    { property: "og:title", content: "Settings — Arwiqa أروقة" }, { property: "og:description", content: "Notification settings." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
   component: Settings,

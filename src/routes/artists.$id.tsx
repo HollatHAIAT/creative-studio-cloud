@@ -12,9 +12,9 @@ export const Route = createFileRoute("/artists/$id")({
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
-      { title: `${loaderData.name} — ${loaderData.discipline} on creativestudio` },
+      { title: `${loaderData.name} — ${loaderData.discipline} on Arwiqa` },
       { name: "description", content: loaderData.bio },
-      { property: "og:title", content: `${loaderData.name} — creativestudio` },
+      { property: "og:title", content: `${loaderData.name} — Arwiqa أروقة` },
       { property: "og:description", content: loaderData.bio },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary_large_image" },

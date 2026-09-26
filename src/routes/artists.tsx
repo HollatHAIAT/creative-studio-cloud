@@ -6,9 +6,9 @@ import { artists } from "@/lib/data";
 export const Route = createFileRoute("/artists")({
   head: () => ({
     meta: [
-      { title: "Artists — creativestudio" },
+      { title: "Artists — Arwiqa أروقة" },
       { name: "description", content: "Discover and follow painters, photographers and calligraphers worldwide." },
-      { property: "og:title", content: "Artists — creativestudio" },
+      { property: "og:title", content: "Artists — Arwiqa أروقة" },
       { property: "og:description", content: "Discover and follow artists worldwide." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

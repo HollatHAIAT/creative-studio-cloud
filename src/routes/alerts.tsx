@@ -11,9 +11,9 @@ import { alertHistory, dayKey, download, evaluate, toCsv, type Metric } from "@/
 export const Route = createFileRoute("/alerts")({
   head: () => ({
     meta: [
-      { title: "Drop alerts — creativestudio" },
+      { title: "Drop alerts — Arwiqa أروقة" },
       { name: "description", content: "Set thresholds for drops in listing views, favorites and purchases, and review alert history." },
-      { property: "og:title", content: "Drop alerts — creativestudio" },
+      { property: "og:title", content: "Drop alerts — Arwiqa أروقة" },
       { property: "og:description", content: "Configure and review listing drop alerts." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -94,7 +94,7 @@ function Alerts() {
     const origin = window.location.origin;
     const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Severity", "Recovery target (days)", "Days past target", "Owner", "Escalated to", "Analytics link"]];
     filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", severity(h), targetFor(h, cfg), daysPast(h, cfg), owners[h.key]?.name ?? "", esc(h)?.responder ?? "", `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
-    download("creativestudio-alert-history.csv", toCsv(rows));
+    download("Arwiqa-alert-history.csv", toCsv(rows));
   }
   const DAYS = 30;
   const dayList = Array.from({ length: DAYS + 1 }, (_, i) => dayKey(Date.now() - (DAYS - i) * 86400000));
@@ -221,7 +221,7 @@ function Alerts() {
         {(() => {
           const cGroups = history.filter((h) => (cListing === "all" || h.listingId === cListing) && (cMetric === "all" || h.metric === cMetric)).map((h) => ({ ...h, triggers: h.triggers.filter((t) => (!cFrom || t.date >= cFrom) && (!cTo || t.date <= cTo)) })).filter((h) => h.triggers.length);
           const c = compliance(cGroups, cfg);
-          const exportCompliance = () => download("creativestudio-recovery-compliance.csv", toCsv([
+          const exportCompliance = () => download("Arwiqa-recovery-compliance.csv", toCsv([
             ["Filters", `listing=${cListing}`, `metric=${cMetric}`, `from=${cFrom || "any"}`, `to=${cTo || "any"}`], [],
             ["Overall", "Met", "Total", "% met"], ["All", c.overall.met, c.overall.total, c.overall.pct.toFixed(1)], [],
             ["Week starting", "Met", "Total", "% met"], ...c.weeks.map((w) => [w.week, w.met, w.total, w.pct.toFixed(1)]), [],

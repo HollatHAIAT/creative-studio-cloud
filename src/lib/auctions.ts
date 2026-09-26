@@ -54,7 +54,7 @@ export function useDbAuctions() {
   });
   // Realtime: any new bid refreshes prices everywhere.
   useEff(() => {
-    const ch = supabase.channel("bids-live").on("postgres_changes", { event: "INSERT", schema: "public", table: "bids" }, () => {
+    const ch = supabase.channel(`bids-live-${crypto.randomUUID()}`).on("postgres_changes", { event: "INSERT", schema: "public", table: "bids" }, () => {
       qc.invalidateQueries({ queryKey: ["auctions"] }); qc.invalidateQueries({ queryKey: ["reserve"] });
     }).subscribe();
     return () => { supabase.removeChannel(ch); };

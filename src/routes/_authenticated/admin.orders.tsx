@@ -11,8 +11,8 @@ import { fmt } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/admin/orders")({
   head: () => ({ meta: [
-    { title: "Order management — creativestudio" }, { name: "description", content: "Staff review of ticket, artwork and license orders." },
-    { property: "og:title", content: "Order management — creativestudio" }, { property: "og:description", content: "Staff order management." },
+    { title: "Order management — Arwiqa أروقة" }, { name: "description", content: "Staff review of ticket, artwork and license orders." },
+    { property: "og:title", content: "Order management — Arwiqa أروقة" }, { property: "og:description", content: "Staff order management." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
   component: () => <StaffGate><AdminOrders /></StaffGate>,
@@ -31,7 +31,7 @@ function AdminOrders() {
   const events = useQuery({ queryKey: ["admin", "events", open], enabled: !!open, queryFn: async () => (await supabase.from("order_events").select("*").eq("order_id", open!).order("created_at")).data ?? [] });
 
   useEffect(() => {
-    const ch = supabase.channel("admin-orders")
+    const ch = supabase.channel(`admin-orders-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => qc.invalidateQueries({ queryKey: ["admin"] }))
       .on("postgres_changes", { event: "*", schema: "public", table: "refund_requests" }, () => qc.invalidateQueries({ queryKey: ["admin"] }))
       .subscribe();

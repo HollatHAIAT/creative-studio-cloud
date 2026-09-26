@@ -11,8 +11,8 @@ import { exhibitions, fmt } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/orders/$id")({
   head: () => ({ meta: [
-    { title: "Order details — creativestudio" }, { name: "description", content: "Order status, items, tickets and receipt." },
-    { property: "og:title", content: "Order details — creativestudio" }, { property: "og:description", content: "Your order on creativestudio." },
+    { title: "Order details — Arwiqa أروقة" }, { name: "description", content: "Order status, items, tickets and receipt." },
+    { property: "og:title", content: "Order details — Arwiqa أروقة" }, { property: "og:description", content: "Your order on Arwiqa." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
   component: OrderPage,

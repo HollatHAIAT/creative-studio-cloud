@@ -6,9 +6,9 @@ import { useListings, useStore } from "@/lib/store";
 export const Route = createFileRoute("/favorites")({
   head: () => ({
     meta: [
-      { title: "Your favorites — creativestudio" },
-      { name: "description", content: "Artworks you've saved on creativestudio." },
-      { property: "og:title", content: "Favorites — creativestudio" },
+      { title: "Your favorites — Arwiqa أروقة" },
+      { name: "description", content: "Artworks you've saved on Arwiqa." },
+      { property: "og:title", content: "Favorites — Arwiqa أروقة" },
       { property: "og:description", content: "Artworks you've saved." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

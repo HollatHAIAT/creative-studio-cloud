@@ -11,9 +11,9 @@ import { FORMATS, metadataCsv, save, type AssetFormat } from "@/lib/bank-assets"
 export const Route = createFileRoute("/collections/saudi-banks")({
   head: () => ({
     meta: [
-      { title: "Saudi Banks digital asset collection — creativestudio" },
+      { title: "Saudi Banks digital asset collection — Arwiqa أروقة" },
       { name: "description", content: "Free logo asset collection for ten Saudi banks: select, choose PNG, JPG, SVG or PDF, and download individually or as a ZIP with CSV metadata." },
-      { property: "og:title", content: "Saudi Banks collection — creativestudio" },
+      { property: "og:title", content: "Saudi Banks collection — Arwiqa أروقة" },
       { property: "og:description", content: "Free digital assets for Saudi banks with bulk ZIP download and license details." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -12,9 +12,9 @@ import { breaches, buildDeliveries, CHANNELS, errorBudget, inRange, perf, today,
 export const Route = createFileRoute("/delivery")({
   head: () => ({
     meta: [
-      { title: "Alert delivery — creativestudio" },
+      { title: "Alert delivery — Arwiqa أروقة" },
       { name: "description", content: "Route alerts by listing and severity, manage retries and fallbacks, and track delivery performance and SLOs." },
-      { property: "og:title", content: "Alert delivery — creativestudio" },
+      { property: "og:title", content: "Alert delivery — Arwiqa أروقة" },
       { property: "og:description", content: "Alert routing, retries, delivery performance and SLOs." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -69,7 +69,7 @@ function Delivery() {
       const p0 = perf(prev, dims[k] as never);
       perf(now, dims[k] as never).forEach((p) => { const q = p0.find((x) => x.key === p.key); rows.push([k, p.key, p.sent, p.delivered, p.success.toFixed(1), q ? q.success.toFixed(1) : "", p.latency.toFixed(2), q ? q.latency.toFixed(2) : "", p.retries, q?.retries ?? ""]); });
     });
-    download(`creativestudio-delivery-performance-${range}d.csv`, toCsv(rows));
+    download(`Arwiqa-delivery-performance-${range}d.csv`, toCsv(rows));
   }
 
   // ---- SLOs + breaches
