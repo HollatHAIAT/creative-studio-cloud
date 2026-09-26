@@ -15,6 +15,7 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as AuctionsRouteImport } from './routes/auctions'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ExhibitionsRouteImport } from './routes/exhibitions'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FavoritesRouteImport } from './routes/favorites'
@@ -51,6 +52,11 @@ const AuctionsRoute = AuctionsRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeliveryRoute = DeliveryRouteImport.update({
+  id: '/delivery',
+  path: '/delivery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExhibitionsRoute = ExhibitionsRouteImport.update({
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/artists': typeof ArtistsRouteWithChildren
   '/auctions': typeof AuctionsRoute
   '/dashboard': typeof DashboardRoute
+  '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRoute
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/artists': typeof ArtistsRouteWithChildren
   '/auctions': typeof AuctionsRoute
   '/dashboard': typeof DashboardRoute
+  '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRoute
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/artists': typeof ArtistsRouteWithChildren
   '/auctions': typeof AuctionsRoute
   '/dashboard': typeof DashboardRoute
+  '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRoute
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/auctions'
     | '/dashboard'
+    | '/delivery'
     | '/exhibitions'
     | '/explore'
     | '/favorites'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/auctions'
     | '/dashboard'
+    | '/delivery'
     | '/exhibitions'
     | '/explore'
     | '/favorites'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/auctions'
     | '/dashboard'
+    | '/delivery'
     | '/exhibitions'
     | '/explore'
     | '/favorites'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   ArtistsRoute: typeof ArtistsRouteWithChildren
   AuctionsRoute: typeof AuctionsRoute
   DashboardRoute: typeof DashboardRoute
+  DeliveryRoute: typeof DeliveryRoute
   ExhibitionsRoute: typeof ExhibitionsRoute
   ExploreRoute: typeof ExploreRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -240,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delivery': {
+      id: '/delivery'
+      path: '/delivery'
+      fullPath: '/delivery'
+      preLoaderRoute: typeof DeliveryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/exhibitions': {
@@ -312,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistsRoute: ArtistsRouteWithChildren,
   AuctionsRoute: AuctionsRoute,
   DashboardRoute: DashboardRoute,
+  DeliveryRoute: DeliveryRoute,
   ExhibitionsRoute: ExhibitionsRoute,
   ExploreRoute: ExploreRoute,
   FavoritesRoute: FavoritesRoute,

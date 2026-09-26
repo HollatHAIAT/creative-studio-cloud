@@ -102,7 +102,7 @@ function Alerts() {
     <SiteShell>
       <PageTitle eyebrow="Analytics" title="Drop alerts" sub="Get notified when a listing's views, favorites or purchases fall sharply. Based on sample data until live tracking is connected." />
       <div className="mx-auto max-w-7xl space-y-8 px-6">
-        <Link to="/analytics" className="text-sm underline">Back to analytics</Link>
+        <div className="flex gap-4 text-sm"><Link to="/analytics" className="underline">Back to analytics</Link><Link to="/delivery" className="underline">Alert delivery, routing &amp; SLOs</Link></div>
         <div className="grid gap-6 lg:grid-cols-2">
           <div className={card}>
             <h2 className="font-display text-2xl">Thresholds</h2>
@@ -182,6 +182,17 @@ function Alerts() {
             <input className={inp} placeholder="Responder name" maxLength={40} value={newResp} onChange={(e) => setNewResp(e.target.value)} />
             <button className={inp} onClick={() => { const n = newResp.trim(); if (!n) return; actions.setEscalation({ ...escalation, responders: [...escalation.responders, n] }); setNewResp(""); }}>Add responder</button>
           </div>
+          {escalation.responders.length > 0 && (
+            <div className="mt-4 rounded-sm bg-muted p-4 text-sm">
+              <p className="font-medium">Dry run {escalation.enabled ? "" : "(policy not enabled yet)"}</p>
+              <p className="text-xs text-muted-foreground">If an alert group stays unacknowledged, this is who would receive it:</p>
+              <ol className="mt-2 space-y-1">
+                {escalation.responders.map((r, i) => <li key={r + i}><b>{i === 0 ? "Immediately" : `After ${i * escalation.intervalHours}h`}</b> → {r} (level {i + 1}){i === escalation.responders.length - 1 && " — stays here until someone acknowledges"}</li>)}
+              </ol>
+              {(() => { const affected = history.filter((h) => groupDuration(h).ongoing && !owners[h.key] && (review[h.key] ?? "open") === "open"); return affected.length > 0 && (
+                <p className="mt-2 text-xs">Right now {affected.length} open group{affected.length > 1 ? "s" : ""} would route to: {affected.slice(0, 4).map((h) => `${h.title} ${h.metric} → ${escalationFor(h, { ...escalation, enabled: true }, false)?.responder}`).join(" · ")}</p>); })()}
+            </div>
+          )}
           <p className="mt-2 text-xs text-muted-foreground">Responders are names for now; they'll get notified directly once accounts and email are connected.</p>
         </div>
 
@@ -337,6 +348,7 @@ function Alerts() {
                   <p className="mt-1 text-xs text-muted-foreground">{recoveryInfo(h)}</p>
                   <button onClick={() => setOpen(open.includes(h.key) ? open.filter((k) => k !== h.key) : [...open, h.key])} className="mt-2 text-xs underline" aria-expanded={open.includes(h.key)}>{open.includes(h.key) ? "Hide details" : "Show details"}</button>
                   {open.includes(h.key) && <p className="mt-2 text-xs font-medium">Recovery duration: {durLabel(groupDuration(h))}{groupDuration(h).ongoing ? ` (elapsed since ${groupDuration(h).first})` : ` (${groupDuration(h).first} → ${groupDuration(h).end})`} · <span className="capitalize">{severity(h)}</span> target {targetFor(h, cfg)} days{groupDuration(h).ongoing && (daysPast(h, cfg) > 0 ? <span className="text-destructive"> · {daysPast(h, cfg)} days past target</span> : <span> · {targetFor(h, cfg) - groupDuration(h).days} days left</span>)}</p>}
+                  {open.includes(h.key) && <AuditTimeline h={h} />}
                   {open.includes(h.key) && <ol className="mt-2 border-l-2 border-border pl-4">
                     {h.triggers.flatMap((t) => [{ d: t.date, kind: "drop" as const, c: t.change, ref: t.date }, ...(t.recoveredAt ? [{ d: t.recoveredAt, kind: "recovery" as const, c: t.recoveryChange!, ref: t.date }] : [])]).sort((a, b) => a.d.localeCompare(b.d)).map((ev) => (
                       <li key={ev.kind + ev.d} className="relative py-1"><span className={`absolute -left-[21px] top-2 h-2.5 w-2.5 rounded-full ${ev.kind === "drop" ? "bg-destructive" : "bg-chart-2"}`} />
@@ -377,5 +389,45 @@ function Alerts() {
         </AlertDialogContent>
       </AlertDialog>
     </SiteShell>
+  );
+}
+
+type AuditRow = { at: number; type: string; actor: string; detail: string };
+function AuditTimeline({ h }: { h: { key: string; triggers: { date: string; change: number; recoveredAt?: string }[] } }) {
+  const { audit, escalation, owners, review } = useStore();
+  const [type, setType] = useState("all");
+  const [actor, setActor] = useState("all");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const rows: AuditRow[] = [
+    ...h.triggers.flatMap((t) => [
+      { at: Date.parse(t.date), type: "status", actor: "System", detail: `Drop triggered (${(t.change * 100).toFixed(0)}%)` },
+      ...(t.recoveredAt ? [{ at: Date.parse(t.recoveredAt), type: "status", actor: "System", detail: "Recovered above threshold" }] : []),
+    ]),
+    ...audit.filter((e) => e.key === h.key),
+  ];
+  const esc = escalationFor(h, escalation, !!owners[h.key] || (review[h.key] ?? "open") !== "open");
+  if (esc) {
+    const first = Date.parse(groupDuration(h).first);
+    for (let i = 0; i < esc.level; i++) rows.push({ at: first + i * escalation.intervalHours * 3600000, type: "escalation", actor: "System", detail: `Routed to ${escalation.responders[i]} (level ${i + 1})` });
+  }
+  const actors = [...new Set(rows.map((r) => r.actor))];
+  const types = [...new Set(rows.map((r) => r.type))];
+  const shown = rows.filter((r) => (type === "all" || r.type === type) && (actor === "all" || r.actor === actor) && (!from || r.at >= Date.parse(from)) && (!to || r.at < Date.parse(to) + 86400000)).sort((a, b) => a.at - b.at);
+  const sel = "rounded-sm border border-border bg-background px-2 py-1 text-xs";
+  return (
+    <div className="mt-3 rounded-sm bg-muted p-3 text-xs">
+      <div className="flex flex-wrap items-center gap-2">
+        <b className="mr-auto">Audit timeline</b>
+        <select className={sel} value={type} onChange={(e) => setType(e.target.value)} aria-label="Event type"><option value="all">All events</option>{types.map((t) => <option key={t}>{t}</option>)}</select>
+        <select className={sel} value={actor} onChange={(e) => setActor(e.target.value)} aria-label="Responder"><option value="all">Anyone</option>{actors.map((a) => <option key={a}>{a}</option>)}</select>
+        <input type="date" className={sel} value={from} onChange={(e) => setFrom(e.target.value)} aria-label="Audit from" />
+        <input type="date" className={sel} value={to} onChange={(e) => setTo(e.target.value)} aria-label="Audit to" />
+      </div>
+      <ul className="mt-2 space-y-1">
+        {shown.map((r, i) => <li key={i} className="flex gap-3"><span className="w-36 shrink-0 text-muted-foreground">{new Date(r.at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span><span className="w-24 shrink-0 capitalize">{r.type}</span><span className="w-20 shrink-0">{r.actor}</span><span>{r.detail}</span></li>)}
+        {shown.length === 0 && <li className="text-muted-foreground">No events match.</li>}
+      </ul>
+    </div>
   );
 }
