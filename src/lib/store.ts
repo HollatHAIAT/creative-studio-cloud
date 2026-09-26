@@ -1,12 +1,16 @@
 import { useSyncExternalStore } from "react";
+import { defaultAlertConfig, type AlertConfig } from "./analytics";
 import { seedListings, toArtwork, type Listing, type ListingStatus } from "./data";
 
 // Demo persistence in the browser; to be replaced by Lovable Cloud with accounts.
 export type SavedView = { id: string; name: string; days: number; category: string; status: string };
-export type Report = { id: string; name: string; frequency: "weekly" | "monthly"; weekday: number; monthday: number; time: string; timezone: string; email: string; paused: boolean; includeSources: boolean };
-type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[] };
+export type Report = { id: string; name: string; frequency: "weekly" | "monthly"; weekday: number; monthday: number; time: string; timezone: string; email: string; paused: boolean; includeSources: boolean;
+  metrics?: ReportMetric[]; sources?: string[]; history?: Delivery[] };
+export type ReportMetric = "views" | "favorites" | "purchases" | "conversion" | "top";
+export type Delivery = { id: string; at: string; status: "sent" | "failed" | "upcoming" | "retrying"; error?: string };
+type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig };
 const KEY = "creativestudio:v1";
-const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [] };
+const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [], alerts: defaultAlertConfig };
 let state: State = empty;
 let loaded = false;
 const subs = new Set<() => void>();
@@ -62,5 +66,6 @@ export const actions = {
   saveView(v: SavedView) { set({ ...state, views: [...state.views.filter((x) => x.id !== v.id), v] }); },
   deleteView(id: string) { set({ ...state, views: state.views.filter((x) => x.id !== id) }); },
   saveReport(r: Report) { set({ ...state, reports: [...state.reports.filter((x) => x.id !== r.id), r] }); },
+  setAlerts(a: AlertConfig) { set({ ...state, alerts: a }); },
   deleteReport(id: string) { set({ ...state, reports: state.reports.filter((x) => x.id !== id) }); },
 };

@@ -32,7 +32,7 @@ export function listingDaily(id: string, days: number, end = Date.now()): DaySta
 export function sourceSplit(id: string) {
   const w = SOURCES.map((s) => 0.3 + rand(id + s));
   const sum = w.reduce((a, b) => a + b, 0);
-  return SOURCES.map((s, i) => ({ source: s, share: w[i] / sum, conv: 0.5 + rand(id + s + "c") }));
+  return SOURCES.map((s, i) => ({ source: s, share: w[i]! / sum, conv: 0.5 + rand(id + s + "c") }));
 }
 
 export function totals(d: DayStat[]) {
@@ -40,16 +40,35 @@ export function totals(d: DayStat[]) {
 }
 export const pct = (a: number, b: number) => (b ? (a / b) * 100 : 0);
 
-export type Alert = { listingId: string; metric: "views" | "favorites" | "purchases"; change: number };
-/** Compare last 3 days vs the 7 days before; flag drops > 30%. */
-export function detectDrops(id: string): Alert[] {
-  const d = listingDaily(id, 10);
-  const recent = totals(d.slice(-3)), prior = totals(d.slice(0, 7));
-  return (["views", "favorites", "purchases"] as const).flatMap((m) => {
-    const r = recent[m] / 3, p = prior[m] / 7;
-    const change = p ? (r - p) / p : 0;
-    return change < -0.3 ? [{ listingId: id, metric: m, change }] : [];
+export type Metric = "views" | "favorites" | "purchases";
+export type AlertConfig = { thresholds: Record<Metric, number>; recent: number; prior: number; paused: string[] };
+export const defaultAlertConfig: AlertConfig = { thresholds: { views: 30, favorites: 30, purchases: 40 }, recent: 3, prior: 7, paused: [] };
+export type Alert = { listingId: string; metric: Metric; change: number; threshold: number; triggered: boolean; date: string };
+/** Compare the average of the last `recent` days vs the `prior` days before, ending `offset` days ago. */
+export function evaluate(id: string, cfg: AlertConfig, offset = 0): Alert[] {
+  const end = Date.now() - offset * DAY;
+  const d = listingDaily(id, cfg.recent + cfg.prior, end);
+  const r = totals(d.slice(-cfg.recent)), p = totals(d.slice(0, cfg.prior));
+  return (["views", "favorites", "purchases"] as const).map((m) => {
+    const ra = r[m] / cfg.recent, pa = p[m] / cfg.prior;
+    const change = pa ? (ra - pa) / pa : 0;
+    return { listingId: id, metric: m, change, threshold: cfg.thresholds[m], triggered: change * 100 <= -cfg.thresholds[m], date: dayKey(end) };
   });
+}
+export function detectDrops(id: string, cfg: AlertConfig = defaultAlertConfig) {
+  return cfg.paused.includes(id) ? [] : evaluate(id, cfg).filter((a) => a.triggered);
+}
+/** Triggered alerts over the past `days` days (first day of each episode). */
+export function alertHistory(id: string, cfg: AlertConfig, days = 21) {
+  const out: Alert[] = [];
+  const active = new Set<string>();
+  for (let o = days; o >= 0; o--) {
+    for (const a of evaluate(id, cfg, o)) {
+      if (a.triggered && !active.has(a.metric)) out.push(a);
+      if (a.triggered) active.add(a.metric); else active.delete(a.metric);
+    }
+  }
+  return out;
 }
 
 export function toCsv(rows: (string | number)[][]) {

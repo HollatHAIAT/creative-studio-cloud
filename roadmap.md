@@ -17,6 +17,12 @@
 - [x] Alerts for sudden drops
 - [x] Saved analytics views
 - [~] Scheduled email reports: schedules, weekly/monthly, time zone done — actual sending waits on connecting an email service
+- [ ] Delivery history (sent/failed/upcoming) + retry
+- [ ] Choose metrics + sources per report
+- [ ] Alert thresholds + comparison periods
+- [ ] Alert trigger preview
+- [ ] Alert history
+- [ ] Per-listing pause/resume alerts
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

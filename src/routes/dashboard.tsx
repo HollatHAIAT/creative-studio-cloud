@@ -97,7 +97,7 @@ function Dashboard() {
       title: form.title.trim(), creatorId: DEMO_CREATOR, category: form.category, images: form.images,
       price, medium: form.medium.trim(), year: Number(form.year) || new Date().getFullYear(),
       description: form.description.trim(), formats: form.formats.split(",").map((s) => s.trim()).filter(Boolean),
-      createdAt: existing?.createdAt ?? Date.now(), auction: existing?.auction, status: form.status,
+      createdAt: existing?.createdAt ?? Date.now(), ...(existing?.auction ? { auction: existing.auction } : {}), status: form.status,
     };
     actions.save(listing);
     toast.success(form.id ? "Listing updated" : "Listing published");
