@@ -14,16 +14,375 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      asset_files: {
+        Row: {
+          asset_id: string
+          content_type: string | null
+          created_at: string
+          file_name: string
+          format: string
+          id: string
+          size_bytes: number
+          storage_path: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          asset_id: string
+          content_type?: string | null
+          created_at?: string
+          file_name: string
+          format: string
+          id?: string
+          size_bytes?: number
+          storage_path: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          asset_id?: string
+          content_type?: string | null
+          created_at?: string
+          file_name?: string
+          format?: string
+          id?: string
+          size_bytes?: number
+          storage_path?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_files_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "digital_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auctions: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          increment: number
+          listing_id: string
+          reserve: number
+          start_bid: number
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id: string
+          increment?: number
+          listing_id: string
+          reserve: number
+          start_bid: number
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          increment?: number
+          listing_id?: string
+          reserve?: number
+          start_bid?: number
+          starts_at?: string
+        }
+        Relationships: []
+      }
+      bids: {
+        Row: {
+          amount: number
+          auction_id: string
+          bidder_name: string
+          created_at: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          auction_id: string
+          bidder_name: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          auction_id?: string
+          bidder_name?: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bids_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          created_at: string
+          exhibition_id: string
+          id: string
+          order_id: string | null
+          quantity: number
+          reference: string
+          slot: string
+          status: string
+          tickets: Json
+          total: number
+          user_id: string
+          visit_date: string
+        }
+        Insert: {
+          created_at?: string
+          exhibition_id: string
+          id?: string
+          order_id?: string | null
+          quantity: number
+          reference?: string
+          slot: string
+          status?: string
+          tickets?: Json
+          total?: number
+          user_id: string
+          visit_date: string
+        }
+        Update: {
+          created_at?: string
+          exhibition_id?: string
+          id?: string
+          order_id?: string | null
+          quantity?: number
+          reference?: string
+          slot?: string
+          status?: string
+          tickets?: Json
+          total?: number
+          user_id?: string
+          visit_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_exhibition_id_fkey"
+            columns: ["exhibition_id"]
+            isOneToOne: false
+            referencedRelation: "exhibitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      digital_assets: {
+        Row: {
+          code: string
+          collection: string
+          color: string
+          created_at: string
+          founded: number | null
+          id: string
+          is_official: boolean
+          license: string
+          license_ar: string
+          name: string
+          name_ar: string
+          sort: number
+        }
+        Insert: {
+          code: string
+          collection?: string
+          color?: string
+          created_at?: string
+          founded?: number | null
+          id: string
+          is_official?: boolean
+          license?: string
+          license_ar?: string
+          name: string
+          name_ar: string
+          sort?: number
+        }
+        Update: {
+          code?: string
+          collection?: string
+          color?: string
+          created_at?: string
+          founded?: number | null
+          id?: string
+          is_official?: boolean
+          license?: string
+          license_ar?: string
+          name?: string
+          name_ar?: string
+          sort?: number
+        }
+        Relationships: []
+      }
+      exhibitions: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+        }
+        Insert: {
+          capacity: number
+          created_at?: string
+          id: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string
+          body_ar: string
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          read_at: string | null
+          title: string
+          title_ar: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          body_ar?: string
+          created_at?: string
+          id?: string
+          kind: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          title_ar: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          body_ar?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          title_ar?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          contact: Json
+          created_at: string
+          currency: string
+          id: string
+          items: Json
+          payment_method: string
+          reference: string
+          shipping: number
+          shipping_address: Json | null
+          status: string
+          subtotal: number
+          total: number
+          user_id: string
+          vat: number
+        }
+        Insert: {
+          contact?: Json
+          created_at?: string
+          currency?: string
+          id?: string
+          items: Json
+          payment_method: string
+          reference?: string
+          shipping?: number
+          shipping_address?: Json | null
+          status?: string
+          subtotal: number
+          total: number
+          user_id: string
+          vat?: number
+        }
+        Update: {
+          contact?: Json
+          created_at?: string
+          currency?: string
+          id?: string
+          items?: Json
+          payment_method?: string
+          reference?: string
+          shipping?: number
+          shipping_address?: Json | null
+          status?: string
+          subtotal?: number
+          total?: number
+          user_id?: string
+          vat?: number
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      slot_bookings: {
+        Args: { _date: string; _exhibition_id: string }
+        Returns: {
+          booked: number
+          slot: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +509,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
