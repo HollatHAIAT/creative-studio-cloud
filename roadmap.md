@@ -97,5 +97,6 @@
 - [ ] Creator dashboard listings still stored in browser — move to database
 
 - [ ] Fix sign-in page loading + admin access for Alhabaty@gmail.com
-- [ ] Rename platform to أروقة (Arwiqa) + palm & brush logo
-- [ ] Fix white screen: live-update listeners registered after subscribe
+- [x] Rename platform to أروقة (Arwiqa) + palm & brush logo
+- [x] Fix white screen: live-update listeners registered after subscribe
+- [x] Unique bids-live channel + cleanup
