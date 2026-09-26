@@ -7,16 +7,16 @@
 - [x] Favorites
 - [x] Creator dashboard: create/edit/remove listings
 - [x] Image uploads with previews + validation
-- [ ] Draft / published / archived listing states
-- [ ] Bulk select: publish, archive, delete (confirm + undo)
-- [ ] Analytics: views, favorites, conversions metrics
-- [ ] Date-range filters + trend charts
-- [ ] Listing-level funnel breakdown, strongest/weakest highlighted
-- [ ] CSV export of breakdown
-- [ ] Referral source attribution
-- [ ] Alerts for sudden drops
-- [ ] Saved analytics views
-- [ ] Scheduled email reports (weekly/monthly, send time, time zone)
-- [ ] Report email preview before saving
-- [ ] Pause / edit / delete reports + next send time
+- [x] Draft / published / archived listing states
+- [x] Bulk select: publish, archive, delete (confirm + undo)
+- [x] Analytics: views, favorites, conversions metrics
+- [x] Date-range filters + trend charts
+- [x] Listing-level funnel breakdown, strongest/weakest highlighted
+- [x] CSV export of breakdown
+- [x] Referral source attribution
+- [x] Alerts for sudden drops
+- [x] Saved analytics views
+- [~] Scheduled email reports: schedules, weekly/monthly, time zone done — actual sending waits on connecting an email service
+- [x] Report email preview before saving
+- [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
