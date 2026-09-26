@@ -8,7 +8,7 @@ import { OverdueNotifier } from "@/components/OverdueNotifier";
 import { useDocumentDirection, useLocale, type Key } from "@/lib/i18n";
 import { allBids, auctionFor, statusOf, topBid, useNow } from "@/lib/auctions";
 
-const nav: { to: string; k: Key }[] = [
+const nav = [
   { to: "/explore", k: "nav.explore" },
   { to: "/auctions", k: "nav.auctions" },
   { to: "/exhibitions", k: "nav.exhibitions" },
@@ -16,7 +16,7 @@ const nav: { to: string; k: Key }[] = [
   { to: "/collections/saudi-banks", k: "nav.collections" },
   { to: "/dashboard", k: "nav.dashboard" },
   { to: "/analytics", k: "nav.analytics" },
-];
+] as const satisfies readonly { to: string; k: Key }[];
 
 export function SiteShell({ children }: { children: ReactNode }) {
   useDocumentDirection();
