@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ArtistsRouteImport } from './routes/artists'
+import { Route as AuctionsRouteImport } from './routes/auctions'
+import { Route as ExhibitionsRouteImport } from './routes/exhibitions'
+import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as SellRouteImport } from './routes/sell'
+import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArtistsRoute = ArtistsRouteImport.update({
+  id: '/artists',
+  path: '/artists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuctionsRoute = AuctionsRouteImport.update({
+  id: '/auctions',
+  path: '/auctions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExhibitionsRoute = ExhibitionsRouteImport.update({
+  id: '/exhibitions',
+  path: '/exhibitions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellRoute = SellRouteImport.update({
+  id: '/sell',
+  path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtworkIdRoute = ArtworkIdRouteImport.update({
+  id: '/artwork/$id',
+  path: '/artwork/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/artists': typeof ArtistsRoute
+  '/auctions': typeof AuctionsRoute
+  '/exhibitions': typeof ExhibitionsRoute
+  '/explore': typeof ExploreRoute
+  '/sell': typeof SellRoute
+  '/artwork/$id': typeof ArtworkIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/artists': typeof ArtistsRoute
+  '/auctions': typeof AuctionsRoute
+  '/exhibitions': typeof ExhibitionsRoute
+  '/explore': typeof ExploreRoute
+  '/sell': typeof SellRoute
+  '/artwork/$id': typeof ArtworkIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/artists': typeof ArtistsRoute
+  '/auctions': typeof AuctionsRoute
+  '/exhibitions': typeof ExhibitionsRoute
+  '/explore': typeof ExploreRoute
+  '/sell': typeof SellRoute
+  '/artwork/$id': typeof ArtworkIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/artists'
+    | '/auctions'
+    | '/exhibitions'
+    | '/explore'
+    | '/sell'
+    | '/artwork/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/artists'
+    | '/auctions'
+    | '/exhibitions'
+    | '/explore'
+    | '/sell'
+    | '/artwork/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/artists'
+    | '/auctions'
+    | '/exhibitions'
+    | '/explore'
+    | '/sell'
+    | '/artwork/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArtistsRoute: typeof ArtistsRoute
+  AuctionsRoute: typeof AuctionsRoute
+  ExhibitionsRoute: typeof ExhibitionsRoute
+  ExploreRoute: typeof ExploreRoute
+  SellRoute: typeof SellRoute
+  ArtworkIdRoute: typeof ArtworkIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/artists': {
+      id: '/artists'
+      path: '/artists'
+      fullPath: '/artists'
+      preLoaderRoute: typeof ArtistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auctions': {
+      id: '/auctions'
+      path: '/auctions'
+      fullPath: '/auctions'
+      preLoaderRoute: typeof AuctionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exhibitions': {
+      id: '/exhibitions'
+      path: '/exhibitions'
+      fullPath: '/exhibitions'
+      preLoaderRoute: typeof ExhibitionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sell': {
+      id: '/sell'
+      path: '/sell'
+      fullPath: '/sell'
+      preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artwork/$id': {
+      id: '/artwork/$id'
+      path: '/artwork/$id'
+      fullPath: '/artwork/$id'
+      preLoaderRoute: typeof ArtworkIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArtistsRoute: ArtistsRoute,
+  AuctionsRoute: AuctionsRoute,
+  ExhibitionsRoute: ExhibitionsRoute,
+  ExploreRoute: ExploreRoute,
+  SellRoute: SellRoute,
+  ArtworkIdRoute: ArtworkIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
