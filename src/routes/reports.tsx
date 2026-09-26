@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { T } from "@/lib/i18n";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore, type Delivery, type Report, type ReportMetric } from "@/lib/store";
 import { listingDaily, pct, SOURCES, sourceSplit, totals } from "@/lib/analytics";
@@ -76,7 +77,7 @@ function Reports() {
   const f = "w-full rounded-sm border border-border bg-background px-3 py-2";
   return (
     <SiteShell>
-      <PageTitle eyebrow="Analytics" title="Email reports" sub="Schedules are saved now. Emails will start sending once the email service is connected." />
+      <PageTitle eyebrow="Analytics" title={<T k="reports.title" />} sub="Schedules are saved now. Emails will start sending once the email service is connected." />
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 flex gap-4"><button onClick={() => setForm(blank())} className="rounded-full bg-primary px-6 py-3 text-primary-foreground">New schedule</button><Link to="/analytics" className="self-center text-sm underline">Back to analytics</Link></div>
 
@@ -99,7 +100,7 @@ function Reports() {
               </fieldset>
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.includeSources} onChange={(e) => setForm({ ...form, includeSources: e.target.checked })} />Include referral-source insights</label>
               {form.includeSources && (
-                <div className="flex flex-wrap gap-3 pl-6 text-sm">{SOURCES.map((src) => <label key={src} className="flex items-center gap-1"><input type="checkbox" checked={sourcesOf(form).includes(src)} onChange={(e) => setForm({ ...form, sources: e.target.checked ? [...sourcesOf(form), src] : sourcesOf(form).filter((x) => x !== src) })} />{src}</label>)}</div>
+                <div className="flex flex-wrap gap-3 ps-6 text-sm">{SOURCES.map((src) => <label key={src} className="flex items-center gap-1"><input type="checkbox" checked={sourcesOf(form).includes(src)} onChange={(e) => setForm({ ...form, sources: e.target.checked ? [...sourcesOf(form), src] : sourcesOf(form).filter((x) => x !== src) })} />{src}</label>)}</div>
               )}
               <p className="text-sm text-muted-foreground">Next send: {nextSend(form)}</p>
               <div className="flex gap-3"><button onClick={save} className="rounded-full bg-primary px-6 py-3 text-primary-foreground">Save schedule</button><button onClick={() => setForm(null)} className="rounded-full border border-border px-6 py-3">Cancel</button></div>
@@ -112,7 +113,7 @@ function Reports() {
           {reports.map((r) => (
             <div key={r.id} className="flex flex-wrap items-center gap-4 py-4">
               <div className="flex-1">
-                <p className="font-display text-xl">{r.name} {r.paused && <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">Paused</span>}</p>
+                <p className="font-display text-xl">{r.name} {r.paused && <span className="ms-2 rounded-full bg-muted px-2 py-0.5 text-xs">Paused</span>}</p>
                 <p className="text-sm text-muted-foreground">{r.frequency === "weekly" ? `Every ${WEEKDAYS[r.weekday]}` : `Monthly on day ${r.monthday}`} at {r.time} · {r.email}</p>
                 <p className="text-sm">{r.paused ? "Not scheduled while paused" : `Next send: ${nextSend(r)}`}</p>
                 <details className="mt-2 text-sm">
@@ -160,8 +161,8 @@ function EmailPreview({ r }: { r: Report }) {
           {([["views", "Views", sum.v.toLocaleString()], ["favorites", "Favorites", sum.f.toLocaleString()], ["purchases", "Purchases", sum.b.toLocaleString()], ["conversion", "Conversion", `${pct(sum.b, sum.v).toFixed(2)}%`]] as const).filter(([k]) => metricsOf(r).includes(k)).map(([, k, v]) => [k, v]).map(([k, v]) => <div key={k} className="rounded-sm bg-muted p-3"><p className="font-display text-xl">{v}</p><p className="text-xs text-muted-foreground">{k}</p></div>)}
         </div>
         {metricsOf(r).includes("top") && (<><p className="font-medium">Top listings</p>
-        <ol className="mb-4 list-decimal pl-5">{per.slice(0, 3).map((p) => <li key={p.l.id}>{p.l.title} — {p.purchases} sales, {pct(p.purchases, p.views).toFixed(2)}% conversion</li>)}</ol></>)}
-        {r.includeSources && (<><p className="font-medium">Where visitors came from</p><ul className="pl-5">{src.filter((x) => sourcesOf(r).includes(x.s)).map((x) => <li key={x.s}>{x.s}: {pct(x.v, sum.v).toFixed(0)}% of views</li>)}</ul></>)}
+        <ol className="mb-4 list-decimal ps-5">{per.slice(0, 3).map((p) => <li key={p.l.id}>{p.l.title} — {p.purchases} sales, {pct(p.purchases, p.views).toFixed(2)}% conversion</li>)}</ol></>)}
+        {r.includeSources && (<><p className="font-medium">Where visitors came from</p><ul className="ps-5">{src.filter((x) => sourcesOf(r).includes(x.s)).map((x) => <li key={x.s}>{x.s}: {pct(x.v, sum.v).toFixed(0)}% of views</li>)}</ul></>)}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useLocale } from "@/lib/i18n";
 import { SiteShell, ArtCard, PageTitle } from "@/components/SiteShell";
 import { useListings, useStore } from "@/lib/store";
 
@@ -18,13 +19,14 @@ export const Route = createFileRoute("/favorites")({
 
 function Favorites() {
   const { favorites } = useStore();
+  const { t } = useLocale();
   const list = useListings().filter((l) => favorites.includes(l.id));
   return (
     <SiteShell>
-      <PageTitle eyebrow="Saved" title="Favorites" />
+      <PageTitle eyebrow={t("fav.eyebrow")} title={t("fav.title")} />
       <div className="mx-auto max-w-7xl px-6">
         {list.length === 0 ? (
-          <p className="text-muted-foreground">Nothing saved yet. Tap the heart on any artwork. <Link to="/explore" className="underline">Explore</Link></p>
+          <p className="text-muted-foreground">{t("fav.empty")} <Link to="/explore" className="underline">{t("nav.explore")}</Link></p>
         ) : <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">{list.map((a) => <ArtCard key={a.id} a={a} />)}</div>}
       </div>
     </SiteShell>

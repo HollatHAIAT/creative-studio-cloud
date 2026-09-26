@@ -69,4 +69,9 @@
 - [x] SLO breach history (start/recovery, channel, service, severity) + filters
 - [x] Breach notification destinations + deduplication
 - [x] Error budget + burn rate metrics
-- [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
+- [x] Full Arabic + English with RTL/LTR switching (creator tools — analytics, alerts, reports, delivery — still have English body text)
+- [x] Saudi Banks collection: multi-select, formats, ZIP + CSV, licenses (placeholders, not official logos)
+- [x] Live auctions: bidding, countdown, reserve price, bid history
+- [x] Exhibitions: ticket booking, schedules, floor map, artworks
+- [x] Artwork variants: original, prints (sizes × materials), digital licenses
+- [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments
