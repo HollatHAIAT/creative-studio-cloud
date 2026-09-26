@@ -47,6 +47,8 @@
 - [ ] Notify when ongoing group exceeds recovery target (uses notification prefs)
 - [ ] Days past target in details + CSV
 - [ ] Recovery targets per alert severity
+- [ ] Recovery-target compliance summary (over time + by severity)
+- [ ] Notification cooldown for overdue groups
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

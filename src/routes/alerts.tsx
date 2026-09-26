@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
-import { daysBetween, daysPast, defaultTargets, durLabel, groupDuration, SEVERITIES, severity, targetFor } from "@/lib/alert-rules";
+import { compliance, daysBetween, daysPast, defaultTargets, durLabel, groupDuration, SEVERITIES, severity, targetFor } from "@/lib/alert-rules";
 import { alertHistory, dayKey, download, evaluate, toCsv, type Metric } from "@/lib/analytics";
 
 export const Route = createFileRoute("/alerts")({
@@ -131,6 +131,12 @@ function Alerts() {
                   <p className="text-muted-foreground">Emails start once the email service is connected.</p>
                 </>
               )}
+              <label className="flex items-center justify-between gap-3">Overdue reminder cooldown
+                <select className={inp} value={notify.cooldownHours ?? 24} onChange={(e) => actions.setNotify({ ...notify, cooldownHours: +e.target.value })}>
+                  {[1, 6, 12, 24, 48, 168].map((h) => <option key={h} value={h}>{h < 24 ? `${h} hours` : h === 168 ? "1 week" : `${h / 24} day${h > 24 ? "s" : ""}`}</option>)}
+                </select>
+              </label>
+              <p className="text-xs text-muted-foreground">An ongoing group past its recovery target notifies you once, then again only after this cooldown.</p>
             </div>
           </div>
         </div>
@@ -155,6 +161,40 @@ function Alerts() {
             </tbody>
           </table>
         </div>
+
+        {(() => { const c = compliance(history, cfg); return (
+        <div className={card}>
+          <h2 className="font-display text-2xl">Recovery-target compliance</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Share of drop episodes that recovered within their severity target. Episodes still inside their target aren't counted yet.</p>
+          <p className="mt-4 font-display text-4xl">{c.overall.pct.toFixed(0)}% <span className="text-base text-muted-foreground">met ({c.overall.met}/{c.overall.total})</span></p>
+          <div className="mt-6 grid gap-8 md:grid-cols-2">
+            <div>
+              <p className="mb-2 text-sm font-medium">By week</p>
+              <div className="flex h-32 items-end gap-2">
+                {c.weeks.map((w) => (
+                  <div key={w.week} className="flex flex-1 flex-col items-center gap-1 text-xs" title={`${w.met}/${w.total} met`}>
+                    <span>{w.pct.toFixed(0)}%</span>
+                    <div className="w-full rounded-t-sm bg-primary" style={{ height: `${Math.max(4, w.pct)}%` }} />
+                    <span className="text-muted-foreground">{w.week.slice(5)}</span>
+                  </div>
+                ))}
+                {c.weeks.length === 0 && <p className="text-sm text-muted-foreground">No completed episodes yet.</p>}
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-medium">By severity</p>
+              <div className="space-y-3">
+                {c.bySeverity.map((sv) => (
+                  <div key={sv.severity} className="grid grid-cols-[110px_1fr_auto] items-center gap-3 text-sm">
+                    <span className="capitalize">{sv.severity} <span className="text-xs text-muted-foreground">≤{sv.target}d</span></span>
+                    <div className="h-2 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary" style={{ width: `${sv.pct}%` }} /></div>
+                    <span className="text-muted-foreground">{sv.total ? `${sv.pct.toFixed(0)}% (${sv.met}/${sv.total})` : "—"}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>); })()}
 
         <div className={card}>
           <h2 className="font-display text-2xl">Timeline</h2>

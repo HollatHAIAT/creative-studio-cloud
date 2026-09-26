@@ -4,6 +4,7 @@ import { Heart } from "lucide-react";
 import type { Artwork } from "@/lib/data";
 import { fmt } from "@/lib/data";
 import { actions, useStore } from "@/lib/store";
+import { OverdueNotifier } from "@/components/OverdueNotifier";
 
 const nav = [
   { to: "/explore", label: "Explore" },
@@ -32,6 +33,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
+      <OverdueNotifier />
       <main>{children}</main>
       <footer className="mt-24 border-t border-border">
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 text-sm text-muted-foreground md:grid-cols-4">

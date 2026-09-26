@@ -8,11 +8,11 @@ export type Report = { id: string; name: string; frequency: "weekly" | "monthly"
   metrics?: ReportMetric[]; sources?: string[]; history?: Delivery[] };
 export type ReportMetric = "views" | "favorites" | "purchases" | "conversion" | "top";
 export type Delivery = { id: string; at: string; status: "sent" | "failed" | "upcoming" | "retrying"; error?: string };
-type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop" | "duration" | "ongoing"; dir: "desc" | "asc" }; alertPresets: AlertPreset[]; overdueNotified: string[] };
+type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop" | "duration" | "ongoing"; dir: "desc" | "asc" }; alertPresets: AlertPreset[]; overdueNotified: Record<string, number> };
 export type AlertPreset = { id: string; name: string; listing: string; metric: string; status: string; from: string; to: string; recovery?: string };
-export type NotifyPrefs = { inApp: boolean; email: boolean; address: string; digest: "instant" | "daily" };
+export type NotifyPrefs = { inApp: boolean; email: boolean; address: string; digest: "instant" | "daily"; cooldownHours?: number };
 const KEY = "creativestudio:v1";
-const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [], alerts: defaultAlertConfig, review: {}, notify: { inApp: true, email: false, address: "", digest: "instant" }, alertSort: { by: "latest", dir: "desc" }, alertPresets: [], overdueNotified: [] };
+const empty: State = { mine: [], removed: [], favorites: [], views: [], reports: [], alerts: defaultAlertConfig, review: {}, notify: { inApp: true, email: false, address: "", digest: "instant" }, alertSort: { by: "latest", dir: "desc" }, alertPresets: [], overdueNotified: {} };
 let state: State = empty;
 let loaded = false;
 const subs = new Set<() => void>();
@@ -77,7 +77,7 @@ export const actions = {
   },
   saveAlertPreset(p: AlertPreset) { set({ ...state, alertPresets: [...state.alertPresets, p] }); },
   deleteAlertPreset(id: string) { set({ ...state, alertPresets: state.alertPresets.filter((x) => x.id !== id) }); },
-  markOverdueNotified(keys: string[]) { set({ ...state, overdueNotified: [...new Set([...state.overdueNotified, ...keys])] }); },
+  markOverdueNotified(keys: string[]) { const n = { ...state.overdueNotified }; keys.forEach((k) => { n[k] = Date.now(); }); set({ ...state, overdueNotified: n }); },
   setAlertSort(s: State["alertSort"]) { set({ ...state, alertSort: s }); },
   setNotify(n: NotifyPrefs) { set({ ...state, notify: n }); },
   setAlerts(a: AlertConfig) { set({ ...state, alerts: a }); },
