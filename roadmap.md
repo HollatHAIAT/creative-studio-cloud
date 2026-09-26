@@ -29,6 +29,9 @@
 - [ ] Recovery events linked to original alert
 - [ ] Group repeated alerts per listing + metric
 - [ ] Link alert entries to listing analytics for same period
+- [ ] Timeline of alert groups vs recovery events
+- [ ] CSV export of filtered alert history
+- [ ] Sort alert groups (latest, repeats, largest drop)
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

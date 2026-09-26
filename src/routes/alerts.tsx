@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, DEMO_CREATOR, useAllListings, useStore } from "@/lib/store";
-import { alertHistory, evaluate, type Metric } from "@/lib/analytics";
+import { alertHistory, dayKey, download, evaluate, toCsv, type Metric } from "@/lib/analytics";
 
 export const Route = createFileRoute("/alerts")({
   head: () => ({
@@ -31,6 +31,7 @@ function Alerts() {
   const [fStatus, setFStatus] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [sortBy, setSortBy] = useState<"latest" | "repeats" | "drop">("latest");
 
   const setCfg = (patch: Partial<typeof cfg>) => actions.setAlerts({ ...cfg, ...patch });
   const togglePause = (id: string) => setCfg({ paused: cfg.paused.includes(id) ? cfg.paused.filter((x) => x !== id) : [...cfg.paused, id] });
@@ -44,7 +45,18 @@ function Alerts() {
       const st = review[h.key] ?? "open";
       return h.triggers.length > 0 && (fListing === "all" || h.listingId === fListing) && (fMetric === "all" || h.metric === fMetric) && (fStatus === "all" || st === fStatus);
     })
-    .sort((x, y) => y.triggers[0]!.date.localeCompare(x.triggers[0]!.date));
+    .sort((x, y) => sortBy === "repeats" ? y.triggers.length - x.triggers.length
+      : sortBy === "drop" ? Math.min(...x.triggers.map((t) => t.change)) - Math.min(...y.triggers.map((t) => t.change))
+      : y.triggers[0]!.date.localeCompare(x.triggers[0]!.date));
+
+  function exportCsv() {
+    const origin = window.location.origin;
+    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Analytics link"]];
+    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
+    download("creativestudio-alert-history.csv", toCsv(rows));
+  }
+  const DAYS = 30;
+  const dayList = Array.from({ length: DAYS + 1 }, (_, i) => dayKey(Date.now() - (DAYS - i) * 86400000));
 
   return (
     <SiteShell>
@@ -107,6 +119,31 @@ function Alerts() {
         </div>
 
         <div className={card}>
+          <h2 className="font-display text-2xl">Timeline</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Last {DAYS} days. Red spans are active drops, green dots mark the linked recovery.</p>
+          <div className="mt-4 space-y-2">
+            {filtered.map((h) => (
+              <div key={h.key} className="grid grid-cols-[180px_1fr] items-center gap-3 text-xs">
+                <span className="truncate">{h.title} · <span className="capitalize">{h.metric}</span></span>
+                <div className="relative h-5 rounded-sm bg-muted">
+                  {h.triggers.map((t) => {
+                    const s0 = Math.max(0, dayList.indexOf(t.date));
+                    const e0 = t.recoveredAt ? dayList.indexOf(t.recoveredAt) : DAYS;
+                    return (
+                      <span key={t.date}>
+                        <span title={`Drop ${(t.change * 100).toFixed(0)}% on ${t.date}`} className="absolute top-0 h-5 rounded-sm bg-destructive/60" style={{ left: `${(s0 / DAYS) * 100}%`, width: `${Math.max(1, ((e0 - s0) / DAYS) * 100)}%` }} />
+                        {t.recoveredAt && <span title={`Recovered ${t.recoveredAt}`} className="absolute top-1 h-3 w-3 -translate-x-1/2 rounded-full bg-chart-2" style={{ left: `${(e0 / DAYS) * 100}%` }} />}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+            {filtered.length > 0 && <div className="grid grid-cols-[180px_1fr] text-xs text-muted-foreground"><span /><span className="flex justify-between"><span>{dayList[0]}</span><span>today</span></span></div>}
+          </div>
+        </div>
+
+        <div className={card}>
           <h2 className="font-display text-2xl">Alert history</h2>
           <div className="mt-4 flex flex-wrap gap-2 text-sm">
             <select className={inp} value={fListing} onChange={(e) => setFListing(e.target.value)}><option value="all">All listings</option>{listings.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}</select>
@@ -114,6 +151,8 @@ function Alerts() {
             <select className={inp} value={fStatus} onChange={(e) => setFStatus(e.target.value)}><option value="all">All statuses</option><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select>
             <input type="date" className={inp} value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From date" />
             <input type="date" className={inp} value={to} onChange={(e) => setTo(e.target.value)} aria-label="To date" />
+            <select className={inp} value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)} aria-label="Sort"><option value="latest">Latest trigger</option><option value="repeats">Most repeats</option><option value="drop">Largest drop</option></select>
+            <button onClick={exportCsv} disabled={!filtered.length} className="ml-auto rounded-full bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">Export CSV</button>
           </div>
           <div className="mt-4 divide-y divide-border border-y border-border">
             {filtered.map((h) => {
