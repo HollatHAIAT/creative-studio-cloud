@@ -1,10 +1,20 @@
 # creativestudio roadmap
 - [x] Foundation: home, explore, auctions, exhibitions, artists, sell
-- [ ] Listing data model + cards (image, price, category, creator)
-- [ ] Search, category filters, sorting
-- [ ] Creator profile pages (bio + listings)
-- [ ] Listing detail: gallery, description, creator link, purchase
-- [ ] Favorites
-- [ ] Creator dashboard: create/edit/remove listings
-- [ ] Image uploads with previews + validation
-- [ ] Later: accounts, saved data in Lovable Cloud, payments, Arabic/RTL
+- [x] Listing data model + cards (image, price, category, creator)
+- [x] Search, category filters, sorting
+- [x] Creator profile pages (bio + listings)
+- [x] Listing detail: gallery, description, creator link, purchase
+- [x] Favorites
+- [x] Creator dashboard: create/edit/remove listings
+- [x] Image uploads with previews + validation
+- [ ] Draft / published / archived listing states
+- [ ] Bulk select: publish, archive, delete (confirm + undo)
+- [ ] Analytics: views, favorites, conversions metrics
+- [ ] Date-range filters + trend charts
+- [ ] Listing-level funnel breakdown, strongest/weakest highlighted
+- [ ] CSV export of breakdown
+- [ ] Referral source attribution
+- [ ] Alerts for sudden drops
+- [ ] Saved analytics views
+- [ ] Scheduled email reports (weekly/monthly, send time, time zone)
+- [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL
