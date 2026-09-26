@@ -77,3 +77,5 @@
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments
 - [ ] Database + file storage: assets, auctions/bids, exhibitions/bookings
 - [ ] Checkout design & full journey (cart, details, payment UI, confirmation) for tickets, artworks, licenses — no real payment provider yet
+- [ ] Access rules: users only reach their own data/files; admins manage assets
+- [ ] Asset page: upload/replace/delete files, store paths, preview
