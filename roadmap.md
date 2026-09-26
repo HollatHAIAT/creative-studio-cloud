@@ -75,19 +75,23 @@
 - [x] Exhibitions: ticket booking, schedules, floor map, artworks
 - [x] Artwork variants: original, prints (sizes × materials), digital licenses
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments
-- [ ] Database + file storage: assets, auctions/bids, exhibitions/bookings
-- [ ] Checkout design & full journey (cart, details, payment UI, confirmation) for tickets, artworks, licenses — no real payment provider yet
-- [ ] Access rules: users only reach their own data/files; admins manage assets
-- [ ] Asset page: upload/replace/delete files, store paths, preview
-- [ ] Realtime updates for bids, prices and ticket status
-- [ ] My orders page (tickets, artworks, licenses) with details, status and receipt link
-- [ ] Server-side bid validation incl. concurrent bids, with clear rejection reasons
-- [ ] In-account notification center: order confirmed, ticket status change, outbid
-- [ ] Wire remaining features end-to-end (frontend + backend)
-- [ ] Admin orders panel: review tickets/artworks/licenses orders, update status, change log
-- [ ] Integration tests for concurrent bids (price stays correct, rejection reason shown)
-- [ ] Ticket issuing + check-in validation at entry, usage status
-- [ ] Cancel/refund requests: eligibility rules, admin review, decision log, buyer notified
-- [ ] Admin reports: sales, orders, ticket activity, bids; date filters; CSV export
-- [ ] Notification settings: choose order / ticket / bid alerts
-- [ ] Staff QR scan screen: instant validity, no reuse, scan time logged
+- [x] Database + file storage: assets, auctions/bids, exhibitions/bookings
+- [x] Checkout design & full journey (cart, details, payment UI, confirmation) for tickets, artworks, licenses — no real payment provider yet
+- [x] Access rules: users only reach their own data/files; admins manage assets
+- [x] Asset page: upload/replace/delete files, store paths, preview
+- [x] Realtime updates for bids, prices and ticket status
+- [x] My orders page (tickets, artworks, licenses) with details, status and receipt link
+- [x] Server-side bid validation incl. concurrent bids, with clear rejection reasons
+- [x] In-account notification center: order confirmed, ticket status change, outbid
+- [x] Wire remaining features end-to-end (frontend + backend)
+- [x] Admin orders panel: review tickets/artworks/licenses orders, update status, change log
+- [x] Integration tests for concurrent bids (price stays correct, rejection reason shown)
+- [x] Ticket issuing + check-in validation at entry, usage status
+- [x] Cancel/refund requests: eligibility rules, admin review, decision log, buyer notified
+- [x] Admin reports: sales, orders, ticket activity, bids; date filters; CSV export
+- [x] Notification settings: choose order / ticket / bid alerts
+- [x] Staff QR scan screen: instant validity, no reuse, scan time logged
+- [ ] Grant first admin role (waits on owner signing up)
+- [ ] Real payment provider connection (later phase, per owner)
+- [ ] Run concurrent-bid live test (needs two test accounts)
+- [ ] Creator dashboard listings still stored in browser — move to database

@@ -11,3 +11,6 @@
 - Translations live in `src/lib/i18n.tsx` (`useLocale().t/pick`); data carries `*Ar` fields; `<html dir/lang>` is set by SiteShell. Why: one switch flips the whole app to Arabic RTL.
 - Use logical Tailwind utilities (ms-/me-/ps-/start-/end-/text-end), never left/right. Why: layouts must mirror in RTL.
 - Listing pricing comes from `variants` (original/print/license); `price` is the minimum. Why: one artwork sells in many forms.
+- Marketplace data (assets, auctions/bids, exhibitions/bookings, orders, tickets, refunds, notifications) lives in Lovable Cloud; business rules are enforced by DB triggers/RPCs (validate_bid, validate_booking, admin_set_order_status, check_in_ticket, admin_decide_refund). Why: rules must hold regardless of client.
+- Orders are priced server-side in `placeOrder` (src/lib/orders.functions.ts) via `priceCart`. Why: clients can't tamper with totals.
+- Staff = admin or moderator role (`is_staff`); staff UI lives under `/_authenticated/admin/*`. Why: one role check for ops screens.
