@@ -252,6 +252,30 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_prefs: {
+        Row: {
+          bids: boolean
+          orders: boolean
+          tickets: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bids?: boolean
+          orders?: boolean
+          tickets?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bids?: boolean
+          orders?: boolean
+          tickets?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
@@ -290,6 +314,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      order_events: {
+        Row: {
+          actor: string | null
+          created_at: string
+          from_status: string | null
+          id: string
+          note: string
+          order_id: string
+          to_status: string
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string
+          order_id: string
+          to_status: string
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string
+          order_id?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
@@ -342,6 +404,132 @@ export type Database = {
         }
         Relationships: []
       }
+      refund_requests: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          kind: string
+          order_id: string
+          reason: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          kind: string
+          order_id: string
+          reason: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          kind?: string
+          order_id?: string
+          reason?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_scans: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          result: string
+          scanned_by: string
+          ticket_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          result: string
+          scanned_by: string
+          ticket_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          result?: string
+          scanned_by?: string
+          ticket_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_scans_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          booking_id: string
+          code: string
+          created_at: string
+          id: string
+          scanned_by: string | null
+          status: string
+          ticket_type: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          code?: string
+          created_at?: string
+          id?: string
+          scanned_by?: string | null
+          status?: string
+          ticket_type: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          code?: string
+          created_at?: string
+          id?: string
+          scanned_by?: string | null
+          status?: string
+          ticket_type?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -365,13 +553,53 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_auction_reserves: {
+        Args: never
+        Returns: {
+          id: string
+          reserve: number
+        }[]
+      }
+      admin_decide_refund: {
+        Args: { _approve: boolean; _note: string; _request_id: string }
+        Returns: undefined
+      }
+      admin_set_order_status: {
+        Args: { _note?: string; _order_id: string; _status: string }
+        Returns: undefined
+      }
       auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
+      check_in_ticket: {
+        Args: { _code: string }
+        Returns: {
+          exhibition_id: string
+          result: string
+          slot: string
+          ticket_type: string
+          used_at: string
+          visit_date: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      is_staff: { Args: { _uid: string }; Returns: boolean }
+      issue_tickets: { Args: { _booking_id: string }; Returns: undefined }
+      push_notification: {
+        Args: {
+          _b: string
+          _bar: string
+          _kind: string
+          _link: string
+          _t: string
+          _tar: string
+          _uid: string
+        }
+        Returns: undefined
       }
       slot_bookings: {
         Args: { _date: string; _exhibition_id: string }
