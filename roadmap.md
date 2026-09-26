@@ -49,6 +49,10 @@
 - [ ] Recovery targets per alert severity
 - [ ] Recovery-target compliance summary (over time + by severity)
 - [ ] Notification cooldown for overdue groups
+- [ ] Compliance CSV export (weekly + severity)
+- [ ] Claim / ownership of ongoing alert groups
+- [ ] Maintenance windows pausing overdue notifications
+- [ ] Compliance date-range + listing/metric filters
 - [x] Report email preview before saving
 - [x] Pause / edit / delete reports + next send time
 - [ ] Later: accounts, saved data in Lovable Cloud, real tracking, payments, Arabic/RTL

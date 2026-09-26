@@ -26,7 +26,13 @@ const card = "rounded-sm border border-border bg-card p-6";
 const inp = "rounded-sm border border-border bg-background px-3 py-2";
 
 function Alerts() {
-  const { alerts: cfg, review, notify, alertSort, alertPresets } = useStore();
+  const { alerts: cfg, review, notify, alertSort, alertPresets, owners, responder, maintenance } = useStore();
+  const [cFrom, setCFrom] = useState("");
+  const [cTo, setCTo] = useState("");
+  const [cListing, setCListing] = useState("all");
+  const [cMetric, setCMetric] = useState("all");
+  const [mw, setMw] = useState({ start: "", end: "", note: "" });
+  const inMaint = maintenance.some((w) => Date.parse(w.start) <= Date.now() && Date.now() <= Date.parse(w.end));
   const [page, setPage] = useState(1);
   const PAGE = 5;
   const sortBy = alertSort.by, dir = alertSort.dir === "asc" ? -1 : 1;
@@ -83,8 +89,8 @@ function Alerts() {
 
   function exportCsv() {
     const origin = window.location.origin;
-    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Severity", "Recovery target (days)", "Days past target", "Analytics link"]];
-    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", severity(h), targetFor(h, cfg), daysPast(h, cfg), `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
+    const rows: (string | number)[][] = [["Listing", "Metric", "Review status", "Trigger date", "Change %", "Recovered on", "Recovery change %", "Comparison", "Group duration (days)", "Group duration status", "Severity", "Recovery target (days)", "Days past target", "Owner", "Analytics link"]];
+    filtered.forEach((h) => h.triggers.forEach((t) => rows.push([h.title, h.metric, review[h.key] ?? "open", t.date, (t.change * 100).toFixed(1), t.recoveredAt ?? "", t.recoveryChange != null ? (t.recoveryChange * 100).toFixed(1) : "", `${cfg.recent}d vs prior ${cfg.prior}d`, groupDuration(h).days, groupDuration(h).ongoing ? "ongoing" : "recovered", severity(h), targetFor(h, cfg), daysPast(h, cfg), owners[h.key]?.name ?? "", `${origin}/analytics?listing=${h.listingId}&days=${periodDays}`])));
     download("creativestudio-alert-history.csv", toCsv(rows));
   }
   const DAYS = 30;
@@ -137,6 +143,17 @@ function Alerts() {
                 </select>
               </label>
               <p className="text-xs text-muted-foreground">An ongoing group past its recovery target notifies you once, then again only after this cooldown.</p>
+              <div className="border-t border-border pt-3">
+                <p className="font-medium">Maintenance windows {inMaint && <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">Active now — notifications paused</span>}</p>
+                <p className="text-xs text-muted-foreground">Recovery-target notifications are paused during these times.</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <input type="datetime-local" className={inp} value={mw.start} onChange={(e) => setMw({ ...mw, start: e.target.value })} aria-label="Window start" />
+                  <input type="datetime-local" className={inp} value={mw.end} onChange={(e) => setMw({ ...mw, end: e.target.value })} aria-label="Window end" />
+                  <input className={inp} placeholder="Note (optional)" maxLength={60} value={mw.note} onChange={(e) => setMw({ ...mw, note: e.target.value })} />
+                  <button className={inp} onClick={() => { if (!mw.start || !mw.end || mw.end <= mw.start) { toast.error("End must be after start"); return; } actions.saveMaintenance({ id: Date.now().toString(36), ...mw }); setMw({ start: "", end: "", note: "" }); }}>Add window</button>
+                </div>
+                <ul className="mt-2 space-y-1">{maintenance.map((w) => <li key={w.id} className="flex gap-2">{w.start.replace("T", " ")} → {w.end.replace("T", " ")}{w.note && ` · ${w.note}`}<button onClick={() => actions.deleteMaintenance(w.id)} className="text-muted-foreground underline">Remove</button></li>)}</ul>
+              </div>
             </div>
           </div>
         </div>
@@ -162,10 +179,26 @@ function Alerts() {
           </table>
         </div>
 
-        {(() => { const c = compliance(history, cfg); return (
+        {(() => {
+          const cGroups = history.filter((h) => (cListing === "all" || h.listingId === cListing) && (cMetric === "all" || h.metric === cMetric)).map((h) => ({ ...h, triggers: h.triggers.filter((t) => (!cFrom || t.date >= cFrom) && (!cTo || t.date <= cTo)) })).filter((h) => h.triggers.length);
+          const c = compliance(cGroups, cfg);
+          const exportCompliance = () => download("creativestudio-recovery-compliance.csv", toCsv([
+            ["Filters", `listing=${cListing}`, `metric=${cMetric}`, `from=${cFrom || "any"}`, `to=${cTo || "any"}`], [],
+            ["Overall", "Met", "Total", "% met"], ["All", c.overall.met, c.overall.total, c.overall.pct.toFixed(1)], [],
+            ["Week starting", "Met", "Total", "% met"], ...c.weeks.map((w) => [w.week, w.met, w.total, w.pct.toFixed(1)]), [],
+            ["Severity", "Target (days)", "Met", "Total", "% met"], ...c.bySeverity.map((x) => [x.severity, x.target, x.met, x.total, x.pct.toFixed(1)]),
+          ]));
+          return (
         <div className={card}>
           <h2 className="font-display text-2xl">Recovery-target compliance</h2>
           <p className="mt-1 text-sm text-muted-foreground">Share of drop episodes that recovered within their severity target. Episodes still inside their target aren't counted yet.</p>
+          <div className="mt-4 flex flex-wrap gap-2 text-sm">
+            <select className={inp} value={cListing} onChange={(e) => setCListing(e.target.value)} aria-label="Compliance listing"><option value="all">All listings</option>{listings.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}</select>
+            <select className={inp} value={cMetric} onChange={(e) => setCMetric(e.target.value)} aria-label="Compliance metric"><option value="all">All metrics</option>{METRICS.map((m) => <option key={m} value={m}>{m}</option>)}</select>
+            <input type="date" className={inp} value={cFrom} onChange={(e) => setCFrom(e.target.value)} aria-label="Compliance from" />
+            <input type="date" className={inp} value={cTo} onChange={(e) => setCTo(e.target.value)} aria-label="Compliance to" />
+            <button onClick={exportCompliance} className="ml-auto rounded-full bg-primary px-4 py-2 text-primary-foreground">Export compliance CSV</button>
+          </div>
           <p className="mt-4 font-display text-4xl">{c.overall.pct.toFixed(0)}% <span className="text-base text-muted-foreground">met ({c.overall.met}/{c.overall.total})</span></p>
           <div className="mt-6 grid gap-8 md:grid-cols-2">
             <div>
@@ -262,7 +295,11 @@ function Alerts() {
                     {overdue(h) && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs text-destructive-foreground">{daysPast(h, cfg)}d past {targetFor(h, cfg)}-day target</span>}
                     <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-destructive/10 text-destructive" : "bg-muted"}`}>{active ? "Still dropping" : "Recovered"}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs ${st === "open" ? "border border-border" : st === "resolved" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{st}</span>
+                    {owners[h.key] ? <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">Handled by {owners[h.key]!.name} · since {new Date(owners[h.key]!.at).toLocaleDateString()}</span> : groupDuration(h).ongoing && <span className="rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-muted-foreground">Unclaimed</span>}
                     <span className="ml-auto space-x-3">
+                      {groupDuration(h).ongoing && (owners[h.key]
+                        ? <button onClick={() => actions.release(h.key)} className="underline">Release</button>
+                        : <button onClick={() => { const n = prompt("Your name", responder)?.trim(); if (n) { actions.claim(h.key, n.slice(0, 40)); if (st === "open") actions.setReview(h.key, "acknowledged"); toast.success(`Claimed by ${n}`); } }} className="underline">Claim</button>)}
                       <Link to="/analytics" search={{ listing: h.listingId, days: periodDays }} className="underline">View analytics</Link>
                       {st === "open" && <button onClick={() => actions.setReview(h.key, "acknowledged")} className="underline">Acknowledge</button>}
                       {st !== "resolved" && <button onClick={() => actions.setReview(h.key, "resolved")} className="underline">Resolve</button>}
