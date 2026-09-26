@@ -3,7 +3,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell, FavButton } from "@/components/SiteShell";
 import { artworks, creatorOf, fmt, MATERIAL_AR, type Variant, type VariantKind } from "@/lib/data";
-import { useListings } from "@/lib/store";
+import { actions, useListings } from "@/lib/store";
+import { useNavigate } from "@tanstack/react-router";
 import { useLocale, type Key } from "@/lib/i18n";
 import { auctionFor, statusOf, useNow } from "@/lib/auctions";
 
@@ -29,6 +30,7 @@ function Detail() {
   const { t, pick, locale, num } = useLocale();
   const a = useListings().find((x) => x.id === id);
   const now = useNow(60_000);
+  const navigate = useNavigate();
   const [img, setImg] = useState(0);
   const [kind, setKind] = useState<VariantKind | null>(null);
   const [size, setSize] = useState<string | null>(null);
@@ -102,7 +104,7 @@ function Detail() {
 
           <p className="mt-8 font-display text-4xl">{v ? fmt(v.price) : "—"}</p>
           {left !== null && <p className="text-sm text-muted-foreground">{v?.edition === 1 ? t("art.original") : `${t("art.edition")} ${num(v!.edition!)}`} · {soldOut ? t("art.soldOut") : `${num(left)} ${t("art.left")}`}</p>}
-          <button disabled={!v || soldOut} onClick={() => toast.success(`${pick(a, "title")} (${label}) — ${t("art.added")}`)} className="mt-4 w-full rounded-full bg-primary py-4 text-primary-foreground disabled:opacity-50">{t("art.buy")}</button>
+          <button disabled={!v || soldOut} onClick={() => { if (!v) return; actions.addToCart({ key: `${a.id}:${v.id}`, kind: "artwork", listingId: a.id, variantId: v.id, qty: 1 }); toast.success(`${pick(a, "title")} (${label}) — ${t("art.added")}`); navigate({ to: "/checkout" }); }} className="mt-4 w-full rounded-full bg-primary py-4 text-primary-foreground disabled:opacity-50">{t("art.buy")}</button>
           <p className="mt-3 text-xs text-muted-foreground">{t("art.cert")}</p>
 
           {auc && aucLive && (
