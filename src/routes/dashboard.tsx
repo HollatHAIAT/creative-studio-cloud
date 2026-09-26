@@ -130,7 +130,7 @@ function Dashboard() {
                 {form.images.map((src, i) => (
                   <div key={i} className="relative h-24 w-24">
                     <img src={src} alt="" className="h-full w-full rounded-sm object-cover" />
-                    <button type="button" aria-label="Remove image" onClick={() => setForm({ ...form, images: form.images.filter((_, j) => j !== i) })} className="absolute -right-2 -top-2 rounded-full bg-foreground p-1 text-background"><X className="h-3 w-3" /></button>
+                    <button type="button" aria-label="Remove image" onClick={() => setForm({ ...form, images: form.images.filter((_, j) => j !== i) })} className="absolute -end-2 -top-2 rounded-full bg-foreground p-1 text-background"><X className="h-3 w-3" /></button>
                   </div>
                 ))}
                 {form.images.length < MAX_FILES && (
@@ -163,7 +163,7 @@ function Dashboard() {
               <button onClick={() => setConfirmDel(true)} className="text-destructive underline">Delete</button>
             </div>
           )}
-          <Link to="/analytics" className="ml-auto text-sm underline">View analytics</Link>
+          <Link to="/analytics" className="ms-auto text-sm underline">View analytics</Link>
         </div>
         <div className="divide-y divide-border border-y border-border">
           {shown.map((l) => (

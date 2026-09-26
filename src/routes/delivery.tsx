@@ -118,7 +118,7 @@ function Delivery() {
           <p className="mt-1 text-sm text-muted-foreground">The most specific matching rule wins (listing + severity, then listing, then severity, then catch-all). If the primary channel fails after all retries, fallbacks are tried in order.</p>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-muted-foreground"><tr><th className="py-2">Listing</th><th>Severity</th><th>Responder</th><th>Primary</th><th>Fallbacks (in order)</th><th /></tr></thead>
+              <thead className="text-start text-muted-foreground"><tr><th className="py-2">Listing</th><th>Severity</th><th>Responder</th><th>Primary</th><th>Fallbacks (in order)</th><th /></tr></thead>
               <tbody>
                 {st.routes.map((r) => (
                   <tr key={r.id} className="border-t border-border align-top">
@@ -134,7 +134,7 @@ function Delivery() {
                         })}
                       </div>
                     </td>
-                    <td className="py-2 text-right"><button onClick={() => actions.setRoutes(st.routes.filter((x) => x.id !== r.id))} className="text-muted-foreground underline">Remove</button></td>
+                    <td className="py-2 text-end"><button onClick={() => actions.setRoutes(st.routes.filter((x) => x.id !== r.id))} className="text-muted-foreground underline">Remove</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -142,14 +142,14 @@ function Delivery() {
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
             <button className={inp} onClick={() => actions.setRoutes([...st.routes, { id: uid(), service: "all", severity: "all", responder: st.responder || "You", primary: "Email", fallbacks: ["In-app"] }])}>Add rule</button>
-            <span className="ml-auto">Retry every <input type="number" min={1} max={120} className={`${inp} w-16`} value={st.retry.intervalMin} onChange={(e) => actions.setRetry({ ...st.retry, intervalMin: Math.max(1, Math.min(120, +e.target.value || 1)) })} /> min, up to <input type="number" min={1} max={10} className={`${inp} w-14`} value={st.retry.maxAttempts} onChange={(e) => actions.setRetry({ ...st.retry, maxAttempts: Math.max(1, Math.min(10, +e.target.value || 1)) })} /> attempts per channel</span>
+            <span className="ms-auto">Retry every <input type="number" min={1} max={120} className={`${inp} w-16`} value={st.retry.intervalMin} onChange={(e) => actions.setRetry({ ...st.retry, intervalMin: Math.max(1, Math.min(120, +e.target.value || 1)) })} /> min, up to <input type="number" min={1} max={10} className={`${inp} w-14`} value={st.retry.maxAttempts} onChange={(e) => actions.setRetry({ ...st.retry, maxAttempts: Math.max(1, Math.min(10, +e.target.value || 1)) })} /> attempts per channel</span>
           </div>
         </div>
 
         {/* Delivery log */}
         <div className={card}>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="mr-auto font-display text-2xl">Delivery status</h2>
+            <h2 className="me-auto font-display text-2xl">Delivery status</h2>
             <select className={inp} value={fCh} onChange={(e) => { setFCh(e.target.value); setPage(1); }}><option value="all">All channels</option>{chOpts}</select>
             <select className={inp} value={fOut} onChange={(e) => { setFOut(e.target.value); setPage(1); }}><option value="all">All outcomes</option><option value="delivered">Delivered</option><option value="exhausted">Retries exhausted</option></select>
           </div>
@@ -162,8 +162,8 @@ function Delivery() {
                     <b>{r.title}</b><span className="capitalize">{r.metric}</span><span className="rounded-full bg-muted px-2 text-xs capitalize">{r.severity}</span>
                     <span className="text-muted-foreground">{r.date} → {r.responder}</span>
                     {r.outcome === "delivered"
-                      ? <span className="ml-auto rounded-full bg-primary px-2 text-xs text-primary-foreground">Delivered via {r.deliveredVia}{r.manual ? " (manual retry)" : ""} after {r.attempts.length} attempt{r.attempts.length > 1 ? "s" : ""}</span>
-                      : <span className="ml-auto rounded-full bg-destructive px-2 text-xs text-destructive-foreground">Retries exhausted on {chans.join(", ")} — not delivered</span>}
+                      ? <span className="ms-auto rounded-full bg-primary px-2 text-xs text-primary-foreground">Delivered via {r.deliveredVia}{r.manual ? " (manual retry)" : ""} after {r.attempts.length} attempt{r.attempts.length > 1 ? "s" : ""}</span>
+                      : <span className="ms-auto rounded-full bg-destructive px-2 text-xs text-destructive-foreground">Retries exhausted on {chans.join(", ")} — not delivered</span>}
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {chans.map((c) => {
@@ -187,7 +187,7 @@ function Delivery() {
         {/* Performance */}
         <div className={card}>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="mr-auto font-display text-2xl">Delivery performance</h2>
+            <h2 className="me-auto font-display text-2xl">Delivery performance</h2>
             <select className={inp} value={range} onChange={(e) => setRange(+e.target.value)}>{[7, 14, 30].map((d) => <option key={d} value={d}>Last {d} days vs previous {d}</option>)}</select>
             <button onClick={exportPerf} className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">Export CSV</button>
           </div>
@@ -217,7 +217,7 @@ function Delivery() {
           <p className="mt-1 text-sm text-muted-foreground">Error budget = failures allowed by the success target over the last {range} days. Burn rate above 1× means the budget runs out before the period ends.</p>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-muted-foreground"><tr><th className="py-2">Channel</th><th>Listing</th><th>Severity</th><th>Min success %</th><th>Max latency (s)</th><th>Budget left</th><th>Burn rate</th><th /></tr></thead>
+              <thead className="text-start text-muted-foreground"><tr><th className="py-2">Channel</th><th>Listing</th><th>Severity</th><th>Min success %</th><th>Max latency (s)</th><th>Budget left</th><th>Burn rate</th><th /></tr></thead>
               <tbody>
                 {st.slos.map((s) => {
                   const eb = errorBudget(s, now);
@@ -230,7 +230,7 @@ function Delivery() {
                       <td><input type="number" min={0.1} max={120} step={0.5} className={`${inp} w-20`} value={s.maxLatency} onChange={(e) => updSlo(s.id, { maxLatency: Math.max(0.1, +e.target.value || 1) })} /></td>
                       <td><span className={eb.remaining <= 0 ? "font-medium text-destructive" : ""}>{isFinite(eb.remaining) ? `${eb.remaining.toFixed(0)}%` : "0%"}</span> <span className="text-xs text-muted-foreground">({eb.failed}/{eb.allowed} failures)</span></td>
                       <td className={eb.burn > 1 ? "font-medium text-destructive" : ""}>{eb.burn.toFixed(2)}×</td>
-                      <td className="text-right"><button onClick={() => actions.setSlos(st.slos.filter((x) => x.id !== s.id))} className="text-muted-foreground underline">Remove</button></td>
+                      <td className="text-end"><button onClick={() => actions.setSlos(st.slos.filter((x) => x.id !== s.id))} className="text-muted-foreground underline">Remove</button></td>
                     </tr>
                   );
                 })}
@@ -239,7 +239,7 @@ function Delivery() {
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
             <button className={inp} onClick={() => actions.setSlos([...st.slos, { id: uid(), channel: "all", service: "all", severity: "all", minSuccess: 90, maxLatency: 5 }])}>Add SLO</button>
-            <span className="ml-auto">Breach notifications to:</span>
+            <span className="ms-auto">Breach notifications to:</span>
             {CHANNELS.map((c) => <label key={c} className="flex items-center gap-1"><input type="checkbox" checked={st.breachNotify.destinations.includes(c)} onChange={(e) => actions.setBreachNotify({ ...st.breachNotify, destinations: e.target.checked ? [...st.breachNotify.destinations, c] : st.breachNotify.destinations.filter((d) => d !== c) })} />{c}</label>)}
             <label className="flex items-center gap-2">Deduplicate
               <select className={inp} value={st.breachNotify.renotifyHours} onChange={(e) => actions.setBreachNotify({ ...st.breachNotify, renotifyHours: +e.target.value })}>
@@ -252,7 +252,7 @@ function Delivery() {
         {/* Breach history */}
         <div className={card}>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="mr-auto font-display text-2xl">SLO breach history</h2>
+            <h2 className="me-auto font-display text-2xl">SLO breach history</h2>
             <select className={inp} value={bCh} onChange={(e) => setBCh(e.target.value)}><option value="all">All channels</option>{chOpts}</select>
             <select className={inp} value={bSvc} onChange={(e) => setBSvc(e.target.value)}>{svcOpts}</select>
             <select className={inp} value={bSev} onChange={(e) => setBSev(e.target.value)}>{sevOpts}</select>
@@ -260,7 +260,7 @@ function Delivery() {
             <label className="flex items-center gap-1 text-sm"><input type="checkbox" checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />Recurring only</label>
           </div>
           <table className="mt-4 w-full text-sm">
-            <thead className="text-left text-muted-foreground"><tr><th className="py-2">Started</th><th>Recovered</th><th>Channel</th><th>Listing</th><th>Severity</th><th>Violated</th><th>Worst</th><th>Repeats</th></tr></thead>
+            <thead className="text-start text-muted-foreground"><tr><th className="py-2">Started</th><th>Recovered</th><th>Channel</th><th>Listing</th><th>Severity</th><th>Violated</th><th>Worst</th><th>Repeats</th></tr></thead>
             <tbody>
               {shownBreaches.slice(0, 50).map((b) => (
                 <tr key={b.id} className="border-t border-border">
@@ -292,7 +292,7 @@ function PerfTable({ title, now, prev }: { title: string; now: Perf[]; prev: Per
     <div>
       <p className="mb-2 text-sm font-medium">{title}</p>
       <table className="w-full text-xs">
-        <thead className="text-left text-muted-foreground"><tr><th className="py-1" /><th>Success</th><th>Latency</th><th>Retries</th></tr></thead>
+        <thead className="text-start text-muted-foreground"><tr><th className="py-1" /><th>Success</th><th>Latency</th><th>Retries</th></tr></thead>
         <tbody>
           {now.map((p) => { const q = prev.find((x) => x.key === p.key); return (
             <tr key={p.key} className="border-t border-border">

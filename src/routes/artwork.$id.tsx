@@ -33,7 +33,7 @@ function Detail() {
         <div>
           <div className="relative">
             <img src={a.images[img] ?? a.image} alt={a.title} className="aspect-[4/5] w-full rounded-sm object-cover" />
-            <FavButton id={a.id} className="absolute right-4 top-4" />
+            <FavButton id={a.id} className="absolute end-4 top-4" />
           </div>
           {a.images.length > 1 && (
             <div className="mt-3 flex gap-3">

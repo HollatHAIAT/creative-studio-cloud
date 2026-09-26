@@ -88,7 +88,7 @@ function Analytics() {
           <select className={sel} value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All states</option><option value="published">Published</option><option value="draft">Drafts</option><option value="archived">Archived</option></select>
           {only && <button onClick={() => setOnly(undefined)} className="rounded-full bg-muted px-3 py-1.5 text-sm">Only: {all.find((l) => l.id === only)?.title ?? only} ×</button>}
           <button onClick={saveView} className={sel}>Save view</button>
-          <button onClick={exportCsv} className="ml-auto flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"><Download className="h-4 w-4" />Export CSV</button>
+          <button onClick={exportCsv} className="ms-auto flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"><Download className="h-4 w-4" />Export CSV</button>
           <Link to="/reports" className="text-sm underline">Email reports</Link>
           <Link to="/alerts" className="text-sm underline">Alerts</Link>
         </div>
@@ -106,7 +106,7 @@ function Analytics() {
 
         {alerts.length > 0 && (
           <div className="rounded-sm border border-destructive/40 bg-destructive/5 p-5">
-            <p className="flex items-center gap-2 font-medium text-destructive"><AlertTriangle className="h-4 w-4" />Sudden drops in the last {alertCfg.recent} days <Link to="/alerts" className="ml-auto text-sm font-normal underline">Manage alerts</Link></p>
+            <p className="flex items-center gap-2 font-medium text-destructive"><AlertTriangle className="h-4 w-4" />Sudden drops in the last {alertCfg.recent} days <Link to="/alerts" className="ms-auto text-sm font-normal underline">Manage alerts</Link></p>
             <ul className="mt-2 space-y-1 text-sm">{alerts.map((a) => <li key={a.listingId + a.metric}><b>{a.title}</b>: {a.metric} down {Math.round(-a.change * 100)}% vs the previous {alertCfg.prior} days</li>)}</ul>
           </div>
         )}
@@ -140,7 +140,7 @@ function Analytics() {
           <h2 className="mb-4 font-display text-2xl">Listing breakdown</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-muted-foreground"><tr><th className="py-2">Listing</th><th>Views</th><th>Favorites</th><th>Purchases</th><th>View→Fav</th><th>Fav→Buy</th><th>Overall</th></tr></thead>
+              <thead className="text-start text-muted-foreground"><tr><th className="py-2">Listing</th><th>Views</th><th>Favorites</th><th>Purchases</th><th>View→Fav</th><th>Fav→Buy</th><th>Overall</th></tr></thead>
               <tbody>
                 {data.per.map((p) => {
                   const best = p.l.id === data.best, worst = p.l.id === data.worst;
@@ -178,5 +178,5 @@ function Analytics() {
 }
 
 function Bar({ v, max }: { v: number; max: number }) {
-  return <span className="mr-2 inline-block h-1.5 w-12 rounded-full bg-muted align-middle"><span className="block h-1.5 rounded-full bg-primary" style={{ width: `${Math.min(100, (v / max) * 100)}%` }} /></span>;
+  return <span className="me-2 inline-block h-1.5 w-12 rounded-full bg-muted align-middle"><span className="block h-1.5 rounded-full bg-primary" style={{ width: `${Math.min(100, (v / max) * 100)}%` }} /></span>;
 }

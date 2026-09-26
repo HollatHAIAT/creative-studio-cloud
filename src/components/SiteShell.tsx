@@ -66,12 +66,12 @@ export function ArtCard({ a }: { a: Artwork }) {
     <Link to="/artwork/$id" params={{ id: a.id }} className="group block">
       <div className="relative overflow-hidden rounded-sm bg-muted">
         <img src={a.image} alt={a.title} loading="lazy" className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-105" />
-        <span className="absolute left-3 top-3 rounded-full bg-background/90 px-3 py-1 text-xs">{a.category}</span>
-        <FavButton id={a.id} className="absolute right-3 top-3" />
+        <span className="absolute start-3 top-3 rounded-full bg-background/90 px-3 py-1 text-xs">{a.category}</span>
+        <FavButton id={a.id} className="absolute end-3 top-3" />
       </div>
       <div className="mt-3 flex items-start justify-between gap-2">
         <div><p className="font-display text-lg">{a.title}</p><p className="text-sm text-muted-foreground">{a.artist}</p></div>
-        <div className="text-right text-sm">
+        <div className="text-end text-sm">
           {a.auction ? (<><p className="text-primary">{fmt(a.auction.currentBid)}</p><p className="text-muted-foreground">{a.auction.endsIn}</p></>) : <p>{fmt(a.price)}</p>}
         </div>
       </div>

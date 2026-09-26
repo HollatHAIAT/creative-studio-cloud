@@ -146,7 +146,7 @@ function Alerts() {
               </label>
               <p className="text-xs text-muted-foreground">An ongoing group past its recovery target notifies you once, then again only after this cooldown.</p>
               <div className="border-t border-border pt-3">
-                <p className="font-medium">Maintenance windows {inMaint && <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">Active now — notifications paused</span>}</p>
+                <p className="font-medium">Maintenance windows {inMaint && <span className="ms-2 rounded-full bg-muted px-2 py-0.5 text-xs">Active now — notifications paused</span>}</p>
                 <p className="text-xs text-muted-foreground">Recovery-target notifications are paused during these times.</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <input type="datetime-local" className={inp} value={mw.start} onChange={(e) => setMw({ ...mw, start: e.target.value })} aria-label="Window start" />
@@ -200,7 +200,7 @@ function Alerts() {
           <h2 className="font-display text-2xl">Preview with recent data</h2>
           <p className="mt-1 text-sm text-muted-foreground">Last {cfg.recent} days vs previous {cfg.prior} days. Red cells would trigger an alert now.</p>
           <table className="mt-4 w-full text-sm">
-            <thead className="text-left text-muted-foreground"><tr><th className="py-2">Listing</th>{METRICS.map((m) => <th key={m} className="capitalize">{m}</th>)}<th>Alerts</th></tr></thead>
+            <thead className="text-start text-muted-foreground"><tr><th className="py-2">Listing</th>{METRICS.map((m) => <th key={m} className="capitalize">{m}</th>)}<th>Alerts</th></tr></thead>
             <tbody>
               {listings.map((l) => {
                 const paused = cfg.paused.includes(l.id);
@@ -235,7 +235,7 @@ function Alerts() {
             <select className={inp} value={cMetric} onChange={(e) => setCMetric(e.target.value)} aria-label="Compliance metric"><option value="all">All metrics</option>{METRICS.map((m) => <option key={m} value={m}>{m}</option>)}</select>
             <input type="date" className={inp} value={cFrom} onChange={(e) => setCFrom(e.target.value)} aria-label="Compliance from" />
             <input type="date" className={inp} value={cTo} onChange={(e) => setCTo(e.target.value)} aria-label="Compliance to" />
-            <button onClick={exportCompliance} className="ml-auto rounded-full bg-primary px-4 py-2 text-primary-foreground">Export compliance CSV</button>
+            <button onClick={exportCompliance} className="ms-auto rounded-full bg-primary px-4 py-2 text-primary-foreground">Export compliance CSV</button>
           </div>
           <p className="mt-4 font-display text-4xl">{c.overall.pct.toFixed(0)}% <span className="text-base text-muted-foreground">met ({c.overall.met}/{c.overall.total})</span></p>
           <div className="mt-6 grid gap-8 md:grid-cols-2">
@@ -306,7 +306,7 @@ function Alerts() {
             <button className={inp} disabled={!filtered.length} onClick={() => setBulkAction("resolved")}>Resolve all ({filtered.length})</button>
             <select className={inp} value={fRecovery} onChange={(e) => { setFRecovery(e.target.value); setPage(1); }} aria-label="Recovery status"><option value="all">Ongoing + recovered</option><option value="ongoing">Ongoing only</option><option value="recovered">Recovered only</option></select>
             <button className={inp} onClick={savePreset}>Save preset</button>
-            <button onClick={exportCsv} disabled={!filtered.length} className="ml-auto rounded-full bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">Export CSV</button>
+            <button onClick={exportCsv} disabled={!filtered.length} className="ms-auto rounded-full bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">Export CSV</button>
           </div>
           {alertPresets.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2 text-sm">
@@ -324,7 +324,7 @@ function Alerts() {
               const st = review[h.key] ?? "open";
               const active = h.triggers.some((t) => !t.recoveredAt);
               return (
-                <div key={h.key} className={`py-4 text-sm ${overdue(h) ? "border-l-4 border-destructive pl-3" : ""}`}>
+                <div key={h.key} className={`py-4 text-sm ${overdue(h) ? "border-l-4 border-destructive ps-3" : ""}`}>
                   <div className="flex flex-wrap items-center gap-3">
                     <p className="font-medium">{h.title} · <span className="capitalize">{h.metric}</span></p>
                     <span className="text-muted-foreground">{h.triggers.length} trigger{h.triggers.length > 1 ? "s" : ""} · {cfg.recent}d vs prior {cfg.prior}d</span>
@@ -335,7 +335,7 @@ function Alerts() {
                     <span className={`rounded-full px-2 py-0.5 text-xs ${st === "open" ? "border border-border" : st === "resolved" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>{st}</span>
                     {owners[h.key] ? <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">Handled by {owners[h.key]!.name} · since {new Date(owners[h.key]!.at).toLocaleDateString()}</span> : groupDuration(h).ongoing && <span className="rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-muted-foreground">Unclaimed</span>}
                     {esc(h) && <span className="rounded-full bg-chart-4/30 px-2 py-0.5 text-xs" title="Escalation">Escalated to {esc(h)!.responder} (level {esc(h)!.level}){esc(h)!.nextIn != null ? ` · ${esc(h)!.next} in ${esc(h)!.nextIn}h` : " · final level"}</span>}
-                    <span className="ml-auto space-x-3">
+                    <span className="ms-auto space-x-3">
                       {groupDuration(h).ongoing && (owners[h.key]
                         ? <button onClick={() => actions.release(h.key)} className="underline">Release</button>
                         : <button onClick={() => { const n = prompt("Your name", responder)?.trim(); if (n) { actions.claim(h.key, n.slice(0, 40)); if (st === "open") actions.setReview(h.key, "acknowledged"); toast.success(`Claimed by ${n}`); } }} className="underline">Claim</button>)}
@@ -349,13 +349,13 @@ function Alerts() {
                   <button onClick={() => setOpen(open.includes(h.key) ? open.filter((k) => k !== h.key) : [...open, h.key])} className="mt-2 text-xs underline" aria-expanded={open.includes(h.key)}>{open.includes(h.key) ? "Hide details" : "Show details"}</button>
                   {open.includes(h.key) && <p className="mt-2 text-xs font-medium">Recovery duration: {durLabel(groupDuration(h))}{groupDuration(h).ongoing ? ` (elapsed since ${groupDuration(h).first})` : ` (${groupDuration(h).first} → ${groupDuration(h).end})`} · <span className="capitalize">{severity(h)}</span> target {targetFor(h, cfg)} days{groupDuration(h).ongoing && (daysPast(h, cfg) > 0 ? <span className="text-destructive"> · {daysPast(h, cfg)} days past target</span> : <span> · {targetFor(h, cfg) - groupDuration(h).days} days left</span>)}</p>}
                   {open.includes(h.key) && <AuditTimeline h={h} />}
-                  {open.includes(h.key) && <ol className="mt-2 border-l-2 border-border pl-4">
+                  {open.includes(h.key) && <ol className="mt-2 border-l-2 border-border ps-4">
                     {h.triggers.flatMap((t) => [{ d: t.date, kind: "drop" as const, c: t.change, ref: t.date }, ...(t.recoveredAt ? [{ d: t.recoveredAt, kind: "recovery" as const, c: t.recoveryChange!, ref: t.date }] : [])]).sort((a, b) => a.d.localeCompare(b.d)).map((ev) => (
                       <li key={ev.kind + ev.d} className="relative py-1"><span className={`absolute -left-[21px] top-2 h-2.5 w-2.5 rounded-full ${ev.kind === "drop" ? "bg-destructive" : "bg-chart-2"}`} />
                         <b>{ev.d}</b> — {ev.kind === "drop" ? `Drop triggered: ${(ev.c * 100).toFixed(0)}% (threshold −${cfg.thresholds[h.metric]}%)` : `Recovered: ${ev.c >= 0 ? "+" : ""}${(ev.c * 100).toFixed(0)}%, linked to drop on ${ev.ref} (${daysBetween(ev.ref, ev.d)} days)`}</li>
                     ))}
                   </ol>}
-                  <ul className="mt-2 hidden space-y-1 pl-4">
+                  <ul className="mt-2 hidden space-y-1 ps-4">
                     {h.triggers.map((t) => (
                       <li key={t.date} className="flex flex-wrap gap-x-4">
                         <span>{t.date}: <span className="text-destructive">{(t.change * 100).toFixed(0)}%</span></span>
@@ -418,7 +418,7 @@ function AuditTimeline({ h }: { h: { key: string; triggers: { date: string; chan
   return (
     <div className="mt-3 rounded-sm bg-muted p-3 text-xs">
       <div className="flex flex-wrap items-center gap-2">
-        <b className="mr-auto">Audit timeline</b>
+        <b className="me-auto">Audit timeline</b>
         <select className={sel} value={type} onChange={(e) => setType(e.target.value)} aria-label="Event type"><option value="all">All events</option>{types.map((t) => <option key={t}>{t}</option>)}</select>
         <select className={sel} value={actor} onChange={(e) => setActor(e.target.value)} aria-label="Responder"><option value="all">Anyone</option>{actors.map((a) => <option key={a}>{a}</option>)}</select>
         <input type="date" className={sel} value={from} onChange={(e) => setFrom(e.target.value)} aria-label="Audit from" />
