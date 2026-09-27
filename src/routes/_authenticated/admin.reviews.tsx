@@ -63,7 +63,7 @@ function Queue() {
   };
 
   const avg = d?.reviews.filter((r) => r.status === "visible").reduce((s, r, _i, a) => s + r.rating / a.length, 0) ?? 0;
-  const tabs: [Tab, string, number?][] = [["reports", L("Reported", "مُبلّغ عنها"), d?.reports.length], ["appeals", L("Appeals", "الاعتراضات"), d?.appeals.length], ["all", L("All reviews", "كل التقييمات")], ["decisions", L("Recent decisions", "القرارات الأخيرة")], ["users", L("Suspensions", "الإيقافات"), d?.blocks.length]];
+  const tabs: [Tab, string, (number | undefined)?][] = [["reports", L("Reported", "مُبلّغ عنها"), d?.reports.length], ["appeals", L("Appeals", "الاعتراضات"), d?.appeals.length], ["all", L("All reviews", "كل التقييمات")], ["decisions", L("Recent decisions", "القرارات الأخيرة")], ["users", L("Suspensions", "الإيقافات"), d?.blocks.length]];
   const row = "rounded-sm border border-border p-4";
   const small = "rounded-full border border-border px-3 py-1 text-sm hover:border-primary";
 
