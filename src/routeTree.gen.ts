@@ -33,6 +33,7 @@ import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOrderHelpRouteImport } from './routes/_authenticated/order-help'
 import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
+import { Route as AuthenticatedSearchTermsRouteImport } from './routes/_authenticated/search-terms'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
 import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
@@ -172,6 +173,12 @@ const AuthenticatedSavedSearchesRoute =
     path: '/saved-searches',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSearchTermsRoute =
+  AuthenticatedSearchTermsRouteImport.update({
+    id: '/search-terms',
+    path: '/search-terms',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -277,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
+  '/search-terms': typeof AuthenticatedSearchTermsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -317,6 +325,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
+  '/search-terms': typeof AuthenticatedSearchTermsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -359,6 +368,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/order-help': typeof AuthenticatedOrderHelpRoute
   '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
+  '/_authenticated/search-terms': typeof AuthenticatedSearchTermsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -401,6 +411,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/order-help'
     | '/saved-searches'
+    | '/search-terms'
     | '/settings'
     | '/artists/$id'
     | '/artwork/$id'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/order-help'
     | '/saved-searches'
+    | '/search-terms'
     | '/settings'
     | '/artists/$id'
     | '/artwork/$id'
@@ -482,6 +494,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/order-help'
     | '/_authenticated/saved-searches'
+    | '/_authenticated/search-terms'
     | '/_authenticated/settings'
     | '/artists/$id'
     | '/artwork/$id'
@@ -693,6 +706,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSavedSearchesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/search-terms': {
+      id: '/_authenticated/search-terms'
+      path: '/search-terms'
+      fullPath: '/search-terms'
+      preLoaderRoute: typeof AuthenticatedSearchTermsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -809,6 +829,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOrderHelpRoute: typeof AuthenticatedOrderHelpRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
+  AuthenticatedSearchTermsRoute: typeof AuthenticatedSearchTermsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
@@ -827,6 +848,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOrderHelpRoute: AuthenticatedOrderHelpRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
+  AuthenticatedSearchTermsRoute: AuthenticatedSearchTermsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
