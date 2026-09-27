@@ -293,7 +293,7 @@ function ListingWriter() {
                   if (phone && dsc.length > 600) issues.push(L("Description is long for a phone — buyers must scroll a lot", "الوصف طويل على الهاتف — سيحتاج المشتري إلى تمرير كثير"));
                   const body = (
                     <>
-                      {preview ? <img src={preview} alt={alt} className={phone ? "aspect-[4/5] w-full bg-muted object-cover" : "max-h-72 w-full bg-muted object-contain"} /> : <div className="grid h-40 place-items-center bg-muted text-sm text-muted-foreground">{L("No image", "لا توجد صورة")}</div>}
+                      {preview ? <img src={preview} alt={alt} onLoad={(e) => { const im = e.currentTarget; if (im.naturalHeight) { setImgRatio(im.naturalWidth / im.naturalHeight); setImgW(im.naturalWidth); } }} className={phone ? "aspect-[4/5] w-full bg-muted object-cover" : "max-h-72 w-full bg-muted object-contain"} /> : <div className="grid h-40 place-items-center bg-muted text-sm text-muted-foreground">{L("No image", "لا توجد صورة")}</div>}
                       <div className={phone ? "px-4 pb-4" : ""}>
                         {medium && <p className="text-xs uppercase tracking-wide text-muted-foreground">{medium}</p>}
                         <h3 className={`font-display ${phone ? "text-xl leading-snug" : "text-2xl"}`}>{t || "—"}</h3>
@@ -321,6 +321,53 @@ function ListingWriter() {
                       {issues.length > 0 ? (
                         <ul className="space-y-1 text-sm text-destructive">{issues.map((i) => <li key={i}>• {i}</li>)}</ul>
                       ) : <p className="text-sm text-success">{L("Ready: title, description and alt text look good.", "جاهز: العنوان والوصف والنص البديل سليمة.")}</p>}
+                      {(() => {
+                        // Phone layout: ~24 title chars/line (2 lines shown on cards), ~110-char description snippet, 4:5 image crop.
+                        const both = (f: (s: string) => boolean) => f(copy.title) && f(copy.titleAr);
+                        const firstSentence = (s: string) => s.trim().split(/(?<=[.!؟?])\s/)[0] ?? "";
+                        const crop = imgRatio == null ? null : Math.abs(imgRatio - 0.8) / Math.max(imgRatio, 0.8);
+                        const alts = [copy.altText, copy.altTextAr];
+                        type Item = { ok: boolean | null; label: string; hint: string };
+                        const groups: { name: string; items: Item[] }[] = [
+                          { name: L("Text truncation", "اقتطاع النص"), items: [
+                            { ok: both((s) => s.trim().length > 0 && s.length <= 48), label: L("Title fits in 2 lines on a phone card", "العنوان يتسع لسطرين في بطاقة الهاتف"), hint: L("Keep both titles under 48 characters.", "اجعل العنوانين أقل من 48 حرفاً.") },
+                            { ok: both((s) => !/\S{22,}/.test(s)), label: L("No overly long words in titles", "لا كلمات طويلة جداً في العنوان"), hint: L("Very long words break awkwardly on narrow screens.", "الكلمات الطويلة جداً تنكسر على الشاشات الضيقة.") },
+                            { ok: [copy.description, copy.descriptionAr].every((s) => { const f = firstSentence(s); return f.length > 0 && f.length <= 110; }), label: L("Description's first sentence survives the snippet", "الجملة الأولى من الوصف تظهر كاملة في المقتطف"), hint: L("Phone listings show about 110 characters before “more”.", "يعرض الهاتف نحو 110 أحرف قبل «المزيد».") },
+                            { ok: [copy.description, copy.descriptionAr].every((s) => s.length <= 700), label: L("Description is short enough to skim", "الوصف قصير بما يكفي للتصفح"), hint: L("Aim for under 700 characters.", "اجعله أقل من 700 حرف.") },
+                          ] },
+                          { name: L("Image cropping", "اقتصاص الصورة"), items: [
+                            { ok: preview ? (crop == null ? null : crop <= 0.15) : false, label: L("Image fits the 4:5 phone frame without heavy cropping", "الصورة تناسب إطار الهاتف 4:5 دون اقتصاص كبير"),
+                              hint: !preview ? L("Add an image.", "أضف صورة.") : crop == null ? L("Measuring…", "جارٍ القياس…") : L(`About ${Math.round(crop * 100)}% of the image is cut off on phones. A portrait photo near 4:5 works best.`, `يُقتطع نحو ${Math.round(crop * 100)}٪ من الصورة على الهاتف. الأفضل صورة عمودية قريبة من 4:5.`) },
+                            { ok: preview ? (imgW == null ? null : imgW >= 1080) : false, label: L("Image is sharp on high-resolution phones", "الصورة حادة على الهواتف عالية الدقة"), hint: L("Use at least 1080 px wide.", "استخدم عرضاً لا يقل عن 1080 بكسل.") },
+                          ] },
+                          { name: L("Accessibility", "إمكانية الوصول"), items: [
+                            { ok: alts.every((s) => s.trim().length >= 15), label: L("Alt text present in both languages", "النص البديل موجود باللغتين"), hint: L("Describe what's visible in at least a short phrase.", "صف ما يظهر بعبارة قصيرة على الأقل.") },
+                            { ok: alts.every((s) => s.length <= 140), label: L("Alt text is 140 characters or fewer", "النص البديل 140 حرفاً أو أقل"), hint: L("Screen readers read long alt text in one go.", "قارئ الشاشة يقرأ النص الطويل دفعة واحدة.") },
+                            { ok: alts.every((s) => !/^(image|picture|photo|صورة)\b/i.test(s.trim())), label: L("Alt text doesn't start with “image of”", "النص البديل لا يبدأ بـ«صورة»"), hint: L("Screen readers already announce it's an image.", "قارئ الشاشة يعلن أنها صورة مسبقاً.") },
+                            { ok: copy.altText.trim() !== copy.title.trim() && copy.altTextAr.trim() !== copy.titleAr.trim(), label: L("Alt text differs from the title", "النص البديل يختلف عن العنوان"), hint: L("Describe the image, don't repeat the title.", "صف الصورة ولا تكرر العنوان.") },
+                            { ok: /[\u0600-\u06FF]/.test(copy.titleAr + copy.descriptionAr + copy.altTextAr) && !/[\u0600-\u06FF]/.test(copy.title + copy.description + copy.altText), label: L("Each language is in its own field", "كل لغة في حقلها"), hint: L("Arabic fields should be Arabic and English fields English, so screen readers pronounce them correctly.", "يجب أن تكون الحقول العربية بالعربية والإنجليزية بالإنجليزية لينطقها قارئ الشاشة صحيحاً.") },
+                          ] },
+                        ];
+                        const all = groups.flatMap((g) => g.items);
+                        const fails = all.filter((i) => i.ok === false).length;
+                        return (
+                          <div className="rounded-sm border border-border p-3 text-sm">
+                            <p className="mb-2 font-medium">{L("Mobile readiness checklist", "قائمة الجاهزية للهاتف")} · <span className={fails ? "text-warning" : "text-success"}>{fails ? L(`${fails} to fix`, `${fails} للإصلاح`) : L("All clear", "كلها سليمة")}</span></p>
+                            {groups.map((g) => (
+                              <div key={g.name} className="mb-2">
+                                <p className="text-xs uppercase tracking-wide text-muted-foreground">{g.name}</p>
+                                <ul className="space-y-1">{g.items.map((i) => (
+                                  <li key={i.label} className="flex gap-2">
+                                    <span aria-hidden className={i.ok ? "text-success" : i.ok === false ? "text-destructive" : "text-muted-foreground"}>{i.ok ? "✓" : i.ok === false ? "✕" : "…"}</span>
+                                    <span className="min-w-0"><span className="sr-only">{i.ok ? L("Passed: ", "ناجح: ") : i.ok === false ? L("Needs fixing: ", "يحتاج إصلاحاً: ") : L("Checking: ", "قيد الفحص: ")}</span>{i.label}
+                                      {i.ok === false || i.ok === null ? <span className="block text-xs text-muted-foreground">{i.hint}</span> : null}</span>
+                                  </li>
+                                ))}</ul>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 })()}
