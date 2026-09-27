@@ -13,6 +13,7 @@ import logoFull from "@/assets/arwiqa-logo.png";
 
 const nav = [
   { to: "/explore", k: "nav.explore" },
+  { to: "/advisor", k: "nav.advisor" },
   { to: "/auctions", k: "nav.auctions" },
   { to: "/exhibitions", k: "nav.exhibitions" },
   { to: "/artists", k: "nav.artists" },
