@@ -447,6 +447,54 @@ export type Database = {
           },
         ]
       }
+      listing_drafts: {
+        Row: {
+          alt_text: string
+          alt_text_ar: string
+          created_at: string
+          description: string
+          description_ar: string
+          id: string
+          image_path: string | null
+          medium: string
+          tags: string[]
+          title: string
+          title_ar: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alt_text?: string
+          alt_text_ar?: string
+          created_at?: string
+          description?: string
+          description_ar?: string
+          id?: string
+          image_path?: string | null
+          medium?: string
+          tags?: string[]
+          title?: string
+          title_ar?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          alt_text?: string
+          alt_text_ar?: string
+          created_at?: string
+          description?: string
+          description_ar?: string
+          id?: string
+          image_path?: string | null
+          medium?: string
+          tags?: string[]
+          title?: string
+          title_ar?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       listings: {
         Row: {
           category: string

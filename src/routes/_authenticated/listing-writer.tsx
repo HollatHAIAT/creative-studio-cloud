@@ -37,6 +37,37 @@ function ListingWriter() {
   const [instr, setInstr] = useState("");
   const [revErr, setRevErr] = useState("");
   const [prev, setPrev] = useState<ListingCopy | null>(null);
+  type Draft = { id: string; title: string; title_ar: string; description: string; description_ar: string; alt_text: string; alt_text_ar: string; tags: string[]; medium: string; image_path: string | null; updated_at: string };
+  const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [saveErr, setSaveErr] = useState("");
+  const loadDrafts = async () => {
+    const { data } = await supabase.from("listing_drafts").select("*").order("updated_at", { ascending: false }).limit(20);
+    setDrafts((data ?? []) as Draft[]);
+  };
+  useEffect(() => { void loadDrafts(); }, []);
+  const save = useAction(async () => {
+    if (!copy) return;
+    setSaveErr("");
+    const row = { title: copy.title, title_ar: copy.titleAr, description: copy.description, description_ar: copy.descriptionAr,
+      alt_text: copy.altText, alt_text_ar: copy.altTextAr, tags: copy.tags, medium, image_path: path };
+    const q = draftId
+      ? supabase.from("listing_drafts").update(row).eq("id", draftId).select("id").single()
+      : supabase.from("listing_drafts").insert(row).select("id").single();
+    const { data, error } = await q;
+    if (error || !data) { setSaveErr(L("Couldn't save the draft.", "تعذّر حفظ المسودة.")); throw error ?? new Error("save"); }
+    setDraftId(data.id);
+    await loadDrafts();
+  });
+  const openDraft = (d: Draft) => {
+    setDraftId(d.id); setMedium(d.medium); setPath(d.image_path); setPreview(null); setPrev(null);
+    setCopy({ title: d.title, titleAr: d.title_ar, description: d.description, descriptionAr: d.description_ar, altText: d.alt_text, altTextAr: d.alt_text_ar, tags: d.tags });
+  };
+  const removeDraft = async (id: string) => {
+    await supabase.from("listing_drafts").delete().eq("id", id);
+    if (id === draftId) setDraftId(null);
+    await loadDrafts();
+  };
   const rev = useAction(async () => {
     if (!copy) return;
     setRevErr("");
@@ -113,6 +144,22 @@ function ListingWriter() {
         </section>
 
         <section aria-live="polite" className="space-y-5">
+          {drafts.length > 0 && (
+            <div className="rounded-sm border border-border p-4">
+              <h2 className="mb-2 text-sm font-medium">{L("Your listing drafts", "مسودات إعلاناتك")}</h2>
+              <ul className="divide-y divide-border">
+                {drafts.map((d) => (
+                  <li key={d.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                    <span className="truncate">{(ar ? d.title_ar : d.title) || L("Untitled", "بلا عنوان")}{d.id === draftId && <span className="ms-2 text-muted-foreground">· {L("open", "مفتوحة")}</span>}</span>
+                    <span className="flex shrink-0 gap-3">
+                      <button type="button" onClick={() => openDraft(d)} className="underline">{L("Open", "افتح")}</button>
+                      <button type="button" onClick={() => removeDraft(d.id)} className="text-destructive underline">{L("Delete", "احذف")}</button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {!copy ? (
             <div className="rounded-sm border border-border bg-card p-8 text-muted-foreground">
               {L("Your title, description and alt text will appear here. You can edit everything before using it.", "سيظهر هنا العنوان والوصف والنص البديل، ويمكنك تعديلها قبل الاستخدام.")}
@@ -158,6 +205,15 @@ function ListingWriter() {
               {copy.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">{copy.tags.map((t) => <span key={t} className="rounded-full border border-border px-3 py-1 text-sm">#{t}</span>)}</div>
               )}
+              <div className="flex flex-wrap items-center gap-3">
+                <ActionButton state={save.state} onClick={() => save.run()} onRetry={save.retry}
+                  loadingLabel={L("Saving…", "جارٍ الحفظ…")} successLabel={L("Saved to draft", "حُفظ في المسودة")}
+                  errorLabel={saveErr || L("Couldn't save the draft.", "تعذّر حفظ المسودة.")} retryLabel={L("Try again", "حاول مجدداً")}
+                  className="rounded-sm bg-primary px-4 py-2 text-sm text-primary-foreground">
+                  {draftId ? L("Update listing draft", "حدّث مسودة الإعلان") : L("Save to listing draft", "احفظ في مسودة إعلان")}
+                </ActionButton>
+                {draftId && <button type="button" onClick={() => setDraftId(null)} className="text-sm underline">{L("Save as a new draft instead", "احفظ كمسودة جديدة")}</button>}
+              </div>
               <p className="text-sm text-muted-foreground">
                 {L("AI-written — check facts before publishing.", "نص مكتوب بالذكاء الاصطناعي — راجع المعلومات قبل النشر.")}{" "}
                 <Link to="/dashboard" className="underline">{L("Go to dashboard", "إلى لوحة التحكم")}</Link>
