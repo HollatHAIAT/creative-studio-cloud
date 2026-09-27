@@ -616,7 +616,10 @@ export type Database = {
           created_at: string
           currency: string
           id: string
+          idempotency_key: string | null
           items: Json
+          payment_attempts: number
+          payment_error: string | null
           payment_method: string
           reference: string
           shipping: number
@@ -632,7 +635,10 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          idempotency_key?: string | null
           items: Json
+          payment_attempts?: number
+          payment_error?: string | null
           payment_method: string
           reference?: string
           shipping?: number
@@ -648,7 +654,10 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          idempotency_key?: string | null
           items?: Json
+          payment_attempts?: number
+          payment_error?: string | null
           payment_method?: string
           reference?: string
           shipping?: number
@@ -1128,6 +1137,10 @@ export type Database = {
         Args: { _reason: string; _uid: string }
         Returns: undefined
       }
+      admin_mark_payment_failed: {
+        Args: { _error: string; _order: string }
+        Returns: undefined
+      }
       admin_moderate_review: {
         Args: { _reason: string; _remove: boolean; _review: string }
         Returns: undefined
@@ -1194,6 +1207,7 @@ export type Database = {
         Args: { _reply: string; _review: string }
         Returns: undefined
       }
+      retry_payment: { Args: { _order: string }; Returns: undefined }
       slot_bookings: {
         Args: { _date: string; _exhibition_id: string }
         Returns: {
