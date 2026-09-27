@@ -25,6 +25,7 @@ import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AuthenticatedListingWriterRouteImport } from './routes/_authenticated/listing-writer'
 import { Route as AuthenticatedMatchExplainerRouteImport } from './routes/_authenticated/match-explainer'
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
@@ -121,6 +122,11 @@ const ReportsRoute = ReportsRouteImport.update({
 const SellRoute = SellRouteImport.update({
   id: '/sell',
   path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedListingWriterRoute =
@@ -238,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -273,6 +280,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -310,6 +318,7 @@ export interface FileRoutesById {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/listing-writer': typeof AuthenticatedListingWriterRoute
   '/_authenticated/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -347,6 +356,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/unsubscribe'
     | '/listing-writer'
     | '/match-explainer'
     | '/my-reviews'
@@ -382,6 +392,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/unsubscribe'
     | '/listing-writer'
     | '/match-explainer'
     | '/my-reviews'
@@ -418,6 +429,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/unsubscribe'
     | '/_authenticated/listing-writer'
     | '/_authenticated/match-explainer'
     | '/_authenticated/my-reviews'
@@ -455,6 +467,7 @@ export interface RootRouteChildren {
   FavoritesRoute: typeof FavoritesRoute
   ReportsRoute: typeof ReportsRoute
   SellRoute: typeof SellRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   ArtworkIdRoute: typeof ArtworkIdRoute
   AssetsIdRoute: typeof AssetsIdRoute
   CollectionsSaudiBanksRoute: typeof CollectionsSaudiBanksRoute
@@ -572,6 +585,13 @@ declare module '@tanstack/react-router' {
       path: '/sell'
       fullPath: '/sell'
       preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/listing-writer': {
@@ -788,6 +808,7 @@ const rootRouteChildren: RootRouteChildren = {
   FavoritesRoute: FavoritesRoute,
   ReportsRoute: ReportsRoute,
   SellRoute: SellRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   ArtworkIdRoute: ArtworkIdRoute,
   AssetsIdRoute: AssetsIdRoute,
   CollectionsSaudiBanksRoute: CollectionsSaudiBanksRoute,

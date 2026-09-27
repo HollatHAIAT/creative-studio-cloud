@@ -24,7 +24,12 @@ export const Route = createFileRoute("/_authenticated/saved-searches")({
   component: SavedSearches,
 });
 
-type Saved = { id: string; name: string; keywords: string; categories: string[]; min_price: number | null; max_price: number | null; active: boolean };
+type Saved = { id: string; name: string; keywords: string; categories: string[]; min_price: number | null; max_price: number | null; active: boolean; email_frequency: Freq };
+type Freq = "off" | "instant" | "daily" | "weekly";
+const FREQS: { v: Freq; en: string; ar: string }[] = [
+  { v: "off", en: "No emails", ar: "بدون بريد" }, { v: "instant", en: "Email instantly", ar: "بريد فوري" },
+  { v: "daily", en: "Daily digest", ar: "ملخص يومي" }, { v: "weekly", en: "Weekly digest", ar: "ملخص أسبوعي" },
+];
 const CAT_AR: Record<string, string> = { Painting: "رسم", Photography: "تصوير", Calligraphy: "خط عربي", Illustration: "رسوم توضيحية", Digital: "رقمي", Print: "مطبوعات" };
 // Generated types may lag the new table; keep one narrow cast.
 const table = () => (supabase as unknown as { from: (t: string) => ReturnType<typeof supabase.from> }).from("saved_searches");
@@ -42,10 +47,23 @@ function SavedSearches() {
   const [keywords, setKeywords] = useState(s.q ?? "");
   const [cats, setCats] = useState<string[]>(s.cat && s.cat !== "All" ? [s.cat] : []);
   const [min, setMin] = useState(""); const [max, setMax] = useState("");
+  const [freq, setFreq] = useState<Freq>("instant");
+  const prefs = useQuery({ queryKey: ["prefs-saved-search-email"], queryFn: async () => {
+    const { data: u } = await supabase.auth.getUser();
+    const { data } = await supabase.from("notification_prefs").select("*").eq("user_id", u.user!.id).maybeSingle();
+    return { uid: u.user!.id, on: (data as { email_saved_searches?: boolean } | null)?.email_saved_searches ?? true };
+  } });
+  const setEmailsOn = async (on: boolean) => {
+    const { error } = await supabase.from("notification_prefs").upsert({ user_id: prefs.data!.uid, email_saved_searches: on, updated_at: new Date().toISOString() } as never);
+    if (error) toast.error(ar ? "تعذّر التحديث" : "Couldn't update");
+    else toast.success(on ? (ar ? "تم تفعيل رسائل التنبيه" : "Alert emails turned on") : (ar ? "تم إيقاف كل رسائل التنبيه" : "All alert emails turned off"));
+    void qc.invalidateQueries({ queryKey: ["prefs-saved-search-email"] });
+  };
+  const setFrequency = async (x: Saved, f: Freq) => { const { error } = await table().update({ email_frequency: f } as never).eq("id", x.id); if (error) toast.error(ar ? "تعذّر التحديث" : "Couldn't update"); refresh(); };
   const refresh = () => qc.invalidateQueries({ queryKey: ["saved-searches"] });
 
   const save = useAction(async () => {
-    const { error } = await table().insert({ name, keywords, categories: cats, min_price: min ? Number(min) : null, max_price: max ? Number(max) : null } as never);
+    const { error } = await table().insert({ name, keywords, categories: cats, min_price: min ? Number(min) : null, max_price: max ? Number(max) : null, email_frequency: freq } as never);
     if (error) throw new Error(error.message);
     setName(""); setKeywords(""); setCats([]); setMin(""); setMax("");
     toast.success(ar ? "تم حفظ البحث — سننبّهك عند وصول أعمال مطابقة" : "Search saved — we'll notify you about new matches");
@@ -84,12 +102,23 @@ function SavedSearches() {
             <label className="space-y-1 text-sm">{ar ? "أقل سعر ($)" : "Min price ($)"}<input type="number" min={0} value={min} onChange={(e) => setMin(e.target.value)} className={field} /></label>
             <label className="space-y-1 text-sm">{ar ? "أعلى سعر ($)" : "Max price ($)"}<input type="number" min={0} value={max} onChange={(e) => setMax(e.target.value)} className={field} /></label>
           </div>
+          <label className="block space-y-1 text-sm">{ar ? "التنبيه بالبريد" : "Email alerts"}
+            <select value={freq} onChange={(e) => setFreq(e.target.value as Freq)} className={field}>
+              {FREQS.map((f) => <option key={f.v} value={f.v}>{ar ? f.ar : f.en}</option>)}
+            </select></label>
           <ActionButton type="submit" state={save.state} loadingLabel={ar ? "جارٍ الحفظ…" : "Saving…"} successLabel={ar ? "تم الحفظ" : "Saved"}
             errorLabel={errMsg(save.error)} onRetry={save.retry} retryLabel={ar ? "حاول مجددًا" : "Try again"}
             className="rounded-md bg-primary px-5 py-2.5 text-primary-foreground"><Bell aria-hidden className="h-4 w-4" />{ar ? "احفظ ونبّهني" : "Save & notify me"}</ActionButton>
         </form>
 
         <section className="space-y-3">
+          {prefs.data && (
+            <label className="flex items-center justify-between gap-3 rounded-lg border border-border p-4 text-sm">
+              <span><span className="block font-medium">{ar ? "رسائل تنبيهات البحث" : "Saved-search emails"}</span>
+                <span className="text-muted-foreground">{prefs.data.on ? (ar ? "تُرسل حسب إعداد كل بحث." : "Sent according to each search's setting.") : (ar ? "متوقفة لكل عمليات البحث. ستبقى الإشعارات داخل التطبيق." : "Off for all searches. In-app alerts continue.")}</span></span>
+              <input type="checkbox" role="switch" className="h-5 w-5 accent-[var(--primary)]" checked={prefs.data.on} onChange={(e) => void setEmailsOn(e.target.checked)} />
+            </label>
+          )}
           {list.isLoading ? <p className="text-muted-foreground">{ar ? "جارٍ التحميل…" : "Loading…"}</p>
             : !list.data?.length ? <p className="text-muted-foreground">{ar ? "لا توجد عمليات بحث محفوظة بعد." : "No saved searches yet."}</p>
             : list.data.map((x) => (
@@ -102,7 +131,11 @@ function SavedSearches() {
                         x.min_price != null || x.max_price != null ? `${x.min_price != null ? money(x.min_price) : "$0"} – ${x.max_price != null ? money(x.max_price) : "∞"}` : null].filter(Boolean).join(" · ")}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+                    <select aria-label={ar ? "تكرار البريد" : "Email frequency"} value={x.email_frequency ?? "off"} disabled={!prefs.data?.on}
+                      onChange={(e) => void setFrequency(x, e.target.value as Freq)} className="rounded-md border border-border bg-card px-2 py-1 text-sm">
+                      {FREQS.map((f) => <option key={f.v} value={f.v}>{ar ? f.ar : f.en}</option>)}
+                    </select>
                     <button type="button" onClick={() => void toggle(x)} className="rounded-md border border-border px-3 py-1 text-sm">{x.active ? (ar ? "إيقاف" : "Pause") : (ar ? "تفعيل" : "Resume")}</button>
                     <button type="button" onClick={() => void remove(x)} aria-label={ar ? "حذف" : "Delete"} className="rounded-md border border-border p-1.5 text-destructive"><Trash2 aria-hidden className="h-4 w-4" /></button>
                   </div>

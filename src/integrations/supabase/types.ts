@@ -517,30 +517,39 @@ export type Database = {
         Row: {
           bids: boolean
           email_orders: boolean
+          email_saved_searches: boolean
           email_shipping: boolean
           orders: boolean
           shipping: boolean
           tickets: boolean
+          unsubscribe_token: string
+          unsubscribed_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           bids?: boolean
           email_orders?: boolean
+          email_saved_searches?: boolean
           email_shipping?: boolean
           orders?: boolean
           shipping?: boolean
           tickets?: boolean
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           bids?: boolean
           email_orders?: boolean
+          email_saved_searches?: boolean
           email_shipping?: boolean
           orders?: boolean
           shipping?: boolean
           tickets?: boolean
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1035,11 +1044,56 @@ export type Database = {
           },
         ]
       }
+      saved_search_matches: {
+        Row: {
+          created_at: string
+          emailed_at: string | null
+          frequency: string
+          id: string
+          listing_id: string
+          saved_search_id: string
+          title: string
+          title_ar: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emailed_at?: string | null
+          frequency: string
+          id?: string
+          listing_id: string
+          saved_search_id: string
+          title: string
+          title_ar: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emailed_at?: string | null
+          frequency?: string
+          id?: string
+          listing_id?: string
+          saved_search_id?: string
+          title?: string
+          title_ar?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_search_matches_saved_search_id_fkey"
+            columns: ["saved_search_id"]
+            isOneToOne: false
+            referencedRelation: "saved_searches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_searches: {
         Row: {
           active: boolean
           categories: string[]
           created_at: string
+          email_frequency: string
           id: string
           keywords: string
           max_price: number | null
@@ -1051,6 +1105,7 @@ export type Database = {
           active?: boolean
           categories?: string[]
           created_at?: string
+          email_frequency?: string
           id?: string
           keywords?: string
           max_price?: number | null
@@ -1062,6 +1117,7 @@ export type Database = {
           active?: boolean
           categories?: string[]
           created_at?: string
+          email_frequency?: string
           id?: string
           keywords?: string
           max_price?: number | null
@@ -1301,12 +1357,21 @@ export type Database = {
         Returns: undefined
       }
       retry_payment: { Args: { _order: string }; Returns: undefined }
+      saved_search_token: { Args: { _uid: string }; Returns: string }
+      send_saved_search_digests: {
+        Args: { _frequency: string }
+        Returns: number
+      }
       slot_bookings: {
         Args: { _date: string; _exhibition_id: string }
         Returns: {
           booked: number
           slot: string
         }[]
+      }
+      unsubscribe_saved_search_emails: {
+        Args: { _token: string }
+        Returns: boolean
       }
     }
     Enums: {
