@@ -761,6 +761,50 @@ export type Database = {
           },
         ]
       }
+      review_appeals: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          message: string
+          review_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          message: string
+          review_id: string
+          status?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          message?: string
+          review_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_appeals_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_reports: {
         Row: {
           created_at: string
@@ -1070,6 +1114,10 @@ export type Database = {
       }
       admin_confirm_payment: {
         Args: { _order: string; _ref: string }
+        Returns: undefined
+      }
+      admin_decide_appeal: {
+        Args: { _appeal: string; _note: string; _overturn: boolean }
         Returns: undefined
       }
       admin_decide_refund: {
