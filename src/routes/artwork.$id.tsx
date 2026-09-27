@@ -189,7 +189,6 @@ function Detail() {
           <div className="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-4">{g.list.map((x) => <ArtCard key={x.id} a={x} />)}</div>
         </section>
       ))}
-      </div>
     </SiteShell>
   );
 }
