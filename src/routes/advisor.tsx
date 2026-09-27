@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles } from "lucide-react";
 import { SiteShell, ArtCard, PageTitle } from "@/components/SiteShell";
 import { useListings } from "@/lib/store";
-import { useLocale } from "@/lib/i18n";
+import { useLocale, type Key } from "@/lib/i18n";
+import { categories, mediumGroup } from "@/lib/data";
 import { recommendArtworks, type AdvisorResult } from "@/lib/advisor.functions";
 import { ActionButton, useAction } from "@/components/ActionButton";
 
@@ -108,7 +109,7 @@ function Advisor() {
         {res && !res.error && (
           <section aria-live="polite" className="mt-12">
             {picks.length === 0 ? (
-              <p className="text-muted-foreground">{ar ? "لم نجد تطابقًا — جرّب وصفًا آخر." : "No close matches — try describing it differently."}</p>
+              <p className="text-muted-foreground">{res.noneLive ? (ar ? "لا توجد أعمال معروضة تطابق الفلاتر — جرّب توسيعها." : "No live listings match these filters — try widening them.") : (ar ? "لم نجد تطابقًا — جرّب وصفًا آخر." : "No close matches — try describing it differently.")}</p>
             ) : (
               <div className="grid gap-8 sm:grid-cols-2">
                 {picks.map(({ p, a }) => (
