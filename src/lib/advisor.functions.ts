@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
-import { seedListings, variantsOf, minPrice, creatorOf } from "./data";
+import { seedListings, variantsOf, minPrice, creatorOf, mediumGroup } from "./data";
 
 export type Pick = { id: string; reason: string; reasonAr: string };
-export type AdvisorResult = { picks: Pick[]; error?: string };
+export type AdvisorResult = { picks: Pick[]; error?: string; noneLive?: boolean };
 
 /** Reads the streamed Responses SSE and returns the final output text. */
 export async function readText(res: Response) {
@@ -33,7 +33,13 @@ export async function readText(res: Response) {
 }
 
 export const recommendArtworks = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ need: z.string().trim().min(3).max(1000) }).parse(d))
+  .inputValidator((d) => z.object({
+    need: z.string().trim().min(3).max(1000),
+    minPrice: z.number().min(0).max(10_000_000).optional(),
+    maxPrice: z.number().min(0).max(10_000_000).optional(),
+    categories: z.array(z.string().max(40)).max(10).default([]),
+    mediums: z.array(z.string().max(80)).max(20).default([]),
+  }).parse(d))
   .handler(async ({ data }): Promise<AdvisorResult> => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { picks: [], error: "AI is not configured." };
@@ -42,11 +48,16 @@ export const recommendArtworks = createServerFn({ method: "POST" })
     const sb = createClient(process.env["SUPABASE_URL"]!, process.env["SUPABASE_PUBLISHABLE_KEY"]!, { auth: { persistSession: false } });
     const { data: rows } = await sb.from("listings").select("id, status").eq("status", "published");
     const live = new Set((rows ?? []).map((r) => r.id));
-    const catalog = seedListings.filter((l) => live.has(l.id)).map((l) => ({
+    // Buyer filters narrow the live catalog before the model sees it, so picks always respect them.
+    const inRange = (p: number) => (data.minPrice == null || p >= data.minPrice) && (data.maxPrice == null || p <= data.maxPrice);
+    const catalog = seedListings.filter((l) => live.has(l.id)
+      && inRange(minPrice(l))
+      && (data.categories.length === 0 || data.categories.includes(l.category))
+      && (data.mediums.length === 0 || data.mediums.includes(mediumGroup(l.medium)))).map((l) => ({
       id: l.id, title: l.title, artist: creatorOf(l.creatorId)?.name, category: l.category, medium: l.medium, year: l.year,
       description: l.description, fromPrice: minPrice(l), options: [...new Set(variantsOf(l).map((v) => v.kind))], inAuction: !!l.auction,
     }));
-    if (!catalog.length) return { picks: [] };
+    if (!catalog.length) return { picks: [], noneLive: true };
 
     const prompt = `You are an art advisor for the Arwiqa marketplace. Recommend up to 4 artworks from the catalog that best match the buyer's need. Only use ids from the catalog. Reply with ONLY JSON: {"picks":[{"id":"...","reason":"one short English sentence","reasonAr":"the same sentence in Arabic"}]}. If nothing fits, return {"picks":[]}.
 
