@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { useStaff } from "@/lib/useStaff";
+import { useStaff } from "@/lib/auth";
 import { fmtDateTime } from "@/lib/orders";
 
 export const Route = createFileRoute("/_authenticated/admin/emails")({
