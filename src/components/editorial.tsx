@@ -31,8 +31,9 @@ export function SectionHead({ eyebrow, title, action }: { eyebrow?: string; titl
   return (
     <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
       <div>
-        {eyebrow && <p className="mb-3 text-xs uppercase tracking-[0.3em] text-primary">{eyebrow}</p>}
+        {eyebrow && <p className="mb-3 flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-primary"><span aria-hidden className="inline-block h-2 w-2 rotate-45 bg-gold" />{eyebrow}</p>}
         <h2 className="font-display text-4xl leading-tight md:text-5xl">{title}</h2>
+        <div aria-hidden className="sadu-thin mt-4 w-24" />
       </div>
       {action}
     </div>
@@ -72,7 +73,7 @@ export function ArtTile({ a, ratio = "aspect-[4/5]", onQuick, size = "md" }: { a
   const badge = live ? L("Auction", "مزاد") : a.variants.some((v) => v.kind === "original") ? L("Original", "أصلية") : a.variants.some((v) => v.kind === "print") ? L("Limited edition", "نسخة محدودة") : null;
   return (
     <article className="group relative">
-      <Link to="/artwork/$id" params={{ id: a.id }} className="block overflow-hidden bg-muted" aria-label={pick(a, "title")}>
+      <Link to="/artwork/$id" params={{ id: a.id }} className="arch-soft block overflow-hidden bg-muted" aria-label={pick(a, "title")}>
         <img src={a.image} alt={pick(a, "title")} loading="lazy" className={`${ratio} w-full object-cover transition duration-700 ease-editorial group-hover:scale-[1.03]`} />
       </Link>
       <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-end gap-2 p-3 opacity-0 transition duration-300 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
