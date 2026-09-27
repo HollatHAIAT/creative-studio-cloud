@@ -7,7 +7,7 @@ export type Pick = { id: string; reason: string; reasonAr: string };
 export type AdvisorResult = { picks: Pick[]; error?: string };
 
 /** Reads the streamed Responses SSE and returns the final output text. */
-async function readText(res: Response) {
+export async function readText(res: Response) {
   const reader = res.body!.getReader();
   const dec = new TextDecoder();
   let buf = "", text = "", done = "";
