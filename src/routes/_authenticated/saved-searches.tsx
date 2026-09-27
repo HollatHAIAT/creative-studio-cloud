@@ -65,6 +65,9 @@ function SavedSearches() {
     <SiteShell>
       <PageTitle eyebrow={ar ? "التنبيهات" : "Alerts"} title={ar ? "عمليات البحث المحفوظة" : "Saved searches"}
         sub={ar ? "سنرسل لك إشعارًا عندما يُعرض عمل جديد يطابق كلماتك وفئاتك وميزانيتك." : "We'll notify you when a new live artwork matches your keywords, categories and budget."} />
+      <div className="mx-auto max-w-5xl px-6 pb-6">
+        <Link to="/match-explainer" className="text-sm underline">{ar ? "اشرح لماذا يناسبني عمل جديد ←" : "Explain why a new artwork fits me →"}</Link>
+      </div>
       <div className="mx-auto grid max-w-5xl gap-10 px-6 pb-20 lg:grid-cols-[1fr_1.2fr]">
         <form onSubmit={(e) => { e.preventDefault(); void save.run(); }} className="space-y-4 rounded-lg border border-border p-5">
           <h2 className="font-display text-xl">{ar ? "بحث جديد" : "New saved search"}</h2>
