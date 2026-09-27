@@ -478,6 +478,8 @@ export type Database = {
           id: string
           image_path: string | null
           medium: string
+          status: string
+          submitted_at: string | null
           tags: string[]
           title: string
           title_ar: string
@@ -493,6 +495,8 @@ export type Database = {
           id?: string
           image_path?: string | null
           medium?: string
+          status?: string
+          submitted_at?: string | null
           tags?: string[]
           title?: string
           title_ar?: string
@@ -508,6 +512,8 @@ export type Database = {
           id?: string
           image_path?: string | null
           medium?: string
+          status?: string
+          submitted_at?: string | null
           tags?: string[]
           title?: string
           title_ar?: string
@@ -1417,6 +1423,10 @@ export type Database = {
       is_blocked: { Args: { _uid: string }; Returns: boolean }
       is_staff: { Args: { _uid: string }; Returns: boolean }
       issue_tickets: { Args: { _booking_id: string }; Returns: undefined }
+      listing_draft_publish_issues: {
+        Args: { d: Database["public"]["Tables"]["listing_drafts"]["Row"] }
+        Returns: string[]
+      }
       push_notification: {
         Args: {
           _b: string
