@@ -404,6 +404,7 @@ export type Database = {
           id: string
           owner_can_reply: boolean
           owner_user_id: string | null
+          price: number
           status: string
           title: string
           title_ar: string
@@ -415,6 +416,7 @@ export type Database = {
           id: string
           owner_can_reply?: boolean
           owner_user_id?: string | null
+          price?: number
           status?: string
           title: string
           title_ar?: string
@@ -426,6 +428,7 @@ export type Database = {
           id?: string
           owner_can_reply?: boolean
           owner_user_id?: string | null
+          price?: number
           status?: string
           title?: string
           title_ar?: string
@@ -977,6 +980,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      saved_searches: {
+        Row: {
+          active: boolean
+          categories: string[]
+          created_at: string
+          id: string
+          keywords: string
+          max_price: number | null
+          min_price: number | null
+          name: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          categories?: string[]
+          created_at?: string
+          id?: string
+          keywords?: string
+          max_price?: number | null
+          min_price?: number | null
+          name?: string
+          user_id?: string
+        }
+        Update: {
+          active?: boolean
+          categories?: string[]
+          created_at?: string
+          id?: string
+          keywords?: string
+          max_price?: number | null
+          min_price?: number | null
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       ticket_scans: {
         Row: {
