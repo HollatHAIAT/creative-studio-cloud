@@ -30,6 +30,7 @@ import { Route as AuthenticatedListingWriterRouteImport } from './routes/_authen
 import { Route as AuthenticatedMatchExplainerRouteImport } from './routes/_authenticated/match-explainer'
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedOrderHelpRouteImport } from './routes/_authenticated/order-help'
 import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
@@ -152,6 +153,11 @@ const AuthenticatedNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOrderHelpRoute = AuthenticatedOrderHelpRouteImport.update({
+  id: '/order-help',
+  path: '/order-help',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSavedSearchesRoute =
   AuthenticatedSavedSearchesRouteImport.update({
     id: '/saved-searches',
@@ -249,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/order-help': typeof AuthenticatedOrderHelpRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/order-help': typeof AuthenticatedOrderHelpRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/_authenticated/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/order-help': typeof AuthenticatedOrderHelpRoute
   '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
@@ -361,6 +370,7 @@ export interface FileRouteTypes {
     | '/match-explainer'
     | '/my-reviews'
     | '/notifications'
+    | '/order-help'
     | '/saved-searches'
     | '/settings'
     | '/artists/$id'
@@ -397,6 +407,7 @@ export interface FileRouteTypes {
     | '/match-explainer'
     | '/my-reviews'
     | '/notifications'
+    | '/order-help'
     | '/saved-searches'
     | '/settings'
     | '/artists/$id'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/_authenticated/match-explainer'
     | '/_authenticated/my-reviews'
     | '/_authenticated/notifications'
+    | '/_authenticated/order-help'
     | '/_authenticated/saved-searches'
     | '/_authenticated/settings'
     | '/artists/$id'
@@ -622,6 +634,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/order-help': {
+      id: '/_authenticated/order-help'
+      path: '/order-help'
+      fullPath: '/order-help'
+      preLoaderRoute: typeof AuthenticatedOrderHelpRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/saved-searches': {
       id: '/_authenticated/saved-searches'
       path: '/saved-searches'
@@ -728,6 +747,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMatchExplainerRoute: typeof AuthenticatedMatchExplainerRoute
   AuthenticatedMyReviewsRoute: typeof AuthenticatedMyReviewsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedOrderHelpRoute: typeof AuthenticatedOrderHelpRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
@@ -743,6 +763,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMatchExplainerRoute: AuthenticatedMatchExplainerRoute,
   AuthenticatedMyReviewsRoute: AuthenticatedMyReviewsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedOrderHelpRoute: AuthenticatedOrderHelpRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,

@@ -20,7 +20,7 @@ function Orders() {
     <SiteShell>
       <PageTitle eyebrow={t("nav.account")} title={t("ord.title")} />
       <div className="mx-auto max-w-5xl px-6 pb-4">
-        <Link to="/order-help" className="text-sm underline">{t("nav.account") && (document.documentElement.lang === "ar" ? "لديك سؤال عن طلب أو شحنة؟ اسأل المساعد" : "Question about an order or shipment? Ask the assistant")}</Link>
+        <Link to="/order-help" className="text-sm underline">{(locale === "ar" ? "لديك سؤال عن طلب أو شحنة؟ اسأل المساعد" : "Question about an order or shipment? Ask the assistant")}</Link>
       </div>
       <div className="mx-auto max-w-7xl px-6">
         {q.isLoading && <p className="text-muted-foreground">…</p>}
