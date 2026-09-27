@@ -57,6 +57,7 @@ export function AccountNav() {
             <DropdownMenuContent align="end">
               <DropdownMenuItem className="text-xs text-muted-foreground" disabled>{user.email}</DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/orders">{t("nav.orders")}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/my-reviews">{locale === "ar" ? "تقييماتي" : "My reviews"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/notifications">{t("nav.notifications")}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/settings">{t("nav.settings")}</Link></DropdownMenuItem>
               {isStaff && (<>

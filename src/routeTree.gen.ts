@@ -35,6 +35,7 @@ import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminScanRouteImport } from './routes/_authenticated/admin.scan'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
@@ -171,6 +172,12 @@ const AuthenticatedAdminReportsRoute =
     path: '/admin/reports',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminReviewsRoute =
+  AuthenticatedAdminReviewsRouteImport.update({
+    id: '/admin/reviews',
+    path: '/admin/reviews',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminScanRoute = AuthenticatedAdminScanRouteImport.update({
   id: '/admin/scan',
   path: '/admin/scan',
@@ -214,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/scan': typeof AuthenticatedAdminScanRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
@@ -244,6 +252,7 @@ export interface FileRoutesByTo {
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/scan': typeof AuthenticatedAdminScanRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
@@ -276,6 +285,7 @@ export interface FileRoutesById {
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/scan': typeof AuthenticatedAdminScanRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/exhibitions/$id'
     | '/admin/orders'
     | '/admin/reports'
+    | '/admin/reviews'
     | '/admin/scan'
     | '/orders/$id'
     | '/orders/'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/exhibitions/$id'
     | '/admin/orders'
     | '/admin/reports'
+    | '/admin/reviews'
     | '/admin/scan'
     | '/orders/$id'
     | '/orders'
@@ -369,6 +381,7 @@ export interface FileRouteTypes {
     | '/exhibitions/$id'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/scan'
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/'
@@ -579,6 +592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/reviews': {
+      id: '/_authenticated/admin/reviews'
+      path: '/admin/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AuthenticatedAdminReviewsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/scan': {
       id: '/_authenticated/admin/scan'
       path: '/admin/scan'
@@ -609,6 +629,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminScanRoute: typeof AuthenticatedAdminScanRoute
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
@@ -620,6 +641,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
   AuthenticatedAdminScanRoute: AuthenticatedAdminScanRoute,
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
