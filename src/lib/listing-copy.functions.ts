@@ -307,3 +307,57 @@ Reply with ONLY JSON: {"summary":"","summaryAr":"","terms":[{"term":"","termAr":
     try { return { result: SearchTerms.parse(JSON.parse(json)) }; }
     catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const Focal = z.object({
+  focalX: z.number().min(0).max(1), focalY: z.number().min(0).max(1),
+  subject: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1), w: z.number().min(0).max(1), h: z.number().min(0).max(1) }),
+  summary: z.string(), summaryAr: z.string(),
+  tips: z.array(z.string()).max(5), tipsAr: z.array(z.string()).max(5),
+});
+export type FocalResult = z.infer<typeof Focal>;
+
+/** Finds the artwork's focal point and main-subject box so the client can crop to a mobile aspect ratio without losing it. */
+export const findFocalPoint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ path: z.string().min(3).max(300), ratio: z.enum(["4:5", "1:1", "9:16", "3:4"]) }).parse(d))
+  .handler(async ({ data, context }): Promise<{ result?: FocalResult; error?: string }> => {
+    if (!data.path.startsWith(`${context.userId}/`)) return { error: "You can only use your own uploads." };
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const { data: blob, error } = await context.supabase.storage.from("artwork-images").download(data.path);
+    if (error || !blob) return { error: "The uploaded image couldn't be read. Please upload it again." };
+    const mime = blob.type || "image/jpeg";
+    const prompt = `You are a photo editor for Arwiqa, an art marketplace. The seller will show this artwork on phones cropped to ${data.ratio} (width:height).
+Return coordinates as fractions of the full image (0 = left/top, 1 = right/bottom):
+- focalX, focalY: the single most important visual point (main subject, face, signature detail).
+- subject: the tightest box {x,y,w,h} containing everything that must stay visible.
+- summary/summaryAr: one sentence naming the focal point and how the crop should sit.
+- tips/tipsAr: up to 3 short tips (e.g. subject too close to the edge, consider a portrait photo).
+Reply with ONLY JSON: {"focalX":0.5,"focalY":0.5,"subject":{"x":0,"y":0,"w":1,"h":1},"summary":"","summaryAr":"","tips":[],"tipsAr":[]}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [
+          { type: "input_text", text: prompt },
+          { type: "input_image", image_url: `data:${mime};base64,${Buffer.from(await blob.arrayBuffer()).toString("base64")}` },
+        ] }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Focal AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no crop." };
+    try { return { result: Focal.parse(JSON.parse(json)) }; }
+    catch { return { error: "The AI returned an unreadable answer." }; }
+  });

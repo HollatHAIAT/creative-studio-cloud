@@ -27,6 +27,7 @@ import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AuthenticatedAltCheckerRouteImport } from './routes/_authenticated/alt-checker'
+import { Route as AuthenticatedCropHelperRouteImport } from './routes/_authenticated/crop-helper'
 import { Route as AuthenticatedListingWriterRouteImport } from './routes/_authenticated/listing-writer'
 import { Route as AuthenticatedMatchExplainerRouteImport } from './routes/_authenticated/match-explainer'
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
@@ -137,6 +138,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const AuthenticatedAltCheckerRoute = AuthenticatedAltCheckerRouteImport.update({
   id: '/alt-checker',
   path: '/alt-checker',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCropHelperRoute = AuthenticatedCropHelperRouteImport.update({
+  id: '/crop-helper',
+  path: '/crop-helper',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedListingWriterRoute =
@@ -278,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/alt-checker': typeof AuthenticatedAltCheckerRoute
+  '/crop-helper': typeof AuthenticatedCropHelperRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -319,6 +326,7 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/alt-checker': typeof AuthenticatedAltCheckerRoute
+  '/crop-helper': typeof AuthenticatedCropHelperRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -362,6 +370,7 @@ export interface FileRoutesById {
   '/sell': typeof SellRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/alt-checker': typeof AuthenticatedAltCheckerRoute
+  '/_authenticated/crop-helper': typeof AuthenticatedCropHelperRoute
   '/_authenticated/listing-writer': typeof AuthenticatedListingWriterRoute
   '/_authenticated/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -405,6 +414,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/unsubscribe'
     | '/alt-checker'
+    | '/crop-helper'
     | '/listing-writer'
     | '/match-explainer'
     | '/my-reviews'
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/unsubscribe'
     | '/alt-checker'
+    | '/crop-helper'
     | '/listing-writer'
     | '/match-explainer'
     | '/my-reviews'
@@ -488,6 +499,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/unsubscribe'
     | '/_authenticated/alt-checker'
+    | '/_authenticated/crop-helper'
     | '/_authenticated/listing-writer'
     | '/_authenticated/match-explainer'
     | '/_authenticated/my-reviews'
@@ -664,6 +676,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAltCheckerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/crop-helper': {
+      id: '/_authenticated/crop-helper'
+      path: '/crop-helper'
+      fullPath: '/crop-helper'
+      preLoaderRoute: typeof AuthenticatedCropHelperRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/listing-writer': {
       id: '/_authenticated/listing-writer'
       path: '/listing-writer'
@@ -823,6 +842,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAltCheckerRoute: typeof AuthenticatedAltCheckerRoute
+  AuthenticatedCropHelperRoute: typeof AuthenticatedCropHelperRoute
   AuthenticatedListingWriterRoute: typeof AuthenticatedListingWriterRoute
   AuthenticatedMatchExplainerRoute: typeof AuthenticatedMatchExplainerRoute
   AuthenticatedMyReviewsRoute: typeof AuthenticatedMyReviewsRoute
@@ -842,6 +862,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAltCheckerRoute: AuthenticatedAltCheckerRoute,
+  AuthenticatedCropHelperRoute: AuthenticatedCropHelperRoute,
   AuthenticatedListingWriterRoute: AuthenticatedListingWriterRoute,
   AuthenticatedMatchExplainerRoute: AuthenticatedMatchExplainerRoute,
   AuthenticatedMyReviewsRoute: AuthenticatedMyReviewsRoute,
