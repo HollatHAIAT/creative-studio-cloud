@@ -432,6 +432,39 @@ export type Database = {
         }
         Relationships: []
       }
+      moderation_audit: {
+        Row: {
+          action: string
+          actor: string
+          created_at: string
+          details: Json
+          id: string
+          reason: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          actor: string
+          created_at?: string
+          details?: Json
+          id?: string
+          reason?: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          actor?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          reason?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
       notification_prefs: {
         Row: {
           bids: boolean
@@ -763,11 +796,38 @@ export type Database = {
           },
         ]
       }
+      review_votes: {
+        Row: {
+          created_at: string
+          review_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          review_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          review_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_votes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           author_name: string
           body: string
           created_at: string
+          helpful_count: number
           id: string
           listing_id: string
           owner_reply: string | null
@@ -776,11 +836,13 @@ export type Database = {
           replied_at: string | null
           status: string
           user_id: string
+          verified: boolean
         }
         Insert: {
           author_name?: string
           body?: string
           created_at?: string
+          helpful_count?: number
           id?: string
           listing_id: string
           owner_reply?: string | null
@@ -789,11 +851,13 @@ export type Database = {
           replied_at?: string | null
           status?: string
           user_id?: string
+          verified?: boolean
         }
         Update: {
           author_name?: string
           body?: string
           created_at?: string
+          helpful_count?: number
           id?: string
           listing_id?: string
           owner_reply?: string | null
@@ -802,6 +866,7 @@ export type Database = {
           replied_at?: string | null
           status?: string
           user_id?: string
+          verified?: boolean
         }
         Relationships: [
           {
@@ -952,12 +1017,20 @@ export type Database = {
           reserve: number
         }[]
       }
+      admin_block_user: {
+        Args: { _reason: string; _uid: string; _until: string }
+        Returns: string
+      }
       admin_confirm_payment: {
         Args: { _order: string; _ref: string }
         Returns: undefined
       }
       admin_decide_refund: {
         Args: { _approve: boolean; _note: string; _request_id: string }
+        Returns: undefined
+      }
+      admin_lift_block: {
+        Args: { _reason: string; _uid: string }
         Returns: undefined
       }
       admin_moderate_review: {
@@ -990,6 +1063,10 @@ export type Database = {
       }
       claim_pending_role: { Args: never; Returns: boolean }
       close_expired_blocks: { Args: never; Returns: undefined }
+      has_purchased: {
+        Args: { _listing: string; _uid: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
