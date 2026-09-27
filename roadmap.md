@@ -107,3 +107,7 @@
 - [ ] Server-enforced agent license validity + owner approval before agents sell
 - [ ] E2E tests: direct purchase, auction routing, owner vs agent listings
 - [ ] Reviews & ratings: owner/agent replies per admin permission, abuse reports, admin removal, timed/permanent user blocks with notices, review analytics
+- [ ] Home page animations + easier, competitive marketplace UX
+- [ ] Verified-purchase badges, buyer-only reviews, duplicate/spam safeguards
+- [ ] Helpful votes + sort/filter reviews by rating, date, verified
+- [ ] Admin audit trail: review removals, abuse decisions, suspensions (actor, reason, time)
