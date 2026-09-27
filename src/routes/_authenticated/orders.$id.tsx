@@ -67,6 +67,9 @@ function OrderPage() {
           </div>
         </div>
 
+        <Fulfillment status={o.status} ar={locale === "ar"} />
+        {o.status === "payment_failed" && <RetryPayment orderId={o.id} ar={locale === "ar"} error={(o as { payment_error?: string | null }).payment_error ?? null} onDone={() => qc.invalidateQueries({ queryKey: ["orders"] })} />}
+
         <section className="mt-8 rounded-sm border border-border bg-card p-6">
           <h2 className="font-display text-2xl">{t("ord.items")}</h2>
           <table className="mt-3 w-full text-sm">
