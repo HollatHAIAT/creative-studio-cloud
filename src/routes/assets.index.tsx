@@ -71,7 +71,8 @@ function AssetsLibrary() {
     setBusy(true);
     const id = toast.loading(L("Preparing download…", "جارٍ تجهيز التنزيل…"));
     try {
-      if (chosen.length === 1) { const r = await resolveBlob(chosen[0], fmt, files); save(r.blob, r.name); }
+      const one = chosen.length === 1 ? chosen[0] : undefined;
+      if (one) { const r = await resolveBlob(one, fmt, files); save(r.blob, r.name); }
       else {
         const JSZip = (await import("jszip")).default;
         const z = new JSZip();

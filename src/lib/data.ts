@@ -135,7 +135,7 @@ export const exhibitions: Exhibition[] = [
 ];
 
 // ---------------- Saudi banks collection ----------------
-export type Bank = { id: string; name: string; nameAr: string; code: string; color: string; founded: number; collection?: string; category?: string; categoryAr?: string; tags?: string[]; description?: string; descriptionAr?: string; preview?: string | null; kind?: string };
+export type Bank = { id: string; name: string; nameAr: string; code: string; color: string; founded: number; collection?: string; category?: string; categoryAr?: string; tags?: string[]; description?: string | undefined; descriptionAr?: string | undefined; preview?: string | null; kind?: string };
 /** Placeholder artwork only — these are NOT the banks' official logos. */
 export const saudiBanks: Bank[] = [
   { id: "snb", name: "Saudi National Bank", nameAr: "البنك الأهلي السعودي", code: "SNB", color: "#0f6b4f", founded: 1953 },
