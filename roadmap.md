@@ -116,3 +116,6 @@
 - [ ] Removal/moderation notices with reason + appeal flow
 - [ ] "My reviews" page with remaining edit/delete time
 - [ ] Keyboard + screen-reader accessible rating, filters, review history
+- [ ] E2E tests: cart+checkout, verified-purchase reviews, moderation appeal
+- [ ] Order/payment hardening: duplicate submits, failed payments, safe recovery
+- [ ] Moderator queue: filters for pending reports, appeals, recent decisions
