@@ -23,7 +23,7 @@ const nav = [
 ] as const;
 const more = [
   { to: "/collections/saudi-banks", en: "Collections", ar: "المجموعات" },
-  { to: "/collections/saudi-banks", en: "Images & digital assets", ar: "الصور والأصول الرقمية" },
+  { to: "/assets", en: "Images & digital assets", ar: "الصور والأصول الرقمية" },
   { to: "/collections/saudi-banks", en: "Saudi banks", ar: "البنوك السعودية" },
   { to: "/artists", en: "Galleries", ar: "صالات العرض" },
   { to: "/advisor", en: "Art advisor (AI)", ar: "مستشار الفن الذكي" },

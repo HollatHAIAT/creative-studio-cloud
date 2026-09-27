@@ -212,46 +212,67 @@ export type Database = {
       }
       digital_assets: {
         Row: {
+          category: string
+          category_ar: string
           code: string
           collection: string
           color: string
           created_at: string
+          description: string | null
+          description_ar: string | null
           founded: number | null
           id: string
           is_official: boolean
+          kind: string
           license: string
           license_ar: string
           name: string
           name_ar: string
+          preview_url: string | null
           sort: number
+          tags: string[]
         }
         Insert: {
+          category?: string
+          category_ar?: string
           code: string
           collection?: string
           color?: string
           created_at?: string
+          description?: string | null
+          description_ar?: string | null
           founded?: number | null
           id: string
           is_official?: boolean
+          kind?: string
           license?: string
           license_ar?: string
           name: string
           name_ar: string
+          preview_url?: string | null
           sort?: number
+          tags?: string[]
         }
         Update: {
+          category?: string
+          category_ar?: string
           code?: string
           collection?: string
           color?: string
           created_at?: string
+          description?: string | null
+          description_ar?: string | null
           founded?: number | null
           id?: string
           is_official?: boolean
+          kind?: string
           license?: string
           license_ar?: string
           name?: string
           name_ar?: string
+          preview_url?: string | null
           sort?: number
+          tags?: string[]
         }
         Relationships: []
       }
