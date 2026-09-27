@@ -126,3 +126,5 @@
 - [ ] Seller dashboard: date-range + product filters, period comparison
 - [ ] Seller CSV exports: sales, conversion, product performance
 - [ ] Inventory adjustment history (change, time, reason)
+- [ ] Button loading/success/error states + clear confirmations (buy, basket, favorite, question, offer)
+- [ ] Test buy/basket/favorite/share/contact journeys on mobile + desktop, sign-in, failed orders, duplicate-submit prevention
