@@ -102,3 +102,7 @@
 - [x] Unique bids-live channel + cleanup
 - [x] Shared BidsLive provider (one channel)
 - [x] Strict Mode test for bids-live channel lifecycle
+- [ ] Persist cart, favorites, offers, inquiries per account on real listing data
+- [ ] Secure checkout: payment confirmation, order records, purchase history
+- [ ] Server-enforced agent license validity + owner approval before agents sell
+- [ ] E2E tests: direct purchase, auction routing, owner vs agent listings
