@@ -56,6 +56,10 @@ export function AccountNav() {
             <DropdownMenuTrigger aria-label={t("nav.account")}><User className="h-5 w-5" /></DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem className="text-xs text-muted-foreground" disabled>{user.email}</DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/dashboard">{t("nav.dashboard")}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/analytics">{t("nav.analytics")}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/listing-writer">{locale === "ar" ? "كاتب الإعلانات الذكي" : "AI listing writer"}</Link></DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem asChild><Link to="/orders">{t("nav.orders")}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/my-reviews">{locale === "ar" ? "تقييماتي" : "My reviews"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/notifications">{t("nav.notifications")}</Link></DropdownMenuItem>

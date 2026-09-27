@@ -17,6 +17,12 @@ export const Route = createFileRoute("/explore")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { q?: string; cat?: string; min?: number; max?: number } => ({
+    q: typeof s.q === "string" ? s.q : undefined,
+    cat: typeof s.cat === "string" ? s.cat : undefined,
+    min: typeof s.min === "number" ? s.min : undefined,
+    max: typeof s.max === "number" ? s.max : undefined,
+  }),
   component: Explore,
 });
 
@@ -25,10 +31,12 @@ const sorts = { newest: "sort.newest", "price-asc": "sort.priceAsc", "price-desc
 function Explore() {
   const all = useListings();
   const { t, pick, num, locale } = useLocale();
-  const [q, setQ] = useState("");
-  const [cat, setCat] = useState<string>("All");
+  const search = Route.useSearch();
+  const [q, setQ] = useState(search.q ?? "");
+  const [cat, setCat] = useState<string>(search.cat && (categories as readonly string[]).includes(search.cat) ? search.cat : "All");
   const [sort, setSort] = useState<keyof typeof sorts>("newest");
   const list = all
+    .filter((a) => (search.min == null || minPrice(a) >= search.min) && (search.max == null || minPrice(a) < search.max))
     .filter((a) => (cat === "All" || a.category === cat) && [a.title, a.titleAr, a.artist, a.artistAr, a.medium, a.mediumAr, a.description].join(" ").toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => sort === "newest" ? b.createdAt - a.createdAt : sort === "price-asc" ? minPrice(a) - minPrice(b) : sort === "price-desc" ? minPrice(b) - minPrice(a) : pick(a, "title").localeCompare(pick(b, "title")));
   return (
