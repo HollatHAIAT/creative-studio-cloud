@@ -8,6 +8,12 @@ import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, useStore } from "@/lib/store";
 import { priceCart } from "@/lib/pricing";
 import { placeOrder } from "@/lib/orders.functions";
+const SELL_ERR: Record<string, [string, string]> = {
+  LISTING_UNAVAILABLE: ["This artwork is no longer available.", "هذا العمل لم يعد متاحًا."],
+  AGENT_NOT_APPROVED: ["The seller's agent isn't approved by the owner yet.", "وكيل البائع غير معتمد من المالك بعد."],
+  AGENT_LICENSE_EXPIRED: ["The seller's agent authorization has expired.", "انتهت صلاحية تفويض وكيل البائع."],
+  AGENT_SCOPE: ["The agent isn't authorized to sell this format.", "الوكيل غير مخوّل ببيع هذا الشكل."],
+};
 import { useLocale, type Key } from "@/lib/i18n";
 import { useSession } from "@/lib/auth";
 import { fmt } from "@/lib/data";
@@ -46,7 +52,7 @@ function Checkout() {
   const m = useMutation({
     mutationFn: () => place({ data: { items, contact: { ...contact, email }, address: priced.needsShipping ? addr : null, paymentMethod: method } }),
     onSuccess: (r) => {
-      if (!r.ok) { toast.error(r.error === "SLOT_FULL" ? t("ex.soldOut") : r.error); return; }
+      if (!r.ok) { toast.error(r.error === "SLOT_FULL" ? t("ex.soldOut") : SELL_ERR[r.error]?.[locale === "ar" ? 1 : 0] ?? r.error); return; }
       actions.clearCart();
       qc.invalidateQueries({ queryKey: ["orders"] });
       toast.success(`${t("co.done")} · ${r.reference}`);
