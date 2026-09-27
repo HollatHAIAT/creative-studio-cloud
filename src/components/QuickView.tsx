@@ -56,7 +56,7 @@ function Body({ a, onClose }: { a: Artwork; onClose: () => void }) {
         {live ? (
           <Link to="/auctions/$id" params={{ id: live.auction.id }} onClick={onClose} className="rounded-full bg-primary px-6 py-3 text-center text-primary-foreground hover:bg-primary-hover">{L("Place a bid", "قدّم مزايدة")}</Link>
         ) : (
-          <button type="button" onClick={() => { actions.addToCart({ kind: "artwork", listingId: a.id, variantId: (original ?? cheapest).id, qty: 1 } as never); toast.success(L("Added to basket", "أضيف إلى السلة")); }}
+          <button type="button" onClick={() => { { const v = original ?? cheapest; actions.addToCart({ key: `${a.id}:${v.id}`, kind: "artwork", listingId: a.id, variantId: v.id, qty: 1 }); }; toast.success(L("Added to basket", "أضيف إلى السلة")); }}
             className="rounded-full bg-primary px-6 py-3 text-primary-foreground hover:bg-primary-hover">{L("Add to basket", "أضف إلى السلة")}</button>
         )}
         <div className="flex gap-3">
