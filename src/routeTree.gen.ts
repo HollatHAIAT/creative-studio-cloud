@@ -39,6 +39,7 @@ import { Route as AssetsIdRouteImport } from './routes/assets.$id'
 import { Route as AuctionsIdRouteImport } from './routes/auctions.$id'
 import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.saudi-banks'
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
+import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
@@ -199,6 +200,12 @@ const ExhibitionsIdRoute = ExhibitionsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ExhibitionsRoute,
 } as any)
+const AuthenticatedAdminEmailsRoute =
+  AuthenticatedAdminEmailsRouteImport.update({
+    id: '/admin/emails',
+    path: '/admin/emails',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminOrdersRoute =
   AuthenticatedAdminOrdersRouteImport.update({
     id: '/admin/orders',
@@ -264,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
@@ -301,6 +309,7 @@ export interface FileRoutesByTo {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
@@ -340,6 +349,7 @@ export interface FileRoutesById {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/admin/emails'
     | '/admin/orders'
     | '/admin/reports'
     | '/admin/reviews'
@@ -416,6 +427,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/admin/emails'
     | '/admin/orders'
     | '/admin/reports'
     | '/admin/reviews'
@@ -454,6 +466,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/_authenticated/admin/emails'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/reviews'
@@ -697,6 +710,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExhibitionsIdRouteImport
       parentRoute: typeof ExhibitionsRoute
     }
+    '/_authenticated/admin/emails': {
+      id: '/_authenticated/admin/emails'
+      path: '/admin/emails'
+      fullPath: '/admin/emails'
+      preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/orders': {
       id: '/_authenticated/admin/orders'
       path: '/admin/orders'
@@ -750,6 +770,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrderHelpRoute: typeof AuthenticatedOrderHelpRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
@@ -766,6 +787,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrderHelpRoute: AuthenticatedOrderHelpRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
