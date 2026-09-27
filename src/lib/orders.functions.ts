@@ -23,6 +23,14 @@ export const placeOrder = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const priced = priceCart(data.items);
     if (priced.errors.length) return { ok: false as const, error: priced.errors.join("; ") };
+    // Seller authorization: listing must be live; agent-sold listings need a valid, owner-approved license covering this format.
+    for (const l of priced.lines.filter((x) => x.kind !== "ticket")) {
+      const listingId = String(l.ref["listingId"]);
+      const { data: row } = await supabase.from("listings").select("id, status").eq("id", listingId).maybeSingle();
+      if (!row || row.status !== "published") return { ok: false as const, error: "LISTING_UNAVAILABLE" };
+      const { data: auth, error: ae } = await supabase.rpc("agent_authorization_valid", { _listing: listingId, _kind: l.kind });
+      if (ae || (auth !== "OWNER" && auth !== "AGENT_OK")) return { ok: false as const, error: String(auth ?? "SELLER_NOT_AUTHORIZED") };
+    }
     if (priced.needsShipping && (!data.address || !data.address.line || !data.address.city || !data.address.country)) return { ok: false as const, error: "Shipping address is required" };
 
     const { data: order, error } = await supabase.from("orders").insert({
@@ -44,5 +52,6 @@ export const placeOrder = createServerFn({ method: "POST" })
         return { ok: false as const, error: msg, orderId: order.id };
       }
     }
+    await supabase.from("cart_items").delete().eq("user_id", userId);
     return { ok: true as const, orderId: order.id, reference: order.reference };
   });

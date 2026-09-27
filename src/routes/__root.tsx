@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "sonner";
 import { BidsLiveProvider } from "@/components/BidsLiveProvider";
+import { AccountSync } from "@/lib/marketplace";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
@@ -138,6 +139,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <BidsLiveProvider />
+      <AccountSync />
       <Toaster position="bottom-right" />
     </QueryClientProvider>
   );
