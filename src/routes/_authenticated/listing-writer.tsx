@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { ImagePlus, Copy as CopyIcon, Trash2 } from "lucide-react";
+import { ImagePlus, Copy as CopyIcon, Trash2, Monitor, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { ActionButton, useAction } from "@/components/ActionButton";
@@ -70,6 +70,7 @@ function ListingWriter() {
     await loadDrafts();
   };
   const [pvLang, setPvLang] = useState<"en" | "ar">(ar ? "ar" : "en");
+  const [pvDevice, setPvDevice] = useState<"desktop" | "phone">("desktop");
   const rev = useAction(async () => {
     if (!copy) return;
     setRevErr("");
@@ -210,11 +211,21 @@ function ListingWriter() {
               <div className="rounded-sm border border-border">
                 <div className="flex items-center justify-between border-b border-border px-4 py-2 text-sm">
                   <h2 className="font-medium">{L("Listing preview", "معاينة الإعلان")}</h2>
+                  <div className="flex flex-wrap gap-3">
+                  <div role="group" aria-label={L("Preview device", "جهاز المعاينة")} className="flex gap-1">
+                    {(["desktop", "phone"] as const).map((dv) => (
+                      <button key={dv} type="button" aria-pressed={pvDevice === dv} onClick={() => setPvDevice(dv)}
+                        className={`inline-flex items-center gap-1 rounded-sm px-2 py-0.5 ${pvDevice === dv ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+                        {dv === "desktop" ? <Monitor className="h-3.5 w-3.5" aria-hidden /> : <Smartphone className="h-3.5 w-3.5" aria-hidden />}
+                        {dv === "desktop" ? L("Desktop", "حاسوب") : L("Phone", "هاتف")}</button>
+                    ))}
+                  </div>
                   <div role="group" aria-label={L("Preview language", "لغة المعاينة")} className="flex gap-1">
                     {(["en", "ar"] as const).map((lg) => (
                       <button key={lg} type="button" aria-pressed={pvLang === lg} onClick={() => setPvLang(lg)}
                         className={`rounded-sm px-2 py-0.5 ${pvLang === lg ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{lg === "en" ? "English" : "العربية"}</button>
                     ))}
+                  </div>
                   </div>
                 </div>
                 {(() => {
@@ -228,15 +239,32 @@ function ListingWriter() {
                     alt.trim() && t.trim() && alt.trim() === t.trim() && L("Alt text just repeats the title", "النص البديل يكرر العنوان فقط"),
                     /^(image|picture|photo|صورة)\b/i.test(alt.trim()) && L("Alt text needn't start with \"image of\"", "لا حاجة لبدء النص البديل بكلمة «صورة»"),
                   ].filter(Boolean) as string[];
-                  return (
-                    <div dir={isAr ? "rtl" : "ltr"} lang={pvLang} className="space-y-4 p-4">
-                      {preview ? <img src={preview} alt={alt} className="max-h-72 w-full bg-muted object-contain" /> : <div className="grid h-40 place-items-center bg-muted text-sm text-muted-foreground">{L("No image", "لا توجد صورة")}</div>}
-                      <div>
+                  const phone = pvDevice === "phone";
+                  if (phone && t.length > 50) issues.push(L("Title is long for a phone — it will wrap over several lines", "العنوان طويل على الهاتف — سيمتد لعدة أسطر"));
+                  if (phone && dsc.length > 600) issues.push(L("Description is long for a phone — buyers must scroll a lot", "الوصف طويل على الهاتف — سيحتاج المشتري إلى تمرير كثير"));
+                  const body = (
+                    <>
+                      {preview ? <img src={preview} alt={alt} className={phone ? "aspect-[4/5] w-full bg-muted object-cover" : "max-h-72 w-full bg-muted object-contain"} /> : <div className="grid h-40 place-items-center bg-muted text-sm text-muted-foreground">{L("No image", "لا توجد صورة")}</div>}
+                      <div className={phone ? "px-4 pb-4" : ""}>
                         {medium && <p className="text-xs uppercase tracking-wide text-muted-foreground">{medium}</p>}
-                        <h3 className="font-display text-2xl">{t || "—"}</h3>
+                        <h3 className={`font-display ${phone ? "text-xl leading-snug" : "text-2xl"}`}>{t || "—"}</h3>
                         <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">{dsc || "—"}</p>
                         {copy.tags.length > 0 && <p className="mt-2 text-xs text-muted-foreground">{copy.tags.map((x) => `#${x}`).join(" ")}</p>}
                       </div>
+                    </>
+                  );
+                  return (
+                    <div dir={isAr ? "rtl" : "ltr"} lang={pvLang} className="space-y-4 p-4">
+                      {phone ? (
+                        <div aria-label={L("Phone preview", "معاينة الهاتف")} role="group" className="mx-auto w-[360px] max-w-full rounded-[2rem] border-[10px] border-foreground bg-foreground shadow-lg">
+                          <div className="mx-auto mb-1 h-1.5 w-16 rounded-full bg-muted-foreground/60" aria-hidden />
+                          <div className="flex h-[640px] flex-col overflow-hidden rounded-[1.4rem] bg-background">
+                            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-2 text-xs"><span className="font-display text-sm">أروقة Arwiqa</span><span className="text-muted-foreground">9:41</span></div>
+                            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto">{body}</div>
+                            <div className="shrink-0 border-t border-border bg-background p-3"><div className="rounded-sm bg-primary py-2.5 text-center text-sm text-primary-foreground">{isAr ? "اشترِ الآن" : "Buy now"}</div></div>
+                          </div>
+                        </div>
+                      ) : body}
                       <div className="rounded-sm bg-muted p-3 text-sm">
                         <p className="mb-1 font-medium">{L("What a screen reader says", "ما يقرؤه قارئ الشاشة")}</p>
                         <p className="text-muted-foreground">{isAr ? "صورة، " : "Image, "}{alt || (isAr ? "بلا وصف" : "no description")}. {isAr ? "عنوان، " : "Heading, "}{t || "—"}.</p>
