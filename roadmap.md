@@ -131,3 +131,10 @@
 - [x] Automated tests: button loading/success/error + duplicate-submit prevention
 - [x] Safe retry for failed requests keeping form data, no duplicate operations
 - [x] Screen-reader announcements + clear focus on button state changes / confirmations
+
+## Editorial UI/UX upgrade (from redesign brief)
+- [x] Phase 1: design tokens, smart sticky header + "More" menu, discovery search, new homepage (hero overlays, curated masonry, live auctions, artists, spotlight, exhibitions, mood, spaces, collections, digital assets, sell, trust), gallery-label tiles, quick-view drawer, price chips
+- [ ] Phase 2: artwork detail page (type selector, story, image viewer), artist page
+- [ ] Phase 3: explore page + mobile filter sheet, mega menu, recently viewed, personalized home
+- [ ] Phase 4: Saudi-bank catalog mode (hover checkboxes, sticky ZIP toolbar), cart/favorites/auth polish, loading/empty/error states
+- [ ] Phase 5: seller dashboard + admin visual refresh ("action required" panels)
