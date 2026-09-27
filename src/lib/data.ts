@@ -152,3 +152,12 @@ export const saudiBanks: Bank[] = [
 
 export const heroImage = gallery;
 export const fmt = (n: number) => `$${n.toLocaleString("en-US")}`;
+
+/** Demo: authorized sales agents acting for an owner. Replace with DB records when agent onboarding exists. */
+export type Agent = { id: string; name: string; nameAr: string; agency: string; agencyAr: string; licenseNo: string; validUntil: string; scope: ("original" | "print" | "license")[] };
+export const agentsByListing: Record<string, Agent> = Object.fromEntries(
+  seedListings.filter((_, i) => i % 3 === 1).map((l) => [l.id, {
+    id: `agent-${l.id}`, name: "Noura Al-Qahtani", nameAr: "نورة القحطاني", agency: "Diriyah Art Representation", agencyAr: "الدرعية لتمثيل الفنانين",
+    licenseNo: `AUTH-${l.id.slice(0, 6).toUpperCase()}-2026`, validUntil: "2027-06-30", scope: ["original", "print", "license"],
+  }]),
+);
