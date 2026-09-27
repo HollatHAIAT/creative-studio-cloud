@@ -56,8 +56,10 @@ export function useLiveAuction(listingId: string) {
 
 export function Countdown({ ms, className = "" }: { ms: number; className?: string }) {
   const s = Math.max(0, Math.floor(ms / 1000));
-  const parts = [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60].map((n) => String(n).padStart(2, "0"));
-  return <span dir="ltr" className={`font-display tabular-nums ${className}`} aria-label={`${parts[0]}h ${parts[1]}m ${parts[2]}s`}>{parts.join(" : ")}</span>;
+  const days = Math.floor(s / 86400);
+  const parts = [Math.floor((s % 86400) / 3600), Math.floor((s % 3600) / 60), s % 60].map((n) => String(n).padStart(2, "0"));
+  const text = (days > 0 ? `${days}d  ` : "") + parts.join(" : ");
+  return <span dir="ltr" className={`font-display tabular-nums ${className}`} aria-label={`${days > 0 ? `${days}d ` : ""}${parts[0]}h ${parts[1]}m ${parts[2]}s`}>{text}</span>;
 }
 
 /** Gallery-label artwork tile: almost no container, metadata sits below like a wall label. */

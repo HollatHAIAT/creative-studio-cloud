@@ -82,7 +82,7 @@ function Hero({ lead }: { lead?: Artwork | undefined }) {
               <p className="mt-2 text-xs text-muted-foreground">{L("Ends in", "ينتهي خلال")}</p>
               <Countdown ms={live?.left ?? 0} className="text-2xl" />
             </div>
-            <div className="rise-in absolute -start-4 bottom-24 border border-border bg-surface/95 px-5 py-4 shadow-float backdrop-blur-sm md:-start-10" style={{ animationDelay: "380ms" }}>
+            <div className="rise-in absolute start-4 bottom-24 border border-border bg-surface/95 px-5 py-4 shadow-float backdrop-blur-sm md:-start-6" style={{ animationDelay: "380ms" }}>
               <p className="text-xs text-muted-foreground">{L("Current bid", "المزايدة الحالية")}</p>
               <p className="font-display text-3xl">{fmt(live?.current ?? 5200)}</p>
             </div>
