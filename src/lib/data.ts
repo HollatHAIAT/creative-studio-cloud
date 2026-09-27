@@ -161,3 +161,6 @@ export const agentsByListing: Record<string, Agent> = Object.fromEntries(
     licenseNo: `AUTH-${l.id.slice(0, 6).toUpperCase()}-2026`, validUntil: "2027-06-30", scope: ["original", "print", "license"],
   }]),
 );
+
+/** Short medium label used for filtering, e.g. "Oil on canvas, 120×150cm" → "Oil on canvas". */
+export const mediumGroup = (m: string) => m.split(",")[0]!.trim();
