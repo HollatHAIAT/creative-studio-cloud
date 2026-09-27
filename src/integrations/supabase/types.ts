@@ -189,6 +189,27 @@ export type Database = {
           },
         ]
       }
+      cart_items: {
+        Row: {
+          item: Json
+          key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          item: Json
+          key: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          item?: Json
+          key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       digital_assets: {
         Row: {
           code: string
@@ -249,6 +270,198 @@ export type Database = {
           capacity?: number
           created_at?: string
           id?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          listing_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inquiries: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          message: string
+          replied_at: string | null
+          reply: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          message: string
+          replied_at?: string | null
+          reply?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          message?: string
+          replied_at?: string | null
+          reply?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inquiries_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_agents: {
+        Row: {
+          agency: string
+          agency_ar: string
+          agent_name: string
+          agent_name_ar: string
+          agent_user_id: string | null
+          created_at: string
+          id: string
+          license_no: string
+          listing_id: string
+          owner_approved_at: string | null
+          revoked_at: string | null
+          scope: string[]
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          agency?: string
+          agency_ar?: string
+          agent_name: string
+          agent_name_ar?: string
+          agent_user_id?: string | null
+          created_at?: string
+          id?: string
+          license_no: string
+          listing_id: string
+          owner_approved_at?: string | null
+          revoked_at?: string | null
+          scope?: string[]
+          valid_from?: string
+          valid_until: string
+        }
+        Update: {
+          agency?: string
+          agency_ar?: string
+          agent_name?: string
+          agent_name_ar?: string
+          agent_user_id?: string | null
+          created_at?: string
+          id?: string
+          license_no?: string
+          listing_id?: string
+          owner_approved_at?: string | null
+          revoked_at?: string | null
+          scope?: string[]
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_agents_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listings: {
+        Row: {
+          category: string
+          created_at: string
+          creator_id: string
+          id: string
+          owner_can_reply: boolean
+          owner_user_id: string | null
+          status: string
+          title: string
+          title_ar: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          creator_id: string
+          id: string
+          owner_can_reply?: boolean
+          owner_user_id?: string | null
+          status?: string
+          title: string
+          title_ar?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          owner_can_reply?: boolean
+          owner_user_id?: string | null
+          status?: string
+          title?: string
+          title_ar?: string
+        }
+        Relationships: []
+      }
+      moderation_audit: {
+        Row: {
+          action: string
+          actor: string
+          created_at: string
+          details: Json
+          id: string
+          reason: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          actor: string
+          created_at?: string
+          details?: Json
+          id?: string
+          reason?: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          actor?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          reason?: string
+          target_id?: string
+          target_type?: string
         }
         Relationships: []
       }
@@ -315,6 +528,50 @@ export type Database = {
         }
         Relationships: []
       }
+      offers: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          listing_id: string
+          message: string
+          response: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          listing_id: string
+          message?: string
+          response?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          listing_id?: string
+          message?: string
+          response?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_events: {
         Row: {
           actor: string | null
@@ -359,7 +616,10 @@ export type Database = {
           created_at: string
           currency: string
           id: string
+          idempotency_key: string | null
           items: Json
+          payment_attempts: number
+          payment_error: string | null
           payment_method: string
           reference: string
           shipping: number
@@ -375,7 +635,10 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          idempotency_key?: string | null
           items: Json
+          payment_attempts?: number
+          payment_error?: string | null
           payment_method: string
           reference?: string
           shipping?: number
@@ -391,7 +654,10 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          idempotency_key?: string | null
           items?: Json
+          payment_attempts?: number
+          payment_error?: string | null
           payment_method?: string
           reference?: string
           shipping?: number
@@ -403,6 +669,44 @@ export type Database = {
           vat?: number
         }
         Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          confirmed_at: string
+          confirmed_by: string | null
+          id: string
+          method: string
+          order_id: string
+          provider_ref: string | null
+        }
+        Insert: {
+          amount: number
+          confirmed_at?: string
+          confirmed_by?: string | null
+          id?: string
+          method: string
+          order_id: string
+          provider_ref?: string | null
+        }
+        Update: {
+          amount?: number
+          confirmed_at?: string
+          confirmed_by?: string | null
+          id?: string
+          method?: string
+          order_id?: string
+          provider_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pending_admins: {
         Row: {
@@ -462,6 +766,214 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_appeals: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          message: string
+          review_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          message: string
+          review_id: string
+          status?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          message?: string
+          review_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_appeals_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_reports: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          resolved_at: string | null
+          review_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          resolved_at?: string | null
+          review_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          resolved_at?: string | null
+          review_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_reports_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_revisions: {
+        Row: {
+          action: string
+          author: string
+          created_at: string
+          id: string
+          new_body: string | null
+          new_rating: number | null
+          old_body: string
+          old_rating: number
+          review_id: string
+        }
+        Insert: {
+          action: string
+          author: string
+          created_at?: string
+          id?: string
+          new_body?: string | null
+          new_rating?: number | null
+          old_body: string
+          old_rating: number
+          review_id: string
+        }
+        Update: {
+          action?: string
+          author?: string
+          created_at?: string
+          id?: string
+          new_body?: string | null
+          new_rating?: number | null
+          old_body?: string
+          old_rating?: number
+          review_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_revisions_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_votes: {
+        Row: {
+          created_at: string
+          review_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          review_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          review_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_votes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          edited_at: string | null
+          helpful_count: number
+          id: string
+          listing_id: string
+          owner_reply: string | null
+          rating: number
+          removed_reason: string | null
+          replied_at: string | null
+          status: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          edited_at?: string | null
+          helpful_count?: number
+          id?: string
+          listing_id: string
+          owner_reply?: string | null
+          rating: number
+          removed_reason?: string | null
+          replied_at?: string | null
+          status?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          edited_at?: string | null
+          helpful_count?: number
+          id?: string
+          listing_id?: string
+          owner_reply?: string | null
+          rating?: number
+          removed_reason?: string | null
+          replied_at?: string | null
+          status?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
             referencedColumns: ["id"]
           },
         ]
@@ -545,6 +1057,36 @@ export type Database = {
           },
         ]
       }
+      user_blocks: {
+        Row: {
+          blocked_until: string | null
+          created_at: string
+          created_by: string
+          id: string
+          lifted_at: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          lifted_at?: string | null
+          reason?: string
+          user_id: string
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          lifted_at?: string | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -575,15 +1117,48 @@ export type Database = {
           reserve: number
         }[]
       }
+      admin_block_user: {
+        Args: { _reason: string; _uid: string; _until: string }
+        Returns: string
+      }
+      admin_confirm_payment: {
+        Args: { _order: string; _ref: string }
+        Returns: undefined
+      }
+      admin_decide_appeal: {
+        Args: { _appeal: string; _note: string; _overturn: boolean }
+        Returns: undefined
+      }
       admin_decide_refund: {
         Args: { _approve: boolean; _note: string; _request_id: string }
+        Returns: undefined
+      }
+      admin_lift_block: {
+        Args: { _reason: string; _uid: string }
+        Returns: undefined
+      }
+      admin_mark_payment_failed: {
+        Args: { _error: string; _order: string }
+        Returns: undefined
+      }
+      admin_moderate_review: {
+        Args: { _reason: string; _remove: boolean; _review: string }
         Returns: undefined
       }
       admin_set_order_status: {
         Args: { _note?: string; _order_id: string; _status: string }
         Returns: undefined
       }
+      admin_set_reply_permission: {
+        Args: { _allowed: boolean; _listing: string }
+        Returns: undefined
+      }
+      agent_authorization_valid: {
+        Args: { _kind: string; _listing: string }
+        Returns: string
+      }
       auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
+      can_review: { Args: { _listing: string }; Returns: boolean }
       check_in_ticket: {
         Args: { _code: string }
         Returns: {
@@ -596,6 +1171,16 @@ export type Database = {
         }[]
       }
       claim_pending_role: { Args: never; Returns: boolean }
+      close_expired_blocks: { Args: never; Returns: undefined }
+      delete_my_review: { Args: { _review: string }; Returns: undefined }
+      edit_my_review: {
+        Args: { _body: string; _rating: number; _review: string }
+        Returns: undefined
+      }
+      has_purchased: {
+        Args: { _listing: string; _uid: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -603,6 +1188,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_blocked: { Args: { _uid: string }; Returns: boolean }
       is_staff: { Args: { _uid: string }; Returns: boolean }
       issue_tickets: { Args: { _booking_id: string }; Returns: undefined }
       push_notification: {
@@ -617,6 +1203,11 @@ export type Database = {
         }
         Returns: undefined
       }
+      reply_to_review: {
+        Args: { _reply: string; _review: string }
+        Returns: undefined
+      }
+      retry_payment: { Args: { _order: string }; Returns: undefined }
       slot_bookings: {
         Args: { _date: string; _exhibition_id: string }
         Returns: {

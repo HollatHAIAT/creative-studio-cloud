@@ -102,3 +102,32 @@
 - [x] Unique bids-live channel + cleanup
 - [x] Shared BidsLive provider (one channel)
 - [x] Strict Mode test for bids-live channel lifecycle
+- [ ] Persist cart, favorites, offers, inquiries per account on real listing data
+- [ ] Secure checkout: payment confirmation, order records, purchase history
+- [ ] Server-enforced agent license validity + owner approval before agents sell
+- [ ] E2E tests: direct purchase, auction routing, owner vs agent listings
+- [ ] Reviews & ratings: owner/agent replies per admin permission, abuse reports, admin removal, timed/permanent user blocks with notices, review analytics
+- [ ] Home page animations + easier, competitive marketplace UX
+- [ ] Verified-purchase badges, buyer-only reviews, duplicate/spam safeguards
+- [ ] Helpful votes + sort/filter reviews by rating, date, verified
+- [ ] Admin audit trail: review removals, abuse decisions, suspensions (actor, reason, time)
+- [ ] Rating distribution + review summary on product pages, linking to filtered reviews
+- [ ] Reviewers edit (48h) / delete (7 days) own reviews; revision history kept for moderators
+- [ ] Removal/moderation notices with reason + appeal flow
+- [ ] "My reviews" page with remaining edit/delete time
+- [ ] Keyboard + screen-reader accessible rating, filters, review history
+- [ ] E2E tests: cart+checkout, verified-purchase reviews, moderation appeal
+- [ ] Order/payment hardening: duplicate submits, failed payments, safe recovery
+- [x] Moderator queue: filters for pending reports, appeals, recent decisions
+- [x] Buyer order details: fulfillment status, shipment tracking links, delivery updates
+- [ ] Seller dashboard: sales, conversion, product performance over time (database-backed)
+- [ ] Seller inventory: stock levels, low-stock alerts, automatic availability
+- [ ] PRIORITY: artwork page buttons full journey (buy now, basket, favorite, share, ask seller, make offer)
+- [ ] Seller dashboard: date-range + product filters, period comparison
+- [ ] Seller CSV exports: sales, conversion, product performance
+- [ ] Inventory adjustment history (change, time, reason)
+- [x] Button loading/success/error states + clear confirmations (buy, basket, favorite, question, offer)
+- [ ] Test buy/basket/favorite/share/contact journeys on mobile + desktop, sign-in, failed orders, duplicate-submit prevention
+- [x] Automated tests: button loading/success/error + duplicate-submit prevention
+- [x] Safe retry for failed requests keeping form data, no duplicate operations
+- [x] Screen-reader announcements + clear focus on button state changes / confirmations

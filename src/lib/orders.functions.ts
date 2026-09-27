@@ -13,6 +13,7 @@ const input = z.object({
   contact: z.object({ name: z.string().trim().min(2).max(100), email: z.string().trim().email().max(255), phone: z.string().trim().max(30).optional().default("") }),
   address: z.object({ line: z.string().trim().max(200), city: z.string().trim().max(100), country: z.string().trim().max(100), postal: z.string().trim().max(20) }).nullable(),
   paymentMethod: z.enum(["card", "mada", "applepay", "stcpay", "bank"]),
+  idempotencyKey: z.string().uuid(),
 });
 
 /** Creates an order priced on the server; payment is captured later once a provider is connected. */
@@ -21,16 +22,31 @@ export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => input.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    // Duplicate submit (double click / network retry): return the order already created with this key.
+    const { data: existing } = await supabase.from("orders").select("id, reference").eq("user_id", userId).eq("idempotency_key", data.idempotencyKey).maybeSingle();
+    if (existing) return { ok: true as const, orderId: existing.id, reference: existing.reference };
     const priced = priceCart(data.items);
     if (priced.errors.length) return { ok: false as const, error: priced.errors.join("; ") };
+    // Seller authorization: listing must be live; agent-sold listings need a valid, owner-approved license covering this format.
+    for (const l of priced.lines.filter((x) => x.kind !== "ticket")) {
+      const listingId = String(l.ref["listingId"]);
+      const { data: row } = await supabase.from("listings").select("id, status").eq("id", listingId).maybeSingle();
+      if (!row || row.status !== "published") return { ok: false as const, error: "LISTING_UNAVAILABLE" };
+      const { data: auth, error: ae } = await supabase.rpc("agent_authorization_valid", { _listing: listingId, _kind: l.kind });
+      if (ae || (auth !== "OWNER" && auth !== "AGENT_OK")) return { ok: false as const, error: String(auth ?? "SELLER_NOT_AUTHORIZED") };
+    }
     if (priced.needsShipping && (!data.address || !data.address.line || !data.address.city || !data.address.country)) return { ok: false as const, error: "Shipping address is required" };
 
     const { data: order, error } = await supabase.from("orders").insert({
       user_id: userId,
       items: priced.lines.map((l) => ({ kind: l.kind, title: l.title, titleAr: l.titleAr, detail: l.detail, unit: l.unit, qty: l.qty, amount: l.amount, ...l.ref })),
       subtotal: priced.subtotal, vat: priced.vat, shipping: priced.shipping, total: priced.total,
-      contact: data.contact, shipping_address: priced.needsShipping ? data.address : null, payment_method: data.paymentMethod,
+      contact: data.contact, shipping_address: priced.needsShipping ? data.address : null, payment_method: data.paymentMethod, idempotency_key: data.idempotencyKey,
     }).select("id, reference").single();
+    if (error?.code === "23505") {
+      const { data: again } = await supabase.from("orders").select("id, reference").eq("user_id", userId).eq("idempotency_key", data.idempotencyKey).maybeSingle();
+      if (again) return { ok: true as const, orderId: again.id, reference: again.reference };
+    }
     if (error || !order) { console.error(error); return { ok: false as const, error: "Could not create order" }; }
 
     for (const l of priced.lines.filter((x) => x.kind === "ticket")) {
@@ -44,5 +60,6 @@ export const placeOrder = createServerFn({ method: "POST" })
         return { ok: false as const, error: msg, orderId: order.id };
       }
     }
+    await supabase.from("cart_items").delete().eq("user_id", userId);
     return { ok: true as const, orderId: order.id, reference: order.reference };
   });

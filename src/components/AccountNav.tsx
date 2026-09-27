@@ -57,6 +57,7 @@ export function AccountNav() {
             <DropdownMenuContent align="end">
               <DropdownMenuItem className="text-xs text-muted-foreground" disabled>{user.email}</DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/orders">{t("nav.orders")}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/my-reviews">{locale === "ar" ? "تقييماتي" : "My reviews"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/notifications">{t("nav.notifications")}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/settings">{t("nav.settings")}</Link></DropdownMenuItem>
               {isStaff && (<>
@@ -64,6 +65,7 @@ export function AccountNav() {
                 <DropdownMenuItem asChild><Link to="/admin/orders">{t("adm.orders")}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/reports">{t("adm.reports")}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/scan">{t("adm.scan")}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/admin/reviews">{locale === "ar" ? "الإشراف على التقييمات" : "Review moderation"}</Link></DropdownMenuItem>
               </>)}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={async () => { await supabase.auth.signOut(); qc.clear(); navigate({ to: "/" }); }}>{t("auth.signout")}</DropdownMenuItem>
