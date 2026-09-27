@@ -68,6 +68,8 @@ export const actions = {
   addToCart(i: CartItem) { set({ ...state, cart: [...(state.cart ?? []).filter((x) => x.key !== i.key), i] }); },
   removeFromCart(key: string) { set({ ...state, cart: (state.cart ?? []).filter((x) => x.key !== key) }); },
   clearCart() { set({ ...state, cart: [] }); },
+  /** Account copy replaces the local cart/favorites after sign-in (see AccountSync). */
+  replaceAccountData(cart: CartItem[], favorites: string[]) { set({ ...state, cart, favorites }); },
   setLocale(l: "en" | "ar") { set({ ...state, locale: l }); },
   addBid(auctionId: string, b: Bid) { set({ ...state, bids: { ...state.bids, [auctionId]: [...(state.bids[auctionId] ?? []), b] } }); },
   book(b: Booking) { set({ ...state, bookings: [...state.bookings, b] }); },
