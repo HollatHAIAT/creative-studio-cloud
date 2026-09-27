@@ -70,3 +70,53 @@ Reply with ONLY JSON: {"title":"","titleAr":"","description":"","descriptionAr":
     try { return { copy: Copy.parse(JSON.parse(json)) }; }
     catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const Revised = z.object({ title: z.string(), titleAr: z.string(), description: z.string(), descriptionAr: z.string() });
+export type RevisedCopy = z.infer<typeof Revised>;
+
+/** Rewrites an existing title + description in both languages following the seller's revision instructions. */
+export const reviseListingCopy = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    instructions: z.string().trim().min(3).max(1000),
+    current: z.object({
+      title: z.string().max(200), titleAr: z.string().max(200),
+      description: z.string().max(4000), descriptionAr: z.string().max(4000),
+    }),
+    medium: z.string().max(160).default(""),
+  }).parse(d))
+  .handler(async ({ data }): Promise<{ copy?: RevisedCopy; error?: string }> => {
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const prompt = `You edit artwork listings for the Arwiqa art marketplace. Rewrite the title and description following the seller's instructions. Keep facts that are already there; never invent sizes, dates, editions or provenance. Titles max 80 characters. The Arabic must be natural Modern Standard Arabic and say the same thing as the English — not a word-for-word translation.
+Reply with ONLY JSON: {"title":"...","titleAr":"...","description":"...","descriptionAr":"..."}
+
+Medium: ${data.medium || "unknown"}
+Current listing:
+${JSON.stringify(data.current)}
+
+Seller's revision instructions:
+${data.instructions}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", input: prompt, stream: true, store: false,
+        reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Listing revise AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no revision." };
+    try { return { copy: Revised.parse(JSON.parse(json)) }; }
+    catch { return { error: "The AI returned an unreadable answer." }; }
+  });

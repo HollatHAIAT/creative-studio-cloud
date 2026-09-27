@@ -7,7 +7,7 @@ import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { ActionButton, useAction } from "@/components/ActionButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { generateListingCopy, type ListingCopy } from "@/lib/listing-copy.functions";
+import { generateListingCopy, reviseListingCopy, type ListingCopy } from "@/lib/listing-copy.functions";
 
 export const Route = createFileRoute("/_authenticated/listing-writer")({
   head: () => ({ meta: [
@@ -33,6 +33,18 @@ function ListingWriter() {
   const [notes, setNotes] = useState("");
   const [copy, setCopy] = useState<ListingCopy | null>(null);
   const [err, setErr] = useState("");
+  const revise = useServerFn(reviseListingCopy);
+  const [instr, setInstr] = useState("");
+  const [revErr, setRevErr] = useState("");
+  const [prev, setPrev] = useState<ListingCopy | null>(null);
+  const rev = useAction(async () => {
+    if (!copy) return;
+    setRevErr("");
+    const r = await revise({ data: { instructions: instr, medium, current: { title: copy.title, titleAr: copy.titleAr, description: copy.description, descriptionAr: copy.descriptionAr } } });
+    if (r.error || !r.copy) { setRevErr(r.error ?? ""); throw new Error(r.error ?? "failed"); }
+    setPrev(copy);
+    setCopy({ ...copy, ...r.copy });
+  });
 
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
@@ -130,6 +142,19 @@ function ListingWriter() {
                   )}
                 </div>
               ))}
+              <form onSubmit={(e) => { e.preventDefault(); if (instr.trim().length >= 3) void rev.run(); }} className="space-y-2 rounded-sm border border-border bg-card p-4">
+                <label htmlFor="revise" className="text-sm font-medium">{L("Revise title & description", "عدّل العنوان والوصف")}</label>
+                <textarea id="revise" rows={3} maxLength={1000} value={instr} onChange={(e) => setInstr(e.target.value)}
+                  placeholder={L("e.g. Shorter, more poetic title; mention it suits a majlis; drop the word 'vibrant'", "مثال: عنوان أقصر وأكثر شاعرية، واذكر أنه يناسب المجلس، واحذف كلمة «نابض»")}
+                  className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm" />
+                <div className="flex flex-wrap items-center gap-3">
+                  <ActionButton type="submit" state={rev.state} disabled={instr.trim().length < 3} onRetry={rev.retry}
+                    loadingLabel={L("Rewriting…", "جارٍ إعادة الكتابة…")} successLabel={L("Updated in both languages", "تم التحديث باللغتين")}
+                    errorLabel={revErr || L("Couldn't revise.", "تعذّر التعديل.")} retryLabel={L("Try again", "حاول مجدداً")}
+                    className="rounded-sm bg-primary px-4 py-2 text-sm text-primary-foreground">{L("Apply revision", "طبّق التعديل")}</ActionButton>
+                  {prev && <button type="button" onClick={() => { setCopy(prev); setPrev(null); }} className="text-sm underline">{L("Undo revision", "تراجع عن التعديل")}</button>}
+                </div>
+              </form>
               {copy.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">{copy.tags.map((t) => <span key={t} className="rounded-full border border-border px-3 py-1 text-sm">#{t}</span>)}</div>
               )}
