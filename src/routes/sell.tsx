@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useLocale } from "@/lib/i18n";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 
@@ -22,6 +22,9 @@ function Sell() {
   return (
     <SiteShell>
       <PageTitle eyebrow={t("sell.eyebrow")} title={t("sell.title")} sub={t("sell.sub")} />
+      <div className="mx-auto mb-6 max-w-7xl px-6">
+        <Link to="/listing-writer" className="inline-flex rounded-sm bg-primary px-5 py-3 text-primary-foreground">{locale === "ar" ? "اكتب إعلانك بالذكاء الاصطناعي من صورة العمل" : "Write your listing with AI from an artwork photo"}</Link>
+      </div>
       <div className="mx-auto grid max-w-7xl gap-6 px-6 md:grid-cols-3">
         {items.map(([t, d]) => (
           <div key={t} className="rounded-sm border border-border bg-card p-6"><p className="font-display text-2xl">{t}</p><p className="mt-2 text-muted-foreground">{d}</p></div>

@@ -25,6 +25,7 @@ import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as AuthenticatedListingWriterRouteImport } from './routes/_authenticated/listing-writer'
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
@@ -121,6 +122,12 @@ const SellRoute = SellRouteImport.update({
   path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedListingWriterRoute =
+  AuthenticatedListingWriterRouteImport.update({
+    id: '/listing-writer',
+    path: '/listing-writer',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMyReviewsRoute = AuthenticatedMyReviewsRouteImport.update({
   id: '/my-reviews',
   path: '/my-reviews',
@@ -224,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -292,6 +301,7 @@ export interface FileRoutesById {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/_authenticated/listing-writer': typeof AuthenticatedListingWriterRoute
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/listing-writer'
     | '/my-reviews'
     | '/notifications'
     | '/saved-searches'
@@ -360,6 +371,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/listing-writer'
     | '/my-reviews'
     | '/notifications'
     | '/saved-searches'
@@ -394,6 +406,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/_authenticated/listing-writer'
     | '/_authenticated/my-reviews'
     | '/_authenticated/notifications'
     | '/_authenticated/saved-searches'
@@ -548,6 +561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/listing-writer': {
+      id: '/_authenticated/listing-writer'
+      path: '/listing-writer'
+      fullPath: '/listing-writer'
+      preLoaderRoute: typeof AuthenticatedListingWriterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/my-reviews': {
       id: '/_authenticated/my-reviews'
       path: '/my-reviews'
@@ -664,6 +684,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedListingWriterRoute: typeof AuthenticatedListingWriterRoute
   AuthenticatedMyReviewsRoute: typeof AuthenticatedMyReviewsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
@@ -677,6 +698,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedListingWriterRoute: AuthenticatedListingWriterRoute,
   AuthenticatedMyReviewsRoute: AuthenticatedMyReviewsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
