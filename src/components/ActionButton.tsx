@@ -49,7 +49,7 @@ export function ActionButton({ state, children, loadingLabel, successLabel, erro
         className={`inline-flex items-center justify-center gap-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60 ${className}`}>
         {state === "loading" && <Loader2 aria-hidden className="h-4 w-4 animate-spin" />}
         {state === "success" && <Check aria-hidden className="h-4 w-4" />}
-        <span>{state === "loading" ? loadingLabel : state === "success" ? successLabel : children}</span>
+        <span className="inline-flex items-center gap-2">{state === "loading" ? loadingLabel : state === "success" ? successLabel : children}</span>
       </button>
       {state === "error" && (
         <span role="alert" className="flex flex-wrap items-center gap-2 text-sm text-destructive">

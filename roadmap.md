@@ -118,16 +118,16 @@
 - [ ] Keyboard + screen-reader accessible rating, filters, review history
 - [ ] E2E tests: cart+checkout, verified-purchase reviews, moderation appeal
 - [ ] Order/payment hardening: duplicate submits, failed payments, safe recovery
-- [ ] Moderator queue: filters for pending reports, appeals, recent decisions
-- [ ] Buyer order details: fulfillment status, shipment tracking links, delivery updates
+- [x] Moderator queue: filters for pending reports, appeals, recent decisions
+- [x] Buyer order details: fulfillment status, shipment tracking links, delivery updates
 - [ ] Seller dashboard: sales, conversion, product performance over time (database-backed)
 - [ ] Seller inventory: stock levels, low-stock alerts, automatic availability
 - [ ] PRIORITY: artwork page buttons full journey (buy now, basket, favorite, share, ask seller, make offer)
 - [ ] Seller dashboard: date-range + product filters, period comparison
 - [ ] Seller CSV exports: sales, conversion, product performance
 - [ ] Inventory adjustment history (change, time, reason)
-- [ ] Button loading/success/error states + clear confirmations (buy, basket, favorite, question, offer)
+- [x] Button loading/success/error states + clear confirmations (buy, basket, favorite, question, offer)
 - [ ] Test buy/basket/favorite/share/contact journeys on mobile + desktop, sign-in, failed orders, duplicate-submit prevention
-- [ ] Automated tests: button loading/success/error + duplicate-submit prevention
-- [ ] Safe retry for failed requests keeping form data, no duplicate operations
-- [ ] Screen-reader announcements + clear focus on button state changes / confirmations
+- [x] Automated tests: button loading/success/error + duplicate-submit prevention
+- [x] Safe retry for failed requests keeping form data, no duplicate operations
+- [x] Screen-reader announcements + clear focus on button state changes / confirmations
