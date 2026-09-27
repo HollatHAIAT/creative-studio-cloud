@@ -111,3 +111,5 @@
 - [ ] Verified-purchase badges, buyer-only reviews, duplicate/spam safeguards
 - [ ] Helpful votes + sort/filter reviews by rating, date, verified
 - [ ] Admin audit trail: review removals, abuse decisions, suspensions (actor, reason, time)
+- [ ] Rating distribution + review summary on product pages, linking to filtered reviews
+- [ ] Reviewers edit (48h) / delete (7 days) own reviews; revision history kept for moderators
