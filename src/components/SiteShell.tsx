@@ -51,7 +51,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </Link>
           <nav className="hidden items-center gap-7 text-sm lg:flex" aria-label={L("Main", "الرئيسية")}>
             {nav.map((n) => (
-              <Link key={n.en} to={n.to} search={"search" in n ? n.search : undefined} className="text-muted-foreground transition hover:text-foreground" activeOptions={{ includeSearch: true }} activeProps={{ className: "text-foreground" }}>{L(n.en, n.ar)}</Link>
+              <Link key={n.en} to={n.to} search={("search" in n ? n.search : {}) as never} className="text-muted-foreground transition hover:text-foreground" activeOptions={{ includeSearch: true }} activeProps={{ className: "text-foreground" }}>{L(n.en, n.ar)}</Link>
             ))}
             <DropdownMenu>
               <DropdownMenuTrigger className="inline-flex items-center gap-1 text-muted-foreground outline-none hover:text-foreground">{L("More", "المزيد")}<ChevronDown className="h-3.5 w-3.5" aria-hidden /></DropdownMenuTrigger>
@@ -69,7 +69,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className={`no-scrollbar flex gap-5 overflow-x-auto px-6 text-sm transition-all lg:hidden ${scrolled ? "pb-2" : "pb-3"}`} aria-label={L("Main", "الرئيسية")}>
-          {[...nav, ...more.slice(2)].map((n) => <Link key={n.en} to={n.to} search={"search" in n ? n.search : undefined} className="shrink-0 text-muted-foreground" activeProps={{ className: "text-foreground" }}>{L(n.en, n.ar)}</Link>)}
+          {[...nav, ...more.slice(2)].map((n) => <Link key={n.en} to={n.to} search={("search" in n ? n.search : {}) as never} className="shrink-0 text-muted-foreground" activeProps={{ className: "text-foreground" }}>{L(n.en, n.ar)}</Link>)}
         </nav>
       </header>
       <Sheet open={searchOpen} onOpenChange={setSearchOpen}>

@@ -17,11 +17,11 @@ export const Route = createFileRoute("/explore")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>): { q?: string; cat?: string; min?: number; max?: number } => ({
-    q: typeof s.q === "string" ? s.q : undefined,
-    cat: typeof s.cat === "string" ? s.cat : undefined,
-    min: typeof s.min === "number" ? s.min : undefined,
-    max: typeof s.max === "number" ? s.max : undefined,
+  validateSearch: (s: Record<string, unknown>): { q?: string | undefined; cat?: string | undefined; min?: number | undefined; max?: number | undefined } => ({
+    q: typeof s["q"] === "string" ? s["q"] : undefined,
+    cat: typeof s["cat"] === "string" ? s["cat"] : undefined,
+    min: typeof s["min"] === "number" ? s["min"] : undefined,
+    max: typeof s["max"] === "number" ? s["max"] : undefined,
   }),
   component: Explore,
 });

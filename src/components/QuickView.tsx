@@ -27,7 +27,7 @@ function Body({ a, onClose }: { a: Artwork; onClose: () => void }) {
   const fav = favorites.includes(a.id);
   const live = useLiveAuction(a.id);
   const original = a.variants.find((v) => v.kind === "original");
-  const cheapest = a.variants.reduce((m, v) => (v.price < m.price ? v : m), a.variants[0]);
+  const cheapest = a.variants.reduce((m, v) => (v.price < m.price ? v : m), a.variants[0]!);
   const kinds = [...new Set(a.variants.map((v) => v.kind))];
   const kindLabel = { original: L("Original", "أصلية"), print: L("Print", "مطبوعة"), license: L("Digital license", "ترخيص رقمي") };
   return (

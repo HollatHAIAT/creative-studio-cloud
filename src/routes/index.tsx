@@ -66,7 +66,7 @@ function TextLink({ to, children }: { to: string; children: React.ReactNode }) {
 }
 
 /* 1–2. Asymmetric editorial hero with layered marketplace overlays + discovery search */
-function Hero({ lead }: { lead?: Artwork }) {
+function Hero({ lead }: { lead?: Artwork | undefined }) {
   const L = useL();
   const { pick } = useLocale();
   const live = useLiveAuction(lead?.id ?? "");
@@ -86,9 +86,9 @@ function Hero({ lead }: { lead?: Artwork }) {
               <p className="text-xs text-muted-foreground">{L("Current bid", "المزايدة الحالية")}</p>
               <p className="font-display text-3xl">{fmt(live?.current ?? 5200)}</p>
             </div>
-            <Link to="/artists/$id" params={{ id: artists[0].id }} className="rise-in absolute -bottom-6 end-6 flex items-center gap-3 border border-border bg-surface px-4 py-3 shadow-float" style={{ animationDelay: "520ms" }}>
+            <Link to="/artists/$id" params={{ id: artists[0]!.id }} className="rise-in absolute -bottom-6 end-6 flex items-center gap-3 border border-border bg-surface px-4 py-3 shadow-float" style={{ animationDelay: "520ms" }}>
               <img src={studio} alt="" className="h-10 w-10 rounded-full object-cover" />
-              <span><span className="block text-sm">{pick(artists[0], "name")}</span><span className="flex items-center gap-1 text-xs text-muted-foreground"><BadgeCheck className="h-3.5 w-3.5 text-primary" aria-hidden />{L("Verified artist", "فنانة موثقة")}</span></span>
+              <span><span className="block text-sm">{pick(artists[0]!, "name")}</span><span className="flex items-center gap-1 text-xs text-muted-foreground"><BadgeCheck className="h-3.5 w-3.5 text-primary" aria-hidden />{L("Verified artist", "فنانة موثقة")}</span></span>
             </Link>
             <span className="absolute start-4 top-4 bg-background/90 px-3 py-1 text-[11px] uppercase tracking-widest">{L("Original • 1/1", "نسخة أصلية • 1/1")}</span>
           </div>
@@ -251,7 +251,7 @@ function Artists({ works }: { works: Artwork[] }) {
 function Spotlight({ works }: { works: Artwork[] }) {
   const L = useL();
   const { pick } = useLocale();
-  const p = artists[0];
+  const p = artists[0]!;
   const w = works.find((x) => x.artistId === p.id);
   return (
     <section className="bg-muted py-24">
@@ -275,7 +275,7 @@ function Spotlight({ works }: { works: Artwork[] }) {
 function Exhibitions() {
   const L = useL();
   const { pick } = useLocale();
-  const virtual = exhibitions.find((e) => e.type === "Virtual") ?? exhibitions[0];
+  const virtual = exhibitions.find((e) => e.type === "Virtual") ?? exhibitions[0]!;
   const hotspots = [[18, 48], [42, 45], [60, 48], [86, 44]];
   return (
     <section className="py-24">
@@ -369,7 +369,7 @@ function CollectionStories() {
     ["Women in Arab art", "المرأة في الفن العربي", "Voices shaping the region's visual language.", "أصوات تصوغ اللغة البصرية للمنطقة.", art3],
     ["Colours of the desert", "ألوان الصحراء", "Ochre, rose and dusk — a palette of the peninsula.", "المغرة والوردي والغسق — ألوان الجزيرة.", art2],
   ];
-  const [lead, ...rest] = stories;
+  const [lead, ...rest] = stories as [typeof stories[0] & {}, ...typeof stories];
   return (
     <section className="mx-auto max-w-7xl px-6 py-24">
       <Reveal><SectionHead eyebrow={L("Collections", "المجموعات")} title={L("Editorial collections", "مجموعات تحريرية")} /></Reveal>
