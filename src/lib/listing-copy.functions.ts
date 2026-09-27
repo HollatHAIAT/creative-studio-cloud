@@ -120,3 +120,62 @@ ${data.instructions}`;
     try { return { copy: Revised.parse(JSON.parse(json)) }; }
     catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const AltReview = z.object({
+  verdict: z.enum(["accurate", "partly", "inaccurate"]),
+  summary: z.string(), summaryAr: z.string(),
+  issues: z.array(z.string()).max(8), issuesAr: z.array(z.string()).max(8),
+  suggestion: z.string(), suggestionAr: z.string(),
+});
+export type AltReview = z.infer<typeof AltReview>;
+
+/** Checks the seller's current alt text against their uploaded image and suggests a clearer bilingual alternative. */
+export const reviewAltText = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    path: z.string().min(3).max(300),
+    altText: z.string().trim().min(1).max(1000),
+  }).parse(d))
+  .handler(async ({ data, context }): Promise<{ review?: AltReview; error?: string }> => {
+    if (!data.path.startsWith(`${context.userId}/`)) return { error: "You can only check your own uploads." };
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const { data: blob, error: dlErr } = await context.supabase.storage.from("artwork-images").download(data.path);
+    if (dlErr || !blob || blob.size === 0) return { error: "The uploaded image couldn't be read. Please upload it again." };
+    const mime = blob.type || "image/jpeg";
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(mime)) return { error: "Please upload a PNG, JPG, WEBP or GIF image." };
+    const b64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
+    const prompt = `You are an accessibility reviewer for Arwiqa, a Saudi art marketplace. Compare the seller's current alt text with the artwork image.
+- verdict: "accurate" (describes what is visible), "partly" (vague, missing key subject/colours/composition, or contains unverifiable claims), or "inaccurate" (describes things not visible or wrong).
+- summary (English, 1-2 sentences) and summaryAr (Arabic).
+- issues: short concrete problems (e.g. wrong colour, starts with "image of", too long, subjective praise, missing main subject); issuesAr same in Arabic. Empty arrays if none.
+- suggestion: clearer objective alt text, max 140 characters, describe only what is visible, no "image of"; suggestionAr natural Arabic equivalent, max 140 characters.
+Current alt text: ${JSON.stringify(data.altText)}
+Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","issues":[],"issuesAr":[],"suggestion":"","suggestionAr":""}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [
+          { type: "input_text", text: prompt },
+          { type: "input_image", image_url: `data:${mime};base64,${b64}` },
+        ] }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Alt review AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no review." };
+    try { return { review: AltReview.parse(JSON.parse(json)) }; }
+    catch { return { error: "The AI returned an unreadable answer." }; }
+  });
