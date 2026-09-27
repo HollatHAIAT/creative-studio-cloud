@@ -106,3 +106,4 @@
 - [ ] Secure checkout: payment confirmation, order records, purchase history
 - [ ] Server-enforced agent license validity + owner approval before agents sell
 - [ ] E2E tests: direct purchase, auction routing, owner vs agent listings
+- [ ] Reviews & ratings: owner/agent replies per admin permission, abuse reports, admin removal, timed/permanent user blocks with notices, review analytics
