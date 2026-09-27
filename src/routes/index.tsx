@@ -340,7 +340,7 @@ function ByMood() {
 function BySpace() {
   const L = useL();
   const spaces: [string, string, string][] = [["Living room", "غرفة المعيشة", spaceLiving], ["Majlis", "مجلس", spaceMajlis], ["Office", "المكتب", spaceOffice]];
-  const more = [["Hotel", "فندق"], ["Restaurant", "مطعم"], ["Commercial spaces", "مساحات تجارية"]];
+  const more: [string, string][] = [["Hotel", "فندق"], ["Restaurant", "مطعم"], ["Commercial spaces", "مساحات تجارية"]];
   return (
     <section className="bg-muted py-24">
       <div className="mx-auto max-w-7xl px-6">
@@ -391,7 +391,7 @@ function CollectionStories() {
               </Link>
             </Reveal>
           ))}
-          <div className="flex flex-wrap gap-2 text-sm">{[["Riyadh picks", "مختارات الرياض"], ["New abstractions", "تجريدات جديدة"]].map(([en, ar]) => <Link key={en} to="/explore" search={{ q: en }} className="rounded-full border border-border px-4 py-2 hover:border-foreground">{L(en, ar)}</Link>)}</div>
+          <div className="flex flex-wrap gap-2 text-sm">{([["Riyadh picks", "مختارات الرياض"], ["New abstractions", "تجريدات جديدة"]] as [string, string][]).map(([en, ar]) => <Link key={en} to="/explore" search={{ q: en }} className="rounded-full border border-border px-4 py-2 hover:border-foreground">{L(en, ar)}</Link>)}</div>
         </div>
       </div>
     </section>
