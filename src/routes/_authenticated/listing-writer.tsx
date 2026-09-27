@@ -61,6 +61,7 @@ function ListingWriter() {
   });
   const openDraft = (d: Draft) => {
     setDraftId(d.id); setMedium(d.medium); setPath(d.image_path); setPreview(null); setPrev(null);
+    if (d.image_path) void supabase.storage.from("artwork-images").createSignedUrl(d.image_path, 3600).then(({ data }) => setPreview(data?.signedUrl ?? null));
     setCopy({ title: d.title, titleAr: d.title_ar, description: d.description, descriptionAr: d.description_ar, altText: d.alt_text, altTextAr: d.alt_text_ar, tags: d.tags });
   };
   const removeDraft = async (id: string) => {
@@ -68,6 +69,7 @@ function ListingWriter() {
     if (id === draftId) setDraftId(null);
     await loadDrafts();
   };
+  const [pvLang, setPvLang] = useState<"en" | "ar">(ar ? "ar" : "en");
   const rev = useAction(async () => {
     if (!copy) return;
     setRevErr("");
@@ -205,6 +207,47 @@ function ListingWriter() {
               {copy.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">{copy.tags.map((t) => <span key={t} className="rounded-full border border-border px-3 py-1 text-sm">#{t}</span>)}</div>
               )}
+              <div className="rounded-sm border border-border">
+                <div className="flex items-center justify-between border-b border-border px-4 py-2 text-sm">
+                  <h2 className="font-medium">{L("Listing preview", "معاينة الإعلان")}</h2>
+                  <div role="group" aria-label={L("Preview language", "لغة المعاينة")} className="flex gap-1">
+                    {(["en", "ar"] as const).map((lg) => (
+                      <button key={lg} type="button" aria-pressed={pvLang === lg} onClick={() => setPvLang(lg)}
+                        className={`rounded-sm px-2 py-0.5 ${pvLang === lg ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{lg === "en" ? "English" : "العربية"}</button>
+                    ))}
+                  </div>
+                </div>
+                {(() => {
+                  const isAr = pvLang === "ar";
+                  const t = isAr ? copy.titleAr : copy.title, dsc = isAr ? copy.descriptionAr : copy.description, alt = isAr ? copy.altTextAr : copy.altText;
+                  const issues = [
+                    !t.trim() && L("Title is empty", "العنوان فارغ"),
+                    !dsc.trim() && L("Description is empty", "الوصف فارغ"),
+                    !alt.trim() && L("Alt text is empty — screen-reader users won't know what the image shows", "النص البديل فارغ — لن يعرف مستخدمو قارئ الشاشة محتوى الصورة"),
+                    alt.length > 140 && L("Alt text is over 140 characters", "النص البديل يتجاوز 140 حرفاً"),
+                    alt.trim() && t.trim() && alt.trim() === t.trim() && L("Alt text just repeats the title", "النص البديل يكرر العنوان فقط"),
+                    /^(image|picture|photo|صورة)\b/i.test(alt.trim()) && L("Alt text needn't start with \"image of\"", "لا حاجة لبدء النص البديل بكلمة «صورة»"),
+                  ].filter(Boolean) as string[];
+                  return (
+                    <div dir={isAr ? "rtl" : "ltr"} lang={pvLang} className="space-y-4 p-4">
+                      {preview ? <img src={preview} alt={alt} className="max-h-72 w-full bg-muted object-contain" /> : <div className="grid h-40 place-items-center bg-muted text-sm text-muted-foreground">{L("No image", "لا توجد صورة")}</div>}
+                      <div>
+                        {medium && <p className="text-xs uppercase tracking-wide text-muted-foreground">{medium}</p>}
+                        <h3 className="font-display text-2xl">{t || "—"}</h3>
+                        <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">{dsc || "—"}</p>
+                        {copy.tags.length > 0 && <p className="mt-2 text-xs text-muted-foreground">{copy.tags.map((x) => `#${x}`).join(" ")}</p>}
+                      </div>
+                      <div className="rounded-sm bg-muted p-3 text-sm">
+                        <p className="mb-1 font-medium">{L("What a screen reader says", "ما يقرؤه قارئ الشاشة")}</p>
+                        <p className="text-muted-foreground">{isAr ? "صورة، " : "Image, "}{alt || (isAr ? "بلا وصف" : "no description")}. {isAr ? "عنوان، " : "Heading, "}{t || "—"}.</p>
+                      </div>
+                      {issues.length > 0 ? (
+                        <ul className="space-y-1 text-sm text-destructive">{issues.map((i) => <li key={i}>• {i}</li>)}</ul>
+                      ) : <p className="text-sm text-success">{L("Ready: title, description and alt text look good.", "جاهز: العنوان والوصف والنص البديل سليمة.")}</p>}
+                    </div>
+                  );
+                })()}
+              </div>
               <div className="flex flex-wrap items-center gap-3">
                 <ActionButton state={save.state} onClick={() => save.run()} onRetry={save.retry}
                   loadingLabel={L("Saving…", "جارٍ الحفظ…")} successLabel={L("Saved to draft", "حُفظ في المسودة")}
