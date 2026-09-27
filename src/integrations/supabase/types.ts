@@ -1050,6 +1050,7 @@ export type Database = {
         Returns: string
       }
       auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
+      can_review: { Args: { _listing: string }; Returns: boolean }
       check_in_ticket: {
         Args: { _code: string }
         Returns: {
