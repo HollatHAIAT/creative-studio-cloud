@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
-import { Heart, Languages } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ChevronDown, Heart, Languages, Search } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { DiscoverySearch } from "@/components/DiscoverySearch";
 import type { Artwork } from "@/lib/data";
 import { fmt, minPrice } from "@/lib/data";
 import { actions, useStore } from "@/lib/store";
@@ -12,43 +15,71 @@ import logoMark from "@/assets/arwiqa-mark.png";
 import logoFull from "@/assets/arwiqa-logo.png";
 
 const nav = [
-  { to: "/explore", k: "nav.explore" },
-  { to: "/advisor", k: "nav.advisor" },
-  { to: "/auctions", k: "nav.auctions" },
-  { to: "/exhibitions", k: "nav.exhibitions" },
-  { to: "/artists", k: "nav.artists" },
-  { to: "/collections/saudi-banks", k: "nav.collections" },
-  { to: "/dashboard", k: "nav.dashboard" },
-  { to: "/analytics", k: "nav.analytics" },
-] as const satisfies readonly { to: string; k: Key }[];
+  { to: "/explore", en: "Explore", ar: "استكشف" },
+  { to: "/explore", en: "Artworks", ar: "الأعمال", search: { cat: "Painting" } },
+  { to: "/artists", en: "Artists", ar: "الفنانون" },
+  { to: "/exhibitions", en: "Exhibitions", ar: "المعارض" },
+  { to: "/auctions", en: "Auctions", ar: "المزادات" },
+] as const;
+const more = [
+  { to: "/collections/saudi-banks", en: "Collections", ar: "المجموعات" },
+  { to: "/collections/saudi-banks", en: "Images & digital assets", ar: "الصور والأصول الرقمية" },
+  { to: "/collections/saudi-banks", en: "Saudi banks", ar: "البنوك السعودية" },
+  { to: "/artists", en: "Galleries", ar: "صالات العرض" },
+  { to: "/advisor", en: "Art advisor (AI)", ar: "مستشار الفن الذكي" },
+] as const;
 
 export function SiteShell({ children }: { children: ReactNode }) {
   useDocumentDirection();
   const { favorites } = useStore();
-  const { t, toggle } = useLocale();
+  const { t, toggle, locale } = useLocale();
+  const L = (en: string, ar: string) => (locale === "ar" ? ar : en);
+  const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 24);
+    on(); window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
-          <Link to="/" className="flex items-center gap-2 font-display text-2xl tracking-tight" aria-label="Arwiqa أروقة"><img src={logoMark} alt="" width={36} height={36} className="h-9 w-9 object-contain" /><span>{t("brand.name")}</span></Link>
-          <nav className="hidden gap-6 text-sm lg:flex">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:bg-surface focus:px-4 focus:py-2">{L("Skip to content", "تخطَّ إلى المحتوى")}</a>
+      <header className={`sticky top-0 z-40 border-b transition-all duration-300 ease-editorial ${scrolled ? "border-border bg-background/80 backdrop-blur-md" : "border-transparent bg-background"}`}>
+        <div className={`mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 transition-all duration-300 ${scrolled ? "py-2.5" : "py-4"}`}>
+          <Link to="/" className="flex shrink-0 items-center gap-2 font-display text-2xl tracking-tight" aria-label="Arwiqa أروقة">
+            <img src={logoMark} alt="" width={36} height={36} className={`object-contain transition-all duration-300 ${scrolled ? "h-7 w-7" : "h-9 w-9"}`} /><span>{t("brand.name")}</span>
+          </Link>
+          <nav className="hidden items-center gap-7 text-sm lg:flex" aria-label={L("Main", "الرئيسية")}>
             {nav.map((n) => (
-              <Link key={n.to} to={n.to} className="text-muted-foreground hover:text-foreground" activeProps={{ className: "text-foreground" }}>{t(n.k)}</Link>
+              <Link key={n.en} to={n.to} search={"search" in n ? n.search : undefined} className="text-muted-foreground transition hover:text-foreground" activeOptions={{ includeSearch: true }} activeProps={{ className: "text-foreground" }}>{L(n.en, n.ar)}</Link>
             ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="inline-flex items-center gap-1 text-muted-foreground outline-none hover:text-foreground">{L("More", "المزيد")}<ChevronDown className="h-3.5 w-3.5" aria-hidden /></DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="min-w-56 bg-surface">
+                {more.map((m) => <DropdownMenuItem key={m.en} asChild><Link to={m.to}>{L(m.en, m.ar)}</Link></DropdownMenuItem>)}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
           <div className="flex items-center gap-4 text-sm">
-            <button onClick={toggle} className="flex items-center gap-1 rounded-full border border-border px-3 py-1.5" aria-label="Switch language"><Languages className="h-4 w-4" />{t("lang.switch")}</button>
-            <Link to="/favorites" className="flex items-center gap-1" aria-label={t("nav.favorites")}><Heart className="h-5 w-5" />{favorites.length > 0 && <span>{favorites.length}</span>}</Link>
+            <button type="button" onClick={() => setSearchOpen(true)} aria-label={L("Search", "بحث")} className="hover:text-primary"><Search className="h-5 w-5" /></button>
+            <button onClick={toggle} className={`items-center gap-1 rounded-full border border-border px-3 py-1.5 ${scrolled ? "hidden md:flex" : "flex"}`} aria-label="Switch language"><Languages className="h-4 w-4" />{t("lang.switch")}</button>
+            <Link to="/favorites" className="relative" aria-label={t("nav.favorites")}><Heart className="h-5 w-5" />{favorites.length > 0 && <span className="absolute -end-2 -top-2 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{favorites.length}</span>}</Link>
             <AccountNav />
-            <Link to="/sell" className="hidden rounded-full bg-primary px-4 py-2 text-primary-foreground hover:opacity-90 sm:inline-block">{t("nav.sell")}</Link>
+            <Link to="/sell" className="hidden rounded-full bg-primary px-4 py-2 text-primary-foreground transition hover:bg-primary-hover sm:inline-block">{L("Sell your art", "بع أعمالك")}</Link>
           </div>
         </div>
-        <nav className="flex gap-5 overflow-x-auto px-6 pb-3 text-sm lg:hidden">
-          {nav.map((n) => <Link key={n.to} to={n.to} className="shrink-0 text-muted-foreground" activeProps={{ className: "text-foreground" }}>{t(n.k)}</Link>)}
+        <nav className={`no-scrollbar flex gap-5 overflow-x-auto px-6 text-sm transition-all lg:hidden ${scrolled ? "pb-2" : "pb-3"}`} aria-label={L("Main", "الرئيسية")}>
+          {[...nav, ...more.slice(2)].map((n) => <Link key={n.en} to={n.to} search={"search" in n ? n.search : undefined} className="shrink-0 text-muted-foreground" activeProps={{ className: "text-foreground" }}>{L(n.en, n.ar)}</Link>)}
         </nav>
       </header>
+      <Sheet open={searchOpen} onOpenChange={setSearchOpen}>
+        <SheetContent side="top" className="bg-background pb-10">
+          <SheetTitle className="sr-only">{L("Search", "بحث")}</SheetTitle>
+          <div className="mx-auto max-w-4xl pt-8"><DiscoverySearch autoFocus onNavigate={() => setSearchOpen(false)} /></div>
+        </SheetContent>
+      </Sheet>
       <OverdueNotifier />
-      <main>{children}</main>
+      <main id="main">{children}</main>
       <footer className="mt-24 border-t border-border">
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 text-sm text-muted-foreground md:grid-cols-4">
           <div><img src={logoFull} alt="Arwiqa أروقة" width={96} height={96} loading="lazy" className="h-24 w-24 object-contain" /><p className="mt-2">{t("brand.tagline")}</p></div>
