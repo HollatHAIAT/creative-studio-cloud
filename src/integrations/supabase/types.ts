@@ -796,6 +796,50 @@ export type Database = {
           },
         ]
       }
+      review_revisions: {
+        Row: {
+          action: string
+          author: string
+          created_at: string
+          id: string
+          new_body: string | null
+          new_rating: number | null
+          old_body: string
+          old_rating: number
+          review_id: string
+        }
+        Insert: {
+          action: string
+          author: string
+          created_at?: string
+          id?: string
+          new_body?: string | null
+          new_rating?: number | null
+          old_body: string
+          old_rating: number
+          review_id: string
+        }
+        Update: {
+          action?: string
+          author?: string
+          created_at?: string
+          id?: string
+          new_body?: string | null
+          new_rating?: number | null
+          old_body?: string
+          old_rating?: number
+          review_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_revisions_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_votes: {
         Row: {
           created_at: string
@@ -827,6 +871,7 @@ export type Database = {
           author_name: string
           body: string
           created_at: string
+          edited_at: string | null
           helpful_count: number
           id: string
           listing_id: string
@@ -842,6 +887,7 @@ export type Database = {
           author_name?: string
           body?: string
           created_at?: string
+          edited_at?: string | null
           helpful_count?: number
           id?: string
           listing_id: string
@@ -857,6 +903,7 @@ export type Database = {
           author_name?: string
           body?: string
           created_at?: string
+          edited_at?: string | null
           helpful_count?: number
           id?: string
           listing_id?: string
@@ -1064,6 +1111,11 @@ export type Database = {
       }
       claim_pending_role: { Args: never; Returns: boolean }
       close_expired_blocks: { Args: never; Returns: undefined }
+      delete_my_review: { Args: { _review: string }; Returns: undefined }
+      edit_my_review: {
+        Args: { _body: string; _rating: number; _review: string }
+        Returns: undefined
+      }
       has_purchased: {
         Args: { _listing: string; _uid: string }
         Returns: boolean
