@@ -36,6 +36,7 @@ import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authen
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
 import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
+import { Route as AssetsIndexRouteImport } from './routes/assets.index'
 import { Route as AssetsIdRouteImport } from './routes/assets.$id'
 import { Route as AuctionsIdRouteImport } from './routes/auctions.$id'
 import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.saudi-banks'
@@ -186,6 +187,11 @@ const ArtworkIdRoute = ArtworkIdRouteImport.update({
   path: '/artwork/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AssetsIndexRoute = AssetsIndexRouteImport.update({
+  id: '/assets/',
+  path: '/assets/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AssetsIdRoute = AssetsIdRouteImport.update({
   id: '/assets/$id',
   path: '/assets/$id',
@@ -278,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/assets/': typeof AssetsIndexRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/assets': typeof AssetsIndexRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -358,6 +366,7 @@ export interface FileRoutesById {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/assets/': typeof AssetsIndexRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -399,6 +408,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/assets/'
     | '/admin/emails'
     | '/admin/orders'
     | '/admin/reports'
@@ -438,6 +448,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/assets'
     | '/admin/emails'
     | '/admin/orders'
     | '/admin/reports'
@@ -478,6 +489,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/assets/'
     | '/_authenticated/admin/emails'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/reports'
@@ -508,6 +520,7 @@ export interface RootRouteChildren {
   ArtworkIdRoute: typeof ArtworkIdRoute
   AssetsIdRoute: typeof AssetsIdRoute
   CollectionsSaudiBanksRoute: typeof CollectionsSaudiBanksRoute
+  AssetsIndexRoute: typeof AssetsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -701,6 +714,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtworkIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/assets/': {
+      id: '/assets/'
+      path: '/assets'
+      fullPath: '/assets/'
+      preLoaderRoute: typeof AssetsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/assets/$id': {
       id: '/assets/$id'
       path: '/assets/$id'
@@ -876,6 +896,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtworkIdRoute: ArtworkIdRoute,
   AssetsIdRoute: AssetsIdRoute,
   CollectionsSaudiBanksRoute: CollectionsSaudiBanksRoute,
+  AssetsIndexRoute: AssetsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
