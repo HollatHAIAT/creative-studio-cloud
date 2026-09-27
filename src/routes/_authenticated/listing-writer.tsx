@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { A11yAudit } from "@/components/A11yAudit";
 import { ImagePlus, Copy as CopyIcon, Trash2, Monitor, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/listing-writer")({
 const MAX = 10 * 1024 * 1024;
 
 function ListingWriter() {
+  const previewRef = useRef<HTMLDivElement>(null);
   const { locale } = useLocale();
   const ar = locale === "ar";
   const L = (en: string, a: string) => (ar ? a : en);
@@ -307,16 +309,19 @@ function ListingWriter() {
                   );
                   return (
                     <div dir={isAr ? "rtl" : "ltr"} lang={pvLang} className="space-y-4 p-4">
+                      <div ref={previewRef}>
                       {phone ? (
                         <div aria-label={L("Phone preview", "معاينة الهاتف")} role="group" className="mx-auto w-[360px] max-w-full rounded-[2rem] border-[10px] border-foreground bg-foreground shadow-lg">
                           <div className="mx-auto mb-1 h-1.5 w-16 rounded-full bg-muted-foreground/60" aria-hidden />
                           <div className="flex h-[640px] flex-col overflow-hidden rounded-[1.4rem] bg-background">
                             <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-2 text-xs"><span className="font-display text-sm">أروقة Arwiqa</span><span className="text-muted-foreground">9:41</span></div>
                             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto">{body}</div>
-                            <div className="shrink-0 border-t border-border bg-background p-3"><div className="rounded-sm bg-primary py-2.5 text-center text-sm text-primary-foreground">{isAr ? "اشترِ الآن" : "Buy now"}</div></div>
+                            <div className="shrink-0 border-t border-border bg-background p-3"><button type="button" className="w-full rounded-sm bg-primary py-2.5 text-center text-sm text-primary-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{isAr ? "اشترِ الآن" : "Buy now"}</button></div>
                           </div>
                         </div>
                       ) : body}
+                      </div>
+                      <A11yAudit target={previewRef} watch={[copy, pvDevice, pvLang, preview]} />
                       <div className="rounded-sm bg-muted p-3 text-sm">
                         <p className="mb-1 font-medium">{L("What a screen reader says", "ما يقرؤه قارئ الشاشة")}</p>
                         <p className="text-muted-foreground">{isAr ? "صورة، " : "Image, "}{alt || (isAr ? "بلا وصف" : "no description")}. {isAr ? "عنوان، " : "Heading, "}{t || "—"}.</p>
