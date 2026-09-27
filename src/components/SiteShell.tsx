@@ -44,7 +44,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:bg-surface focus:px-4 focus:py-2">{L("Skip to content", "تخطَّ إلى المحتوى")}</a>
-      <header className={`sticky top-0 z-40 border-b transition-all duration-300 ease-editorial ${scrolled ? "border-border bg-background/80 backdrop-blur-md" : "border-transparent bg-background"}`}>
+      <header className={`sticky top-0 z-40 transition-all duration-300 ease-editorial ${scrolled ? "bg-background/85 backdrop-blur-md" : "bg-background"}`}>
+        <div aria-hidden className="sadu-thin" />
         <div className={`mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 transition-all duration-300 ${scrolled ? "py-2.5" : "py-4"}`}>
           <Link to="/" className="flex shrink-0 items-center gap-2 font-display text-2xl tracking-tight" aria-label="Arwiqa أروقة">
             <img src={logoMark} alt="" width={36} height={36} className={`object-contain transition-all duration-300 ${scrolled ? "h-7 w-7" : "h-9 w-9"}`} /><span>{t("brand.name")}</span>
@@ -80,13 +81,19 @@ export function SiteShell({ children }: { children: ReactNode }) {
       </Sheet>
       <OverdueNotifier />
       <main id="main">{children}</main>
-      <footer className="mt-24 border-t border-border">
-        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 text-sm text-muted-foreground md:grid-cols-4">
-          <div><img src={logoFull} alt="Arwiqa أروقة" width={96} height={96} loading="lazy" className="h-24 w-24 object-contain" /><p className="mt-2">{t("brand.tagline")}</p></div>
+      <footer className="najdi-top mt-32 bg-clay text-primary-foreground">
+        <div className="mx-auto max-w-7xl px-6 pt-12 text-center">
+          <p lang="ar" dir="rtl" className="font-calligraphy text-4xl text-gold md:text-5xl">فنٌّ عالمي بأيادٍ سعودية</p>
+          <p className="mt-2 text-sm opacity-80">{L("Global art, crafted by Saudi hands", "منصة فنية عالمية من قلب المملكة")}</p>
+          <div aria-hidden className="gold-rule mx-auto mt-6 max-w-md" />
+        </div>
+        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 text-sm opacity-90 md:grid-cols-4 [&_.text-foreground]:text-gold">
+          <div><span className="inline-block rounded-full bg-background p-2"><img src={logoFull} alt="Arwiqa أروقة" width={80} height={80} loading="lazy" className="h-20 w-20 object-contain" /></span><p className="mt-2">{t("brand.tagline")}</p></div>
           <div><p className="text-foreground">{t("footer.buy")}</p><p>{t("footer.originals")}</p><p>{t("footer.prints")}</p><p>{t("footer.licenses")}</p></div>
           <div><p className="text-foreground">{t("footer.sell")}</p><p>{t("footer.storefronts")}</p><p>{t("nav.auctions")}</p><p>{t("nav.exhibitions")}</p></div>
           <div><p className="text-foreground">{t("footer.company")}</p><p>{t("footer.about")}</p><p>{t("footer.licensing")}</p><p>{t("footer.support")}</p></div>
         </div>
+        <div aria-hidden className="sadu-band" />
       </footer>
     </div>
   );
@@ -116,7 +123,7 @@ export function ArtCard({ a }: { a: Artwork }) {
   const top = live ? Math.max(0, ...(q.data?.bids ?? []).filter((b) => b.auction_id === auc.id).map((b) => b.amount)) : 0;
   return (
     <Link to="/artwork/$id" params={{ id: a.id }} className="group block">
-      <div className="relative overflow-hidden rounded-sm bg-muted">
+      <div className="arch-soft relative overflow-hidden bg-muted ring-1 ring-gold/40 ring-offset-4 ring-offset-background">
         <img src={a.image} alt={pick(a, "title")} loading="lazy" className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-105" />
         <span className="absolute start-3 top-3 rounded-full bg-background/90 px-3 py-1 text-xs">{t(`cat.${a.category}` as Key)}</span>
         <FavButton id={a.id} className="absolute end-3 top-3" />
@@ -133,10 +140,13 @@ export function ArtCard({ a }: { a: Artwork }) {
 
 export function PageTitle({ eyebrow, title, sub }: { eyebrow: ReactNode; title: ReactNode; sub?: ReactNode }) {
   return (
-    <div className="mx-auto max-w-7xl px-6 pb-10 pt-16">
-      <p className="text-xs uppercase tracking-[0.3em] text-primary">{eyebrow}</p>
-      <h1 className="mt-3 font-display text-5xl md:text-6xl">{title}</h1>
-      {sub && <p className="mt-4 max-w-2xl text-muted-foreground">{sub}</p>}
+    <div className="sadu-bg border-b border-border">
+      <div className="mx-auto max-w-7xl px-6 pb-10 pt-16">
+        <p className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-primary"><span aria-hidden className="inline-block h-2.5 w-2.5 rotate-45 bg-gold" />{eyebrow}</p>
+        <h1 className="mt-3 font-display text-5xl md:text-6xl">{title}</h1>
+        {sub && <p className="mt-4 max-w-2xl text-muted-foreground">{sub}</p>}
+        <div aria-hidden className="sadu-thin mt-8 w-40" />
+      </div>
     </div>
   );
 }
