@@ -7,7 +7,7 @@ import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { ActionButton, useAction } from "@/components/ActionButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { generateListingCopy, reviseListingCopy, type ListingCopy } from "@/lib/listing-copy.functions";
+import { generateListingCopy, reviseListingCopy, reviewMobileCopy, type ListingCopy, type MobileReview } from "@/lib/listing-copy.functions";
 
 export const Route = createFileRoute("/_authenticated/listing-writer")({
   head: () => ({ meta: [
@@ -71,6 +71,17 @@ function ListingWriter() {
   };
   const [pvLang, setPvLang] = useState<"en" | "ar">(ar ? "ar" : "en");
   const [pvDevice, setPvDevice] = useState<"desktop" | "phone">("desktop");
+  const mobCheck = useServerFn(reviewMobileCopy);
+  const [mobile, setMobile] = useState<MobileReview | null>(null);
+  const [mobErr, setMobErr] = useState("");
+  const mob = useAction(async () => {
+    if (!copy) return;
+    setMobErr("");
+    const { tags: _t, ...c } = copy;
+    const r = await mobCheck({ data: { path, copy: c } });
+    if (r.error || !r.review) { setMobErr(r.error ?? ""); throw new Error(r.error); }
+    setMobile(r.review);
+  });
   const rev = useAction(async () => {
     if (!copy) return;
     setRevErr("");
@@ -208,6 +219,44 @@ function ListingWriter() {
               {copy.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">{copy.tags.map((t) => <span key={t} className="rounded-full border border-border px-3 py-1 text-sm">#{t}</span>)}</div>
               )}
+              <div className="space-y-3 rounded-sm border border-border p-4">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                  <div className="min-w-0">
+                    <h2 className="font-medium">{L("Phone readability check", "فحص الوضوح على الهاتف")}</h2>
+                    <p className="text-sm text-muted-foreground">{L("AI checks whether your title, description and alt text read clearly on a phone.", "يتحقق الذكاء الاصطناعي من وضوح العنوان والوصف والنص البديل على الهاتف.")}</p>
+                  </div>
+                  <ActionButton state={mob.state} onClick={() => mob.run()} onRetry={mob.retry}
+                    loadingLabel={L("Checking…", "جارٍ الفحص…")} successLabel={L("Checked", "تم الفحص")}
+                    errorLabel={mobErr || L("Couldn't run the check.", "تعذّر الفحص.")} retryLabel={L("Try again", "حاول مجدداً")}
+                    className="shrink-0 rounded-sm border border-border px-3 py-2 text-sm hover:border-primary">
+                    <Smartphone className="h-4 w-4" aria-hidden />{L("Check on phone", "افحص للهاتف")}
+                  </ActionButton>
+                </div>
+                {mobile && (
+                  <div aria-live="polite" className="space-y-3 text-sm">
+                    <p><span className={`me-2 rounded-sm border px-2 py-0.5 font-medium ${mobile.verdict === "clear" ? "border-success text-success" : "border-warning text-warning"}`}>
+                      {mobile.verdict === "clear" ? L("Clear on phone", "واضح على الهاتف") : L("Needs work", "يحتاج تحسيناً")}</span>{ar ? mobile.summaryAr : mobile.summary}</p>
+                    {mobile.tips.length > 0 && (
+                      <ul className="list-disc space-y-1 ps-5">{mobile.tips.map((tp, i) => (
+                        <li key={i}><span className="font-medium">{tp.field === "title" ? L("Title", "العنوان") : tp.field === "description" ? L("Description", "الوصف") : L("Alt text", "النص البديل")}:</span> {ar ? tp.issueAr : tp.issue}</li>
+                      ))}</ul>
+                    )}
+                    <details className="rounded-sm bg-muted p-3">
+                      <summary className="cursor-pointer font-medium">{L("Suggested concise versions", "الصيغ المختصرة المقترحة")}</summary>
+                      <dl className="mt-2 space-y-2">
+                        {([["Title", "العنوان", mobile.title, mobile.titleAr], ["Description", "الوصف", mobile.description, mobile.descriptionAr], ["Alt text", "النص البديل", mobile.altText, mobile.altTextAr]] as const).map(([en, a, v, va]) => (
+                          <div key={en}><dt className="font-medium">{L(en, a)}</dt><dd dir="ltr" lang="en" className="whitespace-pre-line">{v}</dd><dd dir="rtl" lang="ar" className="whitespace-pre-line">{va}</dd></div>
+                        ))}
+                      </dl>
+                    </details>
+                    <div className="flex flex-wrap gap-3">
+                      <button type="button" onClick={() => { setPrev(copy); setCopy({ ...copy, title: mobile.title, titleAr: mobile.titleAr, description: mobile.description, descriptionAr: mobile.descriptionAr, altText: mobile.altText, altTextAr: mobile.altTextAr }); setPvDevice("phone"); toast.success(L("Suggestions applied", "طُبّقت الاقتراحات")); }}
+                        className="rounded-sm bg-primary px-3 py-2 text-primary-foreground">{L("Apply suggestions", "طبّق الاقتراحات")}</button>
+                      {prev && <button type="button" onClick={() => { setCopy(prev); setPrev(null); }} className="underline">{L("Undo", "تراجع")}</button>}
+                    </div>
+                  </div>
+                )}
+              </div>
               <div className="rounded-sm border border-border">
                 <div className="flex items-center justify-between border-b border-border px-4 py-2 text-sm">
                   <h2 className="font-medium">{L("Listing preview", "معاينة الإعلان")}</h2>

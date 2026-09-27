@@ -179,3 +179,69 @@ Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","issues":[],"iss
     try { return { review: AltReview.parse(JSON.parse(json)) }; }
     catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const MobileReview = z.object({
+  verdict: z.enum(["clear", "needs_work"]),
+  summary: z.string(), summaryAr: z.string(),
+  tips: z.array(z.object({ field: z.enum(["title", "description", "altText"]), issue: z.string(), issueAr: z.string() })).max(10),
+  title: z.string(), titleAr: z.string(),
+  description: z.string(), descriptionAr: z.string(),
+  altText: z.string(), altTextAr: z.string(),
+});
+export type MobileReview = z.infer<typeof MobileReview>;
+
+/** Assesses whether listing copy reads clearly on a phone (with the image for context) and suggests concise bilingual rewrites. */
+export const reviewMobileCopy = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    path: z.string().min(3).max(300).nullable(),
+    copy: z.object({
+      title: z.string().max(200), titleAr: z.string().max(200),
+      description: z.string().max(4000), descriptionAr: z.string().max(4000),
+      altText: z.string().max(1000), altTextAr: z.string().max(1000),
+    }),
+  }).parse(d))
+  .handler(async ({ data, context }): Promise<{ review?: MobileReview; error?: string }> => {
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const content: unknown[] = [];
+    if (data.path) {
+      if (!data.path.startsWith(`${context.userId}/`)) return { error: "You can only check your own uploads." };
+      const { data: blob } = await context.supabase.storage.from("artwork-images").download(data.path);
+      const mime = blob?.type || "image/jpeg";
+      if (blob && blob.size > 0 && /^image\/(png|jpeg|webp|gif)$/.test(mime))
+        content.push({ type: "input_image", image_url: `data:${mime};base64,${Buffer.from(await blob.arrayBuffer()).toString("base64")}` });
+    }
+    const prompt = `You review artwork listings for Arwiqa, a Saudi art marketplace, for how they read on a phone (about 360px wide, title ~2 lines max, description skimmed in the first 2-3 short sentences, screen-reader alt text).
+Assess clarity of the English and Arabic title, description and alt text. Use the image (if provided) only to check the alt text matches what is visible. Never invent facts, sizes, dates or provenance.
+- verdict: "clear" or "needs_work"
+- summary / summaryAr: 1-2 sentences
+- tips: concrete, concise issues, each with field "title" | "description" | "altText", issue (English) and issueAr (Arabic)
+- improved versions: title/titleAr max 50 characters; description/descriptionAr max 90 words with short paragraphs, key point first; altText/altTextAr max 140 characters, objective, no "image of". Arabic must be natural Modern Standard Arabic.
+Current listing: ${JSON.stringify(data.copy)}
+Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","tips":[{"field":"title","issue":"","issueAr":""}],"title":"","titleAr":"","description":"","descriptionAr":"","altText":"","altTextAr":""}`;
+    content.unshift({ type: "input_text", text: prompt });
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Mobile review AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no review." };
+    try { return { review: MobileReview.parse(JSON.parse(json)) }; }
+    catch { return { error: "The AI returned an unreadable answer." }; }
+  });
