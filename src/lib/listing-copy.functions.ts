@@ -245,3 +245,65 @@ Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","tips":[{"field"
     try { return { review: MobileReview.parse(JSON.parse(json)) }; }
     catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const SearchTerms = z.object({
+  summary: z.string(), summaryAr: z.string(),
+  terms: z.array(z.object({ term: z.string(), termAr: z.string(), intent: z.string(), intentAr: z.string() })).max(15),
+  tags: z.array(z.object({ tag: z.string(), tagAr: z.string(), reason: z.string(), reasonAr: z.string() })).max(15),
+});
+export type SearchTerms = z.infer<typeof SearchTerms>;
+
+/** Uses the artwork image and listing copy to predict buyer search terms and suggest listing tags. */
+export const suggestSearchTerms = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    path: z.string().min(3).max(300).nullable(),
+    title: z.string().trim().max(200),
+    description: z.string().trim().max(4000),
+    existingTags: z.array(z.string().max(40)).max(30),
+  }).refine((v) => v.path || v.title || v.description, "Add an image or some listing copy.").parse(d))
+  .handler(async ({ data, context }): Promise<{ result?: SearchTerms; error?: string }> => {
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const content: Array<Record<string, string>> = [];
+    const prompt = `You are a search/SEO specialist for Arwiqa, a Saudi art marketplace with Arabic and English buyers.
+From the artwork image (if given) and the listing copy, identify what buyers would likely type to find this artwork, and suggest listing tags.
+- summary/summaryAr: 1 sentence on who would search for it.
+- terms: 8-12 realistic search phrases (2-5 words) in English with a natural Arabic equivalent termAr, plus intent (e.g. "gift", "majlis decor", "style") and intentAr.
+- tags: 8-12 short lowercase single-concept tags (subject, style, colour, medium, room, mood) with Arabic tagAr and a short reason/reasonAr. Don't repeat existing tags. Only describe what is visible or stated; no invented facts.
+Title: ${JSON.stringify(data.title)}
+Description: ${JSON.stringify(data.description)}
+Existing tags: ${JSON.stringify(data.existingTags)}
+Reply with ONLY JSON: {"summary":"","summaryAr":"","terms":[{"term":"","termAr":"","intent":"","intentAr":""}],"tags":[{"tag":"","tagAr":"","reason":"","reasonAr":""}]}`;
+    content.push({ type: "input_text", text: prompt });
+    if (data.path) {
+      if (!data.path.startsWith(`${context.userId}/`)) return { error: "You can only use your own uploads." };
+      const { data: blob, error } = await context.supabase.storage.from("artwork-images").download(data.path);
+      if (error || !blob) return { error: "The uploaded image couldn't be read. Please upload it again." };
+      const mime = blob.type || "image/jpeg";
+      content.push({ type: "input_image", image_url: `data:${mime};base64,${Buffer.from(await blob.arrayBuffer()).toString("base64")}` });
+    }
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Search terms AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no suggestions." };
+    try { return { result: SearchTerms.parse(JSON.parse(json)) }; }
+    catch { return { error: "The AI returned an unreadable answer." }; }
+  });
