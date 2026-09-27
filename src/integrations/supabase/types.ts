@@ -263,6 +263,8 @@ export type Database = {
           created_at: string
           id: string
           kind: string
+          last_attempt_at: string | null
+          last_error: string | null
           link: string | null
           sent_at: string | null
           status: string
@@ -277,6 +279,8 @@ export type Database = {
           created_at?: string
           id?: string
           kind: string
+          last_attempt_at?: string | null
+          last_error?: string | null
           link?: string | null
           sent_at?: string | null
           status?: string
@@ -291,6 +295,8 @@ export type Database = {
           created_at?: string
           id?: string
           kind?: string
+          last_attempt_at?: string | null
+          last_error?: string | null
           link?: string | null
           sent_at?: string | null
           status?: string
@@ -1270,6 +1276,7 @@ export type Database = {
         Args: { _reason: string; _uid: string; _until: string }
         Returns: string
       }
+      admin_cancel_email: { Args: { _id: string }; Returns: undefined }
       admin_confirm_payment: {
         Args: { _order: string; _ref: string }
         Returns: undefined
@@ -1294,6 +1301,7 @@ export type Database = {
         Args: { _reason: string; _remove: boolean; _review: string }
         Returns: undefined
       }
+      admin_retry_email: { Args: { _id: string }; Returns: undefined }
       admin_set_order_status: {
         Args: { _note?: string; _order_id: string; _status: string }
         Returns: undefined
