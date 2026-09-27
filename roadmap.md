@@ -129,3 +129,5 @@
 - [ ] Button loading/success/error states + clear confirmations (buy, basket, favorite, question, offer)
 - [ ] Test buy/basket/favorite/share/contact journeys on mobile + desktop, sign-in, failed orders, duplicate-submit prevention
 - [ ] Automated tests: button loading/success/error + duplicate-submit prevention
+- [ ] Safe retry for failed requests keeping form data, no duplicate operations
+- [ ] Screen-reader announcements + clear focus on button state changes / confirmations
