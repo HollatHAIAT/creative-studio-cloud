@@ -2,8 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell, FavButton, ArtCard } from "@/components/SiteShell";
-import { artworks, agentsByListing, creatorOf, fmt, MATERIAL_AR, type Variant, type VariantKind } from "@/lib/data";
-import { actions, useListings, useStore } from "@/lib/store";
+import { artworks, creatorOf, fmt, MATERIAL_AR, type Variant, type VariantKind } from "@/lib/data";
+import { actions, useListings } from "@/lib/store";
+import { useListingAgent } from "@/lib/marketplace";
+import { ArtworkActions } from "@/components/ArtworkActions";
+import { Reviews } from "@/components/Reviews";
 import { useNavigate } from "@tanstack/react-router";
 import { useLocale, type Key } from "@/lib/i18n";
 import { auctionFor, statusOf, useNow } from "@/lib/auctions";
@@ -30,7 +33,6 @@ function Detail() {
   const { t, pick, locale, num } = useLocale();
   const all = useListings();
   const a = all.find((x) => x.id === id);
-  const { favorites } = useStore();
   const now = useNow(60_000);
   const navigate = useNavigate();
   const [img, setImg] = useState(0);
@@ -41,15 +43,10 @@ function Detail() {
   const [qty, setQty] = useState(1);
   const [showLic, setShowLic] = useState(false);
   const L = (en: string, ar: string) => (locale === "ar" ? ar : en);
+  const { data: agent } = useListingAgent(id);
   if (!a) return <SiteShell><div className="p-16 text-center"><p>{t("art.unavailable")}</p><Link to="/explore" className="underline">{t("art.back")}</Link></div></SiteShell>;
-  const fav = favorites.includes(a.id);
-  const agent = agentsByListing[a.id];
   const moreByArtist = all.filter((x) => x.creatorId === a.creatorId && x.id !== a.id).slice(0, 4);
   const similar = all.filter((x) => x.category === a.category && x.creatorId !== a.creatorId).slice(0, 4);
-  const share = async () => {
-    const url = window.location.href;
-    try { if (navigator.share) await navigator.share({ title: pick(a, "title"), url }); else { await navigator.clipboard.writeText(url); toast.success(L("Link copied", "نُسخ الرابط")); } } catch { /* cancelled */ }
-  };
   const creator = creatorOf(a.creatorId);
   const auc = auctionFor(a.id);
   const aucLive = auc && now > 0 && statusOf(auc, now) !== "closed";
@@ -68,7 +65,8 @@ function Detail() {
   const soldOut = left !== null && left <= 0;
   const mat = (x: string) => (locale === "ar" ? MATERIAL_AR[x] ?? x : x);
   const label = v ? [t(kindKey[v.kind]), v.size, v.material && mat(v.material), v.license && t(licKey[v.license])].filter(Boolean).join(" · ") : "";
-  const addToCart = () => { if (!v) return; actions.addToCart({ key: `${a.id}:${v.id}`, kind: "artwork", listingId: a.id, variantId: v.id, qty }); toast.success(`${pick(a, "title")} (${label}) — ${t("art.added")}`); };
+  const addToCart = () => { if (!v) return; actions.addToCart({ key: `${a.id}:${v.id}`, kind: "artwork", listingId: a.id, variantId: v.id, qty: v.kind === "print" ? qty : 1 }); };
+  const agentBlocked = !!agent && (!agent.valid || !!(v && !agent.scope.includes(v.kind)));
   const chip = (on: boolean) => `rounded-full border px-4 py-2 text-sm ${on ? "border-primary bg-primary text-primary-foreground" : "border-border"}`;
 
   return (
@@ -122,22 +120,15 @@ function Detail() {
             <div className="mt-4 flex items-center gap-3">
               <span className="text-sm">{L("Quantity", "الكمية")}</span>
               <div className="flex items-center rounded-full border border-border">
-                <button className="px-3 py-1" onClick={() => setQty(Math.max(1, qty - 1))} aria-label="-">−</button>
+                <button className="px-3 py-1" onClick={() => setQty(Math.max(1, qty - 1))} aria-label={L("Decrease quantity", "إنقاص الكمية")}>−</button>
                 <span className="w-8 text-center">{num(qty)}</span>
-                <button className="px-3 py-1" onClick={() => setQty(Math.min(left ?? 10, qty + 1))} aria-label="+">+</button>
+                <button className="px-3 py-1" onClick={() => setQty(Math.min(left ?? 10, qty + 1))} aria-label={L("Increase quantity", "زيادة الكمية")}>+</button>
               </div>
             </div>
           )}
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <button disabled={!v || soldOut} onClick={() => { addToCart(); navigate({ to: "/checkout" }); }} className="rounded-full bg-primary py-4 text-primary-foreground disabled:opacity-50">{t("art.buy")}</button>
-            <button disabled={!v || soldOut} onClick={() => addToCart()} className="rounded-full border border-foreground py-4 disabled:opacity-50">{L("Add to basket", "أضف إلى السلة")}</button>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2 text-sm">
-            <button onClick={() => actions.toggleFavorite(a.id)} className="rounded-full border border-border px-4 py-2">{fav ? L("♥ Saved to favorites", "♥ في المفضلة") : L("♡ Add to favorites", "♡ أضف إلى المفضلة")}</button>
-            <button onClick={share} className="rounded-full border border-border px-4 py-2">{L("Share", "مشاركة")}</button>
-            <button onClick={() => toast.success(L("Your message was sent to the seller", "أُرسلت رسالتك إلى البائع"))} className="rounded-full border border-border px-4 py-2">{L("Ask the seller", "اسأل البائع")}</button>
-            <button onClick={() => toast.success(L("Your offer request was sent", "أُرسل طلب العرض"))} className="rounded-full border border-border px-4 py-2">{L("Make an offer", "قدّم عرضًا")}</button>
-          </div>
+          <ArtworkActions listingId={a.id} title={pick(a, "title")} price={v?.price ?? null} disabled={!v || soldOut || agentBlocked}
+            blockedReason={agentBlocked ? L("This work is sold by an agent whose owner authorization isn't currently valid, so it can't be bought right now.", "يبيع هذا العمل وكيلٌ تفويضه من المالك غير سارٍ حاليًا، لذا لا يمكن شراؤه الآن.") : undefined}
+            onAdd={() => { if (!v) return false; addToCart(); return true; }} />
           <p className="mt-3 text-xs text-muted-foreground">{t("art.cert")}</p>
 
           {auc && aucLive && (
@@ -161,15 +152,15 @@ function Detail() {
             )}
             {agent && (
               <div className="mt-4 border-t border-border pt-4">
-                <p>{pick(agent, "name")} <span className="ms-2 rounded-full bg-accent px-2 py-0.5 text-xs">{L("Authorized agent", "وكيل معتمد")}</span></p>
-                <p className="text-sm text-muted-foreground">{pick(agent, "agency")}</p>
-                <button onClick={() => setShowLic(!showLic)} className="mt-2 text-sm underline">{L("View owner authorization", "عرض تفويض المالك")}</button>
+                <p>{locale === "ar" ? agent.agent_name_ar || agent.agent_name : agent.agent_name} <span className={`ms-2 rounded-full px-2 py-0.5 text-xs ${agent.valid ? "bg-accent" : "bg-destructive/10 text-destructive"}`}>{agent.valid ? L("Authorized agent", "وكيل معتمد") : L("Authorization not valid", "التفويض غير سارٍ")}</span></p>
+                <p className="text-sm text-muted-foreground">{locale === "ar" ? agent.agency_ar || agent.agency : agent.agency}</p>
+                <button aria-expanded={showLic} onClick={() => setShowLic(!showLic)} className="mt-2 text-sm underline">{L("View owner authorization", "عرض تفويض المالك")}</button>
                 {showLic && (
                   <dl className="mt-3 grid grid-cols-2 gap-2 rounded-sm bg-muted p-3 text-sm">
-                    <dt className="text-muted-foreground">{L("Authorization no.", "رقم التفويض")}</dt><dd dir="ltr" className="text-end">{agent.licenseNo}</dd>
-                    <dt className="text-muted-foreground">{L("Valid until", "سارٍ حتى")}</dt><dd className="text-end">{new Date(agent.validUntil).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")}</dd>
-                    <dt className="text-muted-foreground">{L("May sell", "مخوّل ببيع")}</dt><dd className="text-end">{agent.scope.map((x) => t(kindKey[x])).join(" · ")}</dd>
-                    <dt className="text-muted-foreground">{L("Approved by", "بموافقة")}</dt><dd className="text-end">{creator ? pick(creator, "name") : "—"}</dd>
+                    <dt className="text-muted-foreground">{L("Authorization no.", "رقم التفويض")}</dt><dd dir="ltr" className="text-end">{agent.license_no}</dd>
+                    <dt className="text-muted-foreground">{L("Valid until", "سارٍ حتى")}</dt><dd className="text-end">{new Date(agent.valid_until).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")}</dd>
+                    <dt className="text-muted-foreground">{L("May sell", "مخوّل ببيع")}</dt><dd className="text-end">{agent.scope.map((x) => t(kindKey[x as VariantKind])).join(" · ")}</dd>
+                    <dt className="text-muted-foreground">{L("Approved by", "بموافقة")}</dt><dd className="text-end">{agent.owner_approved_at ? `${creator ? pick(creator, "name") : "—"} · ${new Date(agent.owner_approved_at).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")}` : L("Not approved", "غير معتمد")}</dd>
                   </dl>
                 )}
               </div>
@@ -183,6 +174,7 @@ function Detail() {
           </ul>
         </div>
       </div>
+      <Reviews listingId={a.id} />
       {[{ title: L("More from this artist", "المزيد من الفنان"), list: moreByArtist }, { title: L("You may also like", "قد يعجبك أيضًا"), list: similar }].filter((g) => g.list.length).map((g) => (
         <section key={g.title} className="mx-auto max-w-7xl px-6 pt-16">
           <h2 className="font-display text-3xl">{g.title}</h2>
