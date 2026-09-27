@@ -27,6 +27,7 @@ import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
 import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
@@ -131,6 +132,12 @@ const AuthenticatedNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSavedSearchesRoute =
+  AuthenticatedSavedSearchesRouteImport.update({
+    id: '/saved-searches',
+    path: '/saved-searches',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -219,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -251,6 +259,7 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -285,6 +294,7 @@ export interface FileRoutesById {
   '/sell': typeof SellRoute
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/my-reviews'
     | '/notifications'
+    | '/saved-searches'
     | '/settings'
     | '/artists/$id'
     | '/artwork/$id'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/my-reviews'
     | '/notifications'
+    | '/saved-searches'
     | '/settings'
     | '/artists/$id'
     | '/artwork/$id'
@@ -384,6 +396,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/_authenticated/my-reviews'
     | '/_authenticated/notifications'
+    | '/_authenticated/saved-searches'
     | '/_authenticated/settings'
     | '/artists/$id'
     | '/artwork/$id'
@@ -549,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/saved-searches': {
+      id: '/_authenticated/saved-searches'
+      path: '/saved-searches'
+      fullPath: '/saved-searches'
+      preLoaderRoute: typeof AuthenticatedSavedSearchesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -646,6 +666,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyReviewsRoute: typeof AuthenticatedMyReviewsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
@@ -658,6 +679,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyReviewsRoute: AuthenticatedMyReviewsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,

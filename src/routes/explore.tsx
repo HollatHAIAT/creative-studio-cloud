@@ -45,7 +45,12 @@ function Explore() {
             {Object.entries(sorts).map(([k, v]) => <option key={k} value={k}>{t(v)}</option>)}
           </select>
         </div>
-        <p className="mb-6 text-sm text-muted-foreground">{num(list.length)} {t("explore.results")}</p>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">{num(list.length)} {t("explore.results")}</p>
+          <Link to="/saved-searches" search={{ q: q || undefined, cat: cat === "All" ? undefined : cat }} className="inline-flex items-center gap-1.5 rounded-full border border-primary px-4 py-1.5 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
+            <Bell aria-hidden className="h-4 w-4" />{locale === "ar" ? "احفظ هذا البحث ونبّهني" : "Save this search & alert me"}
+          </Link>
+        </div>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">{list.map((a) => <ArtCard key={a.id} a={a} />)}</div>
         {list.length === 0 && <p className="text-muted-foreground">{t("explore.none")}</p>}
       </div>
