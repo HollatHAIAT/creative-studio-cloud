@@ -255,6 +255,51 @@ export type Database = {
         }
         Relationships: []
       }
+      email_outbox: {
+        Row: {
+          attempts: number
+          body: string
+          body_ar: string
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          subject_ar: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          body?: string
+          body_ar?: string
+          created_at?: string
+          id?: string
+          kind: string
+          link?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          subject_ar: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          body?: string
+          body_ar?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          subject_ar?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exhibitions: {
         Row: {
           capacity: number
@@ -471,21 +516,30 @@ export type Database = {
       notification_prefs: {
         Row: {
           bids: boolean
+          email_orders: boolean
+          email_shipping: boolean
           orders: boolean
+          shipping: boolean
           tickets: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
           bids?: boolean
+          email_orders?: boolean
+          email_shipping?: boolean
           orders?: boolean
+          shipping?: boolean
           tickets?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
           bids?: boolean
+          email_orders?: boolean
+          email_shipping?: boolean
           orders?: boolean
+          shipping?: boolean
           tickets?: boolean
           updated_at?: string
           user_id?: string
