@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Bell } from "lucide-react";
 import { useState } from "react";
 import { SiteShell, ArtCard, PageTitle } from "@/components/SiteShell";
 import { categories, minPrice } from "@/lib/data";
@@ -23,7 +24,7 @@ const sorts = { newest: "sort.newest", "price-asc": "sort.priceAsc", "price-desc
 
 function Explore() {
   const all = useListings();
-  const { t, pick, num } = useLocale();
+  const { t, pick, num, locale } = useLocale();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
   const [sort, setSort] = useState<keyof typeof sorts>("newest");
