@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { A11yAudit } from "@/components/A11yAudit";
+import { PublishGate, publishIssues } from "@/components/PublishGate";
 import { ImagePlus, Copy as CopyIcon, Trash2, Monitor, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
@@ -39,10 +40,12 @@ function ListingWriter() {
   const [instr, setInstr] = useState("");
   const [revErr, setRevErr] = useState("");
   const [prev, setPrev] = useState<ListingCopy | null>(null);
-  type Draft = { id: string; title: string; title_ar: string; description: string; description_ar: string; alt_text: string; alt_text_ar: string; tags: string[]; medium: string; image_path: string | null; updated_at: string };
+  type Draft = { id: string; title: string; title_ar: string; description: string; description_ar: string; alt_text: string; alt_text_ar: string; tags: string[]; medium: string; image_path: string | null; updated_at: string; status: string };
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [saveErr, setSaveErr] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [pubErr, setPubErr] = useState("");
   const loadDrafts = async () => {
     const { data } = await supabase.from("listing_drafts").select("*").order("updated_at", { ascending: false }).limit(20);
     setDrafts((data ?? []) as Draft[]);
@@ -61,8 +64,25 @@ function ListingWriter() {
     setDraftId(data.id);
     await loadDrafts();
   });
+  const setStatus = async (status: "draft" | "submitted") => {
+    if (!copy) return;
+    const row = { title: copy.title, title_ar: copy.titleAr, description: copy.description, description_ar: copy.descriptionAr,
+      alt_text: copy.altText, alt_text_ar: copy.altTextAr, tags: copy.tags, medium, image_path: path, status };
+    const q = draftId
+      ? supabase.from("listing_drafts").update(row).eq("id", draftId).select("id").single()
+      : supabase.from("listing_drafts").insert(row).select("id").single();
+    const { data, error } = await q;
+    if (error || !data) {
+      const failed = error?.message.match(/checks failed: (.+)/)?.[1];
+      setPubErr(failed ? L(`Blocked by the server — fix: ${failed}`, `رفضه الخادم — أصلح: ${failed}`) : L("Couldn't submit the listing.", "تعذّر إرسال الإعلان."));
+      throw error ?? new Error("publish");
+    }
+    setDraftId(data.id); setSubmitted(status === "submitted");
+    await loadDrafts();
+  };
+  const publish = useAction(async () => { setPubErr(""); await setStatus("submitted"); });
   const openDraft = (d: Draft) => {
-    setDraftId(d.id); setMedium(d.medium); setPath(d.image_path); setPreview(null); setPrev(null);
+    setDraftId(d.id); setSubmitted(d.status === "submitted"); setMedium(d.medium); setPath(d.image_path); setPreview(null); setPrev(null);
     if (d.image_path) void supabase.storage.from("artwork-images").createSignedUrl(d.image_path, 3600).then(({ data }) => setPreview(data?.signedUrl ?? null));
     setCopy({ title: d.title, titleAr: d.title_ar, description: d.description, descriptionAr: d.description_ar, altText: d.alt_text, altTextAr: d.alt_text_ar, tags: d.tags });
   };
@@ -134,7 +154,7 @@ function ListingWriter() {
       <div className="mx-auto grid max-w-6xl gap-8 px-6 pb-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <section className="space-y-4">
           {preview ? (
-            <figure className="relative overflow-hidden rounded-sm border border-border bg-card">
+            <figure id="f-image" tabIndex={-1} className="relative overflow-hidden rounded-sm border border-border bg-card">
               <img src={preview} alt={copy ? (ar ? copy.altTextAr : copy.altText) : L("Your uploaded artwork", "العمل الذي رفعته")} className="max-h-[420px] w-full object-contain" />
               <button type="button" onClick={removeImage} aria-label={L("Remove image", "إزالة الصورة")} className="absolute end-2 top-2 rounded-sm bg-background/90 p-2 hover:bg-background"><Trash2 className="h-4 w-4" /></button>
             </figure>
@@ -143,7 +163,7 @@ function ListingWriter() {
               <ImagePlus className="h-8 w-8" aria-hidden />
               <span className="font-medium text-foreground">{upload.busy ? L("Uploading…", "جارٍ الرفع…") : L("Choose an artwork photo", "اختر صورة العمل")}</span>
               <span className="text-sm">PNG, JPG, WEBP, GIF · {L("up to 10 MB", "حتى 10 ميجابايت")}</span>
-              <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="sr-only" disabled={upload.busy}
+              <input id="f-image" type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="sr-only" disabled={upload.busy}
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) upload.run(f); e.target.value = ""; }} />
             </label>
           )}
@@ -380,6 +400,9 @@ function ListingWriter() {
                   );
                 })()}
               </div>
+              <PublishGate issues={publishIssues(copy, !!path, { ratio: imgRatio, width: imgW }, L)} submitted={submitted}
+                state={publish.state} error={pubErr} onPublish={() => publish.run()} onRetry={publish.retry}
+                onUnpublish={() => { void setStatus("draft").catch(() => toast.error(L("Couldn't withdraw.", "تعذّر السحب."))); }} />
               <div className="flex flex-wrap items-center gap-3">
                 <ActionButton state={save.state} onClick={() => save.run()} onRetry={save.retry}
                   loadingLabel={L("Saving…", "جارٍ الحفظ…")} successLabel={L("Saved to draft", "حُفظ في المسودة")}
