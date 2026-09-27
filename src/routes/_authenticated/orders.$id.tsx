@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/SiteShell";
 import { TicketQR } from "@/components/TicketQR";
+import { ActionButton, useAction } from "@/components/ActionButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale, type Key } from "@/lib/i18n";
 import { fmtDateTime, itemsOf, useOrder } from "@/lib/orders";
@@ -139,5 +140,47 @@ function OrderPage() {
         </section>
       </div>
     </SiteShell>
+  );
+}
+
+const STEPS: { k: string; en: string; ar: string }[] = [
+  { k: "pending", en: "Order placed", ar: "تم الطلب" },
+  { k: "paid", en: "Payment confirmed", ar: "تأكيد الدفع" },
+  { k: "processing", en: "Preparing", ar: "قيد التجهيز" },
+  { k: "shipped", en: "Shipped", ar: "تم الشحن" },
+  { k: "delivered", en: "Delivered", ar: "تم التسليم" },
+];
+
+function Fulfillment({ status, ar }: { status: string; ar: boolean }) {
+  const idx = STEPS.findIndex((s) => s.k === status);
+  if (idx < 0) return null;
+  return (
+    <ol className="mt-8 grid grid-cols-5 gap-2 print:hidden" aria-label={ar ? "مراحل الطلب" : "Order progress"}>
+      {STEPS.map((s, i) => (
+        <li key={s.k} aria-current={i === idx ? "step" : undefined} className="text-center text-xs">
+          <span className={`mx-auto mb-2 block h-1.5 rounded-full ${i <= idx ? "bg-primary" : "bg-muted"}`} />
+          <span className={i === idx ? "font-semibold" : "text-muted-foreground"}>{ar ? s.ar : s.en}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function RetryPayment({ orderId, ar, error, onDone }: { orderId: string; ar: boolean; error: string | null; onDone: () => void }) {
+  const L = (en: string, a: string) => (ar ? a : en);
+  const act = useAction(async () => {
+    const { error: e } = await supabase.rpc("retry_payment", { _order: orderId });
+    if (e) throw new Error(e.message.includes("TOO_MANY") ? L("Too many attempts — contact support.", "محاولات كثيرة — تواصل مع الدعم.") : e.message);
+    toast.success(L("Payment resubmitted — we'll notify you once confirmed", "أُعيد إرسال الدفع — سنُعلمك عند التأكيد"));
+    onDone();
+  });
+  return (
+    <section role="status" className="mt-6 rounded-sm border border-destructive/40 bg-destructive/5 p-4">
+      <p className="font-medium text-destructive">{L("Payment failed", "فشل الدفع")}{error ? ` — ${error}` : ""}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{L("Your order and details are kept. Retrying won't create a second order.", "طلبك وبياناتك محفوظة. إعادة المحاولة لا تُنشئ طلبًا جديدًا.")}</p>
+      <div className="mt-3"><ActionButton state={act.state} onClick={() => void act.run()} className="rounded-full bg-primary px-5 py-2 text-primary-foreground"
+        loadingLabel={L("Retrying…", "جارٍ إعادة المحاولة…")} successLabel={L("Resubmitted", "أُعيد الإرسال")} errorLabel={act.error instanceof Error ? act.error.message : L("Retry failed", "فشلت المحاولة")}
+        onRetry={() => void act.retry()} retryLabel={L("Try again", "حاول مجددًا")}>{L("Retry payment", "أعد محاولة الدفع")}</ActionButton></div>
+    </section>
   );
 }
