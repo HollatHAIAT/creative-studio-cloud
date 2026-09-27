@@ -15,8 +15,8 @@ export function useAssets() {
         supabase.from("asset_files").select("*"),
       ]);
       const banks: Bank[] = a.data?.length
-        ? a.data.map((x) => ({ id: x.id, name: x.name, nameAr: x.name_ar, code: x.code, color: x.color, founded: x.founded ?? 0 }))
-        : saudiBanks;
+        ? a.data.map((x) => ({ id: x.id, name: x.name, nameAr: x.name_ar, code: x.code, color: x.color, founded: x.founded ?? 0, collection: x.collection, category: x.category, categoryAr: x.category_ar, tags: x.tags ?? [], description: x.description ?? undefined, descriptionAr: x.description_ar ?? undefined, preview: x.preview_url, kind: x.kind }))
+        : saudiBanks.map((b) => ({ ...b, collection: "saudi-banks", category: "Logos", categoryAr: "شعارات", tags: ["bank", "saudi", "logo"], kind: "logo" }));
       return { banks, files: (f.data ?? []) as AssetFile[] };
     },
   });
@@ -28,6 +28,10 @@ export async function resolveBlob(b: Bank, f: AssetFormat, files: AssetFile[]): 
   if (up) {
     const { data, error } = await supabase.storage.from(BUCKET).download(up.storage_path);
     if (!error && data) return { blob: data, name: up.file_name };
+  }
+  if (b.preview) {
+    const res = await fetch(b.preview);
+    if (res.ok) { const blob = await res.blob(); return { blob, name: `${b.id}.${b.preview.split(".").pop()}` }; }
   }
   return { blob: await assetBlob(b, f), name: `${b.id}-placeholder.${f}` };
 }
