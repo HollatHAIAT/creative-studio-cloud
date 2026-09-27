@@ -9,7 +9,7 @@ import { actions, useStore } from "@/lib/store";
 import { fmt } from "@/lib/data";
 import { ruleMessage, useMyListingActivity, useSendInquiry, useSendOffer } from "@/lib/marketplace";
 
-type Props = { listingId: string; title: string; price: number | null; disabled: boolean; blockedReason?: string; onAdd: () => boolean };
+type Props = { listingId: string; title: string; price: number | null; disabled: boolean; blockedReason?: string | undefined; onAdd: () => boolean };
 
 /** Buy / basket / favorite / share / ask / offer — each a complete journey. */
 export function ArtworkActions({ listingId, title, price, disabled, blockedReason, onAdd }: Props) {
@@ -28,7 +28,7 @@ export function ArtworkActions({ listingId, title, price, disabled, blockedReaso
   const mine = useMyListingActivity(listingId, !!user);
   const url = typeof window !== "undefined" ? window.location.href : "";
   const minOffer = price ? Math.ceil(price * 0.5) : 1;
-  const needSignIn = () => { toast.info(L("Sign in to continue", "سجّل الدخول للمتابعة")); navigate({ to: "/auth", search: { next: `/artwork/${listingId}` } as never }); };
+  const needSignIn = () => { toast.info(L("Sign in to continue", "سجّل الدخول للمتابعة")); navigate({ to: "/auth", search: { next: `/artwork/${listingId}` } }); };
   const btn = "inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 hover:border-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary";
   const field = "w-full rounded-sm border border-border bg-background px-3 py-2";
 
@@ -101,7 +101,7 @@ export function ArtworkActions({ listingId, title, price, disabled, blockedReaso
           </form>
         </DialogContent>
       </Dialog>
-      {!user && <p className="mt-2 text-xs text-muted-foreground">{L("Your basket and favorites are saved on this device; ", "تُحفظ سلتك ومفضلتك على هذا الجهاز؛ ")}<Link to="/auth" className="underline">{L("sign in", "سجّل الدخول")}</Link>{L(" to keep them in your account.", " لحفظها في حسابك.")}</p>}
+      {!user && <p className="mt-2 text-xs text-muted-foreground">{L("Your basket and favorites are saved on this device; ", "تُحفظ سلتك ومفضلتك على هذا الجهاز؛ ")}<Link to="/auth" search={{ next: `/artwork/${listingId}` }} className="underline">{L("sign in", "سجّل الدخول")}</Link>{L(" to keep them in your account.", " لحفظها في حسابك.")}</p>}
     </>
   );
 }

@@ -81,7 +81,7 @@ export function Reviews({ listingId }: { listingId: string }) {
           {sum.verified > 0 && <button onClick={() => openFilter(null, true)} className="mt-2 text-sm underline">{L("Show verified purchases only", "اعرض المشتريات الموثّقة فقط")}</button>}
 
           <div className="mt-8 rounded-sm border border-border p-4">
-            {!r.user ? <p className="text-sm">{L("Sign in to review this work.", "سجّل الدخول لتقييم هذا العمل.")} <Link to="/auth" className="underline">{L("Sign in", "تسجيل الدخول")}</Link></p>
+            {!r.user ? <p className="text-sm">{L("Sign in to review this work.", "سجّل الدخول لتقييم هذا العمل.")} <Link to="/auth" search={{ next: `/artwork/${listingId}` }} className="underline">{L("Sign in", "تسجيل الدخول")}</Link></p>
               : mine && !editing ? <p className="text-sm text-muted-foreground">{L("You've reviewed this work.", "قيّمت هذا العمل.")} <Link to="/my-reviews" className="underline">{L("Manage my reviews", "إدارة تقييماتي")}</Link></p>
               : !data?.canReview && !editing ? <p className="text-sm text-muted-foreground">{L("Only buyers who purchased this work can review it.", "التقييم متاح فقط لمن اشترى هذا العمل.")}</p>
               : (
