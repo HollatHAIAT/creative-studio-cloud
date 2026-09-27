@@ -26,6 +26,7 @@ import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as AuthenticatedAltCheckerRouteImport } from './routes/_authenticated/alt-checker'
 import { Route as AuthenticatedListingWriterRouteImport } from './routes/_authenticated/listing-writer'
 import { Route as AuthenticatedMatchExplainerRouteImport } from './routes/_authenticated/match-explainer'
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
@@ -130,6 +131,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAltCheckerRoute = AuthenticatedAltCheckerRouteImport.update({
+  id: '/alt-checker',
+  path: '/alt-checker',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedListingWriterRoute =
   AuthenticatedListingWriterRouteImport.update({
@@ -258,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -336,6 +344,7 @@ export interface FileRoutesById {
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/_authenticated/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/_authenticated/listing-writer': typeof AuthenticatedListingWriterRoute
   '/_authenticated/match-explainer': typeof AuthenticatedMatchExplainerRoute
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
@@ -376,6 +385,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sell'
     | '/unsubscribe'
+    | '/alt-checker'
     | '/listing-writer'
     | '/match-explainer'
     | '/my-reviews'
@@ -414,6 +424,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sell'
     | '/unsubscribe'
+    | '/alt-checker'
     | '/listing-writer'
     | '/match-explainer'
     | '/my-reviews'
@@ -453,6 +464,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sell'
     | '/unsubscribe'
+    | '/_authenticated/alt-checker'
     | '/_authenticated/listing-writer'
     | '/_authenticated/match-explainer'
     | '/_authenticated/my-reviews'
@@ -619,6 +631,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/alt-checker': {
+      id: '/_authenticated/alt-checker'
+      path: '/alt-checker'
+      fullPath: '/alt-checker'
+      preLoaderRoute: typeof AuthenticatedAltCheckerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/listing-writer': {
       id: '/_authenticated/listing-writer'
       path: '/listing-writer'
@@ -763,6 +782,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAltCheckerRoute: typeof AuthenticatedAltCheckerRoute
   AuthenticatedListingWriterRoute: typeof AuthenticatedListingWriterRoute
   AuthenticatedMatchExplainerRoute: typeof AuthenticatedMatchExplainerRoute
   AuthenticatedMyReviewsRoute: typeof AuthenticatedMyReviewsRoute
@@ -780,6 +800,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAltCheckerRoute: AuthenticatedAltCheckerRoute,
   AuthenticatedListingWriterRoute: AuthenticatedListingWriterRoute,
   AuthenticatedMatchExplainerRoute: AuthenticatedMatchExplainerRoute,
   AuthenticatedMyReviewsRoute: AuthenticatedMyReviewsRoute,
