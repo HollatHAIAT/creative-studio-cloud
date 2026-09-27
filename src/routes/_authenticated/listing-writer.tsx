@@ -71,6 +71,9 @@ function ListingWriter() {
   };
   const [pvLang, setPvLang] = useState<"en" | "ar">(ar ? "ar" : "en");
   const [pvDevice, setPvDevice] = useState<"desktop" | "phone">("desktop");
+  const [imgRatio, setImgRatio] = useState<number | null>(null);
+  const [imgW, setImgW] = useState<number | null>(null);
+  useEffect(() => { setImgRatio(null); setImgW(null); }, [preview]);
   const mobCheck = useServerFn(reviewMobileCopy);
   const [mobile, setMobile] = useState<MobileReview | null>(null);
   const [mobErr, setMobErr] = useState("");
