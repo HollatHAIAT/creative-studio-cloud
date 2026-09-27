@@ -67,6 +67,7 @@ ${data.need}`;
     if (!res.ok) {
       const msg = await res.text().catch(() => "");
       if (res.status === 429) return { picks: [], error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { picks: [], error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
       if (res.status === 402) return { picks: [], error: "AI credits are used up for this workspace." };
       return { picks: [], error: `AI request failed (${res.status}). ${msg.slice(0, 200)}` };
     }
