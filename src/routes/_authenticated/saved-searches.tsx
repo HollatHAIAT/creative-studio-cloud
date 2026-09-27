@@ -10,7 +10,7 @@ import { useLocale } from "@/lib/i18n";
 import { ActionButton, useAction } from "@/components/ActionButton";
 
 export const Route = createFileRoute("/_authenticated/saved-searches")({
-  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : undefined, cat: typeof s.cat === "string" ? s.cat : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s['q'] === "string" ? s['q'] : undefined, cat: typeof s['cat'] === "string" ? s['cat'] : undefined }),
   head: () => ({
     meta: [
       { title: "Saved searches — Arwiqa أروقة" },
