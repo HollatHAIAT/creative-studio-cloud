@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { SiteShell, FavButton } from "@/components/SiteShell";
-import { artworks, creatorOf, fmt, MATERIAL_AR, type Variant, type VariantKind } from "@/lib/data";
-import { actions, useListings } from "@/lib/store";
+import { SiteShell, FavButton, ArtCard } from "@/components/SiteShell";
+import { artworks, agentsByListing, creatorOf, fmt, MATERIAL_AR, type Variant, type VariantKind } from "@/lib/data";
+import { actions, useListings, useStore } from "@/lib/store";
 import { useNavigate } from "@tanstack/react-router";
 import { useLocale, type Key } from "@/lib/i18n";
 import { auctionFor, statusOf, useNow } from "@/lib/auctions";
@@ -68,6 +68,7 @@ function Detail() {
   const soldOut = left !== null && left <= 0;
   const mat = (x: string) => (locale === "ar" ? MATERIAL_AR[x] ?? x : x);
   const label = v ? [t(kindKey[v.kind]), v.size, v.material && mat(v.material), v.license && t(licKey[v.license])].filter(Boolean).join(" · ") : "";
+  const addToCart = () => { if (!v) return; actions.addToCart({ key: `${a.id}:${v.id}`, kind: "artwork", listingId: a.id, variantId: v.id, qty }); toast.success(`${pick(a, "title")} (${label}) — ${t("art.added")}`); };
   const chip = (on: boolean) => `rounded-full border px-4 py-2 text-sm ${on ? "border-primary bg-primary text-primary-foreground" : "border-border"}`;
 
   return (
