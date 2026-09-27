@@ -122,3 +122,7 @@
 - [ ] Buyer order details: fulfillment status, shipment tracking links, delivery updates
 - [ ] Seller dashboard: sales, conversion, product performance over time (database-backed)
 - [ ] Seller inventory: stock levels, low-stock alerts, automatic availability
+- [ ] PRIORITY: artwork page buttons full journey (buy now, basket, favorite, share, ask seller, make offer)
+- [ ] Seller dashboard: date-range + product filters, period comparison
+- [ ] Seller CSV exports: sales, conversion, product performance
+- [ ] Inventory adjustment history (change, time, reason)

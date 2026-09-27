@@ -141,7 +141,7 @@ export function Reviews({ listingId }: { listingId: string }) {
                       {!r.user && x.helpful_count > 0 && <span className="text-muted-foreground">{num(x.helpful_count)} {L("found this helpful", "وجدوه مفيدًا")}</span>}
                       {r.user && !own && <button onClick={() => { const why = prompt(L("Why are you reporting this review?", "لماذا تبلّغ عن هذا التقييم؟")); if (why && why.trim().length > 1) void act(() => r.report(x.id, why.trim().slice(0, 500)), L("Reported to moderators", "أُبلغ المشرفون")); }} className="underline">{L("Report", "إبلاغ")}</button>}
                       {canEdit && <button onClick={() => { setEditing(x); setRating(x.rating); setBody(x.body); document.getElementById("rv-body")?.focus(); }} className="underline">{L("Edit", "تعديل")}</button>}
-                      {(data?.isOwner || r.user && data && false) && data.ownerCanReply && !x.owner_reply && (
+                      {data?.isOwner && data.ownerCanReply && !x.owner_reply && (
                         <button onClick={() => { const t = prompt(L("Your response", "ردّك")); if (t && t.trim()) void act(() => r.reply(x.id, t.trim()), L("Response posted", "نُشر الرد")); }} className="underline">{L("Respond", "رد")}</button>
                       )}
                     </div>
