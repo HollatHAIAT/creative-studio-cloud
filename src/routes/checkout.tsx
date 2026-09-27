@@ -45,12 +45,13 @@ function Checkout() {
   const [method, setMethod] = useState<Method>("card");
   const [card, setCard] = useState({ number: "", exp: "", cvc: "" });
   const place = useServerFn(placeOrder);
+  const [idem] = useState(() => crypto.randomUUID());
   const qc = useQueryClient();
   const navigate = useNavigate();
   const email = contact.email || user?.email || "";
 
   const m = useMutation({
-    mutationFn: () => place({ data: { items, contact: { ...contact, email }, address: priced.needsShipping ? addr : null, paymentMethod: method } }),
+    mutationFn: () => place({ data: { items, contact: { ...contact, email }, address: priced.needsShipping ? addr : null, paymentMethod: method, idempotencyKey: idem } }),
     onSuccess: (r) => {
       if (!r.ok) { toast.error(r.error === "SLOT_FULL" ? t("ex.soldOut") : SELL_ERR[r.error]?.[locale === "ar" ? 1 : 0] ?? r.error); return; }
       actions.clearCart();

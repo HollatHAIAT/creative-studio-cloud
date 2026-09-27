@@ -119,3 +119,6 @@
 - [ ] E2E tests: cart+checkout, verified-purchase reviews, moderation appeal
 - [ ] Order/payment hardening: duplicate submits, failed payments, safe recovery
 - [ ] Moderator queue: filters for pending reports, appeals, recent decisions
+- [ ] Buyer order details: fulfillment status, shipment tracking links, delivery updates
+- [ ] Seller dashboard: sales, conversion, product performance over time (database-backed)
+- [ ] Seller inventory: stock levels, low-stock alerts, automatic availability
