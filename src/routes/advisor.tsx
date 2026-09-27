@@ -28,19 +28,39 @@ const EXAMPLES = [
   ["Desert photography I can license for a website", "تصوير صحراوي يمكن ترخيصه لموقع إلكتروني"],
 ] as const;
 
+const PRICES: { en: string; ar: string; min?: number; max?: number }[] = [
+  { en: "Any price", ar: "أي سعر" },
+  { en: "Under $100", ar: "أقل من ١٠٠$", max: 100 },
+  { en: "$100 – 1,000", ar: "١٠٠ – ١٬٠٠٠$", min: 100, max: 1000 },
+  { en: "$1,000 – 5,000", ar: "١٬٠٠٠ – ٥٬٠٠٠$", min: 1000, max: 5000 },
+  { en: "$5,000+", ar: "+٥٬٠٠٠$", min: 5000 },
+];
+
 function Advisor() {
-  const { locale } = useLocale();
+  const { locale, t, pick } = useLocale();
   const ar = locale === "ar";
   const all = useListings();
   const call = useServerFn(recommendArtworks);
   const [need, setNeed] = useState("");
   const [res, setRes] = useState<AdvisorResult | null>(null);
+  const [price, setPrice] = useState(0);
+  const [cats, setCats] = useState<string[]>([]);
+  const [meds, setMeds] = useState<string[]>([]);
+  const mediumOptions = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const a of all) { const k = mediumGroup(a.medium); if (!m.has(k)) m.set(k, a.mediumAr ? mediumGroup(a.mediumAr).replace("،", ",").split(",")[0]!.trim() : k); }
+    return [...m.entries()];
+  }, [all]);
+  const toggle = (list: string[], set: (v: string[]) => void, v: string) => set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
+  const range = PRICES[price]!;
+  const filterCount = (price ? 1 : 0) + cats.length + meds.length;
   const act = useAction(async () => {
-    const r = await call({ data: { need } });
+    const r = await call({ data: { need, categories: cats, mediums: meds, ...(range.min != null ? { minPrice: range.min } : {}), ...(range.max != null ? { maxPrice: range.max } : {}) } });
     setRes(r);
     if (r.error) throw new Error(r.error);
   });
   const picks = (res?.picks ?? []).map((p) => ({ p, a: all.find((x) => x.id === p.id) })).filter((x) => x.a);
+  const chip = (on: boolean) => `rounded-full border px-3 py-1 text-sm transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-foreground"}`;
 
   return (
     <SiteShell>
@@ -58,6 +78,24 @@ function Advisor() {
                 className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground hover:border-primary hover:text-foreground">{ar ? ex[1] : ex[0]}</button>
             ))}
           </div>
+          <fieldset className="space-y-4 border-t border-border pt-5">
+            <legend className="flex w-full items-center justify-between pt-5 text-sm font-medium">
+              <span>{ar ? "تضييق النتائج" : "Narrow the results"}{filterCount > 0 && <span className="ms-2 text-muted-foreground">({filterCount})</span>}</span>
+            </legend>
+            <div role="group" aria-label={ar ? "السعر" : "Price"} className="flex flex-wrap items-center gap-2">
+              <span className="w-20 text-xs uppercase tracking-wider text-muted-foreground">{ar ? "السعر" : "Price"}</span>
+              {PRICES.map((p, i) => <button key={p.en} type="button" aria-pressed={price === i} onClick={() => setPrice(i)} className={chip(price === i)}>{ar ? p.ar : p.en}</button>)}
+            </div>
+            <div role="group" aria-label={ar ? "الفئة" : "Category"} className="flex flex-wrap items-center gap-2">
+              <span className="w-20 text-xs uppercase tracking-wider text-muted-foreground">{ar ? "الفئة" : "Category"}</span>
+              {categories.map((c) => <button key={c} type="button" aria-pressed={cats.includes(c)} onClick={() => toggle(cats, setCats, c)} className={chip(cats.includes(c))}>{t(`cat.${c}` as Key)}</button>)}
+            </div>
+            <div role="group" aria-label={ar ? "الخامة" : "Medium"} className="flex flex-wrap items-center gap-2">
+              <span className="w-20 text-xs uppercase tracking-wider text-muted-foreground">{ar ? "الخامة" : "Medium"}</span>
+              {mediumOptions.map(([k, arLabel]) => <button key={k} type="button" aria-pressed={meds.includes(k)} onClick={() => toggle(meds, setMeds, k)} className={chip(meds.includes(k))}>{ar ? arLabel : k}</button>)}
+            </div>
+            {filterCount > 0 && <button type="button" onClick={() => { setPrice(0); setCats([]); setMeds([]); }} className="text-sm underline">{ar ? "مسح الفلاتر" : "Clear filters"}</button>}
+          </fieldset>
           <ActionButton type="submit" state={act.state} disabled={need.trim().length < 3}
             loadingLabel={ar ? "جارٍ البحث…" : "Finding matches…"} successLabel={ar ? "تم" : "Done"}
             errorLabel={res?.error ?? (ar ? "تعذّر الحصول على اقتراحات" : "Couldn't get suggestions")}

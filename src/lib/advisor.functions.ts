@@ -87,6 +87,6 @@ ${data.need}`;
     if (!json) return { picks: [], error: "The advisor returned no answer." };
     try {
       const parsed = JSON.parse(json) as { picks?: Pick[] };
-      return { picks: (parsed.picks ?? []).filter((p) => live.has(p.id)).slice(0, 4) };
+      return { picks: (parsed.picks ?? []).filter((p) => catalog.some((c) => c.id === p.id)).slice(0, 4) };
     } catch { return { picks: [], error: "The advisor returned an unreadable answer." }; }
   });
