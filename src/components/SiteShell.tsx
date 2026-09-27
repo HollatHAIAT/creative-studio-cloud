@@ -125,8 +125,8 @@ export function ArtCard({ a }: { a: Artwork }) {
     <Link to="/artwork/$id" params={{ id: a.id }} className="group block">
       <div className="arch-soft relative overflow-hidden bg-muted ring-1 ring-gold/40 ring-offset-4 ring-offset-background">
         <img src={a.image} alt={pick(a, "title")} loading="lazy" className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-105" />
-        <span className="absolute start-3 top-3 rounded-full bg-background/90 px-3 py-1 text-xs">{t(`cat.${a.category}` as Key)}</span>
-        <FavButton id={a.id} className="absolute end-3 top-3" />
+        <span className="absolute bottom-3 start-3 rounded-full bg-background/90 px-3 py-1 text-xs">{t(`cat.${a.category}` as Key)}</span>
+        <FavButton id={a.id} className="absolute bottom-3 end-3" />
       </div>
       <div className="mt-3 flex items-start justify-between gap-2">
         <div><p className="font-display text-lg">{pick(a, "title")}</p><p className="text-sm text-muted-foreground">{pick(a, "artist")}</p></div>

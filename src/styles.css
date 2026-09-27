@@ -231,8 +231,8 @@ html[lang="ar"] h1.font-display, html[lang="ar"] h2.font-display { font-family: 
 /* Faint sadu-inspired geometric background */
 @utility sadu-bg {
   background-image:
-    linear-gradient(45deg, color-mix(in oklab, var(--clay) 7%, transparent) 25%, transparent 25% 75%, color-mix(in oklab, var(--clay) 7%, transparent) 75%),
-    linear-gradient(45deg, color-mix(in oklab, var(--clay) 7%, transparent) 25%, transparent 25% 75%, color-mix(in oklab, var(--clay) 7%, transparent) 75%);
+    linear-gradient(45deg, color-mix(in oklab, var(--clay) 4%, transparent) 25%, transparent 25% 75%, color-mix(in oklab, var(--clay) 4%, transparent) 75%),
+    linear-gradient(45deg, color-mix(in oklab, var(--clay) 4%, transparent) 25%, transparent 25% 75%, color-mix(in oklab, var(--clay) 4%, transparent) 75%);
   background-size: 28px 28px; background-position: 0 0, 14px 14px;
 }
 /* Hijazi rawshan / arch frame for artwork images */
