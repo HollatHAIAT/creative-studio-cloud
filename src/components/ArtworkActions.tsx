@@ -13,7 +13,7 @@ type Props = { listingId: string; title: string; price: number | null; disabled:
 
 /** Buy / basket / favorite / share / ask / offer — each a complete journey. */
 export function ArtworkActions({ listingId, title, price, disabled, blockedReason, onAdd }: Props) {
-  const { locale, num } = useLocale();
+  const { locale } = useLocale();
   const ar = locale === "ar";
   const L = (en: string, a: string) => (ar ? a : en);
   const { user } = useSession();
@@ -96,7 +96,7 @@ export function ArtworkActions({ listingId, title, price, disabled, blockedReaso
             <input id="offer-amt" type="number" inputMode="decimal" min={minOffer} max={price ? price - 1 : undefined} required value={amount} onChange={(e) => setAmount(e.target.value)} className={`${field} mt-1`} dir="ltr" />
             <label htmlFor="offer-msg" className="mt-3 block text-sm">{L("Message (optional)", "رسالة (اختياري)")}</label>
             <textarea id="offer-msg" maxLength={1000} rows={3} value={msg} onChange={(e) => setMsg(e.target.value)} className={`${field} mt-1`} />
-            <p className="mt-2 text-xs text-muted-foreground">{num(minOffer) && L("An accepted offer is added to your basket at the agreed price by the seller.", "عند قبول العرض يرسل لك البائع السعر المتفق عليه.")}</p>
+            <p className="mt-2 text-xs text-muted-foreground">{L("If the seller accepts, you'll be notified here and in your notifications to complete the purchase.", "إذا قبل البائع ستصلك إشعارات هنا لإتمام الشراء.")}</p>
             <button disabled={offer.isPending} className="mt-3 rounded-full bg-primary px-5 py-2 text-primary-foreground disabled:opacity-50">{L("Send offer", "إرسال العرض")}</button>
           </form>
         </DialogContent>
