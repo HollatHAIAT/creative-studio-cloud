@@ -150,3 +150,45 @@ html[lang="ar"] { --font-display: "Amiri", "Fraunces", serif; --font-sans: "IBM 
 html[lang="ar"] body { font-family: var(--font-sans); }
 html[lang="ar"] .font-display { font-family: "Amiri", serif; }
 html[lang="ar"] [class*="tracking-"] { letter-spacing: 0; }
+
+/* ============ Arwiqa editorial design tokens ============ */
+:root {
+  --surface: oklch(0.99 0.006 85);
+  --ink: oklch(0.2 0.02 60);
+  --ink-muted: oklch(0.48 0.02 60);
+  --primary-hover: oklch(0.5 0.15 40);
+  --success: oklch(0.55 0.12 150);
+  --warning: oklch(0.72 0.14 75);
+  --info: oklch(0.5 0.08 230);
+  --live: oklch(0.58 0.19 30);
+  --shadow-float: 0 18px 40px -18px color-mix(in oklab, var(--ink) 35%, transparent);
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-slow: 700ms;
+}
+@theme inline {
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-primary-hover: var(--primary-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-live: var(--live);
+  --shadow-float: var(--shadow-float);
+  --ease-editorial: var(--ease-editorial);
+}
+
+@keyframes live-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.8); } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@utility live-dot { width: 0.5rem; height: 0.5rem; border-radius: 9999px; background: var(--live); animation: live-pulse 1.8s ease-in-out infinite; }
+@utility reveal { opacity: 0; transform: translateY(18px); transition: opacity var(--dur-slow) var(--ease-editorial), transform var(--dur-slow) var(--ease-editorial); }
+@utility reveal-in { opacity: 1; transform: none; }
+@utility rise-in { animation: rise-in var(--dur-slow) var(--ease-editorial) both; }
+@utility no-scrollbar { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
+}
