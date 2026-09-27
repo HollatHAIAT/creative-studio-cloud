@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { ActionButton, useAction } from "@/components/ActionButton";
@@ -17,7 +18,7 @@ describe("ActionButton", () => {
     const btn = screen.getByRole("button", { name: "Send" });
     fireEvent.click(btn); fireEvent.click(btn); fireEvent.click(btn);
     expect(fn).toHaveBeenCalledTimes(1);
-    expect(btn).toBeDisabled();
+    expect((btn as HTMLButtonElement).disabled).toBe(true);
     expect(btn.getAttribute("aria-busy")).toBe("true");
     await act(async () => { d.res(); await d.p; });
     expect(screen.getByRole("button", { name: /Sent/ })).toBeTruthy();
