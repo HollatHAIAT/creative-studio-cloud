@@ -51,7 +51,7 @@ function MatchExplainer() {
   };
   const loadListing = (id: string) => {
     const l = all.find((x) => x.id === id); if (!l) return;
-    setA({ title: ar ? l.titleAr : l.title, artist: creatorOf(l.creatorId)?.name ?? "", category: l.category, medium: l.medium, price: String(minPrice(l)), description: l.description ?? "" });
+    setA({ title: (ar ? l.titleAr : l.title) ?? l.title, artist: creatorOf(l.creatorId)?.name ?? "", category: l.category, medium: l.medium, price: String(minPrice(l)), description: (ar ? l.descriptionAr : l.description) ?? l.description });
   };
 
   const act = useAction(async () => {
