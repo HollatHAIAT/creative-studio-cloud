@@ -1,3 +1,4 @@
+import { InviteDeliveryPanel } from "@/components/InviteDeliveryPanel";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -127,6 +128,7 @@ function AdminEmails() {
             </div>
           )}
         <p className="text-xs text-muted-foreground">{L("No sender domain is set up yet, so emails stay queued until one is configured.", "لم يُضبط نطاق مرسل بعد، لذا تبقى الرسائل في الانتظار حتى يتم ضبطه.")}</p>
+        <InviteDeliveryPanel />
       </div>
     </SiteShell>
   );
