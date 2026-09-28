@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.log_bid(), public.auction_order_paid() FROM PUBLIC, anon, authenticated;
