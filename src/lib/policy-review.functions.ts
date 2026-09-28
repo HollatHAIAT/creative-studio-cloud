@@ -290,3 +290,58 @@ Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","requests":[{"re
     if (!json) return { error: "The AI returned no assessment." };
     try { return { result: VersionCompare.parse(JSON.parse(json)) }; } catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const RecurringResult = z.object({
+  summary: z.string().default(""), summaryAr: z.string().default(""),
+  issues: z.array(z.object({ issue: z.string(), issueAr: z.string().default(""), field: z.string().default("other"),
+    versions: z.array(z.number()).default([]), status: z.string().default("unresolved"), evidence: z.string().default(""), evidenceAr: z.string().default("") })).default([]),
+  checks: z.array(z.object({ check: z.string(), checkAr: z.string().default(""), field: z.string().default("other"), priority: z.string().default("medium") })).default([]),
+});
+export type RecurringIssuesResult = z.infer<typeof RecurringResult>;
+
+/** Staff-only: reads every version, reviewer note and private field comment, and asks the AI which issues keep coming back. */
+export const findRecurringIssues = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ draftId: z.string().uuid(), extra: z.string().trim().max(3000).default("") }).parse(d))
+  .handler(async ({ data, context }): Promise<{ result?: RecurringIssuesResult; error?: string }> => {
+    try { await assertStaff(context.supabase as never, context.userId); } catch { return { error: "Staff only." }; }
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const sb = context.supabase as any;
+    const [{ data: vs }, { data: cs }] = await Promise.all([
+      sb.from("listing_draft_versions").select("version,title,title_ar,description,description_ar,alt_text,alt_text_ar,tags,medium,image_path,previous_review_note").eq("draft_id", data.draftId).order("version").limit(20),
+      sb.from("listing_version_comments").select("version,field,body,created_at").eq("draft_id", data.draftId).order("created_at").limit(200),
+    ]);
+    const versions = (vs ?? []) as any[];
+    if (!versions.length) return { error: "This listing has no revision history yet." };
+    const history = versions.map((v, i) => ({ version: v.version, reviewerNoteBeforeThis: v.previous_review_note, title: v.title, titleAr: v.title_ar,
+      description: v.description, descriptionAr: v.description_ar, altText: v.alt_text, altTextAr: v.alt_text_ar, tags: v.tags, medium: v.medium,
+      imageChanged: i > 0 ? v.image_path !== versions[i - 1].image_path : null }));
+    const prompt = `You assist moderators at Arwiqa, a Saudi-based global art marketplace. Below is a listing's full revision history (each version, the reviewer note that preceded it) and moderators' PRIVATE field comments.
+Find RECURRING issues: problems raised in more than one note/comment or that reappear across versions. For each give: issue (EN) + issueAr, field (title|description|alt_text|tags|medium|image|price|other), versions where it appears, status ("unresolved" if still present in the latest version, "resolved" if fixed, "unclear" if it can't be judged from text, e.g. image content), short evidence quoting the text (EN + AR).
+Then suggest 3–6 focused checks for the NEXT review, highest risk first, each with field and priority (high|medium|low). Base everything only on the provided material; do not invent new policy requirements. If nothing recurs, return an empty issues array and still suggest checks for any unresolved notes.
+Give a 1–2 sentence summary (EN + AR).
+${data.extra ? `Moderator's extra context: ${JSON.stringify(data.extra)}\n` : ""}HISTORY: ${JSON.stringify(history)}
+PRIVATE COMMENTS: ${JSON.stringify(cs ?? [])}
+Reply with ONLY JSON: {"summary":"","summaryAr":"","issues":[{"issue":"","issueAr":"","field":"","versions":[1],"status":"","evidence":"","evidenceAr":""}],"checks":[{"check":"","checkAr":"","field":"","priority":""}]}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({ model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "medium", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [{ type: "input_text", text: prompt }] }] }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Recurring issues AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no analysis." };
+    try { const r = RecurringResult.parse(JSON.parse(json)); return { result: { ...r, checks: r.checks.slice(0, 6) } }; } catch { return { error: "The AI returned an unreadable answer." }; }
+  });
