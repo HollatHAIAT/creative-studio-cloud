@@ -16,3 +16,5 @@
 - Staff = admin or moderator role (`is_staff`); staff UI lives under `/_authenticated/admin/*`. Why: one role check for ops screens.
 - Realtime bids use one shared channel via BidsLiveProvider in __root; components read the query cache. Why: one channel per card caused the after-subscribe crash.
 - Saved-search emails: per-search `email_frequency` (off/instant/daily/weekly), global `notification_prefs.email_saved_searches`, digests built by pg_cron via `send_saved_search_digests`; `unsubscribe_saved_search_emails(token)` is intentionally callable signed-out. Why: one-click unsubscribe must work from any inbox; the token is an unguessable UUID.
+
+- Security-definer lookups about a person or draft (has_role, is_blocked, draft_owner, active_reviewer, platform_validation_issues) answer only for the caller themself or staff (caller_is_staff). Why: signed-in users could otherwise probe other users' roles, suspensions and reviewer invitations. The remaining linter warnings on security-definer functions are intentional: each function checks the caller inside.

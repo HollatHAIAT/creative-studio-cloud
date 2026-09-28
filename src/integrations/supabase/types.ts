@@ -1809,6 +1809,7 @@ export type Database = {
       }
       auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
       award_auction: { Args: { _auction: string }; Returns: undefined }
+      caller_is_staff: { Args: never; Returns: boolean }
       can_manage_auction: { Args: { _auction: string }; Returns: boolean }
       can_review: { Args: { _listing: string }; Returns: boolean }
       can_view_private_comments: { Args: { _uid: string }; Returns: boolean }
