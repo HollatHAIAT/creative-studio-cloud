@@ -685,14 +685,27 @@ export type Database = {
           alt_text: string
           alt_text_ar: string
           category: string | null
+          co_owners: Json
+          condition_grade: string | null
+          condition_report: string
+          consignment_terms: string
           created_at: string
           description: string
           description_ar: string
+          era: string
+          export_permit_ref: string
+          heritage_type: string | null
           id: string
           image_path: string | null
+          is_heritage: boolean
           medium: string
+          origin_region: string
+          owner_approved_at: string | null
           owner_declared: boolean
+          owner_email: string | null
+          owner_name: string
           price: number | null
+          provenance: Json
           published_at: string | null
           published_by: string | null
           published_listing_id: string | null
@@ -700,6 +713,7 @@ export type Database = {
           review_note: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          seller_role: string
           status: string
           submitted_at: string | null
           tags: string[]
@@ -712,14 +726,27 @@ export type Database = {
           alt_text?: string
           alt_text_ar?: string
           category?: string | null
+          co_owners?: Json
+          condition_grade?: string | null
+          condition_report?: string
+          consignment_terms?: string
           created_at?: string
           description?: string
           description_ar?: string
+          era?: string
+          export_permit_ref?: string
+          heritage_type?: string | null
           id?: string
           image_path?: string | null
+          is_heritage?: boolean
           medium?: string
+          origin_region?: string
+          owner_approved_at?: string | null
           owner_declared?: boolean
+          owner_email?: string | null
+          owner_name?: string
           price?: number | null
+          provenance?: Json
           published_at?: string | null
           published_by?: string | null
           published_listing_id?: string | null
@@ -727,6 +754,7 @@ export type Database = {
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          seller_role?: string
           status?: string
           submitted_at?: string | null
           tags?: string[]
@@ -739,14 +767,27 @@ export type Database = {
           alt_text?: string
           alt_text_ar?: string
           category?: string | null
+          co_owners?: Json
+          condition_grade?: string | null
+          condition_report?: string
+          consignment_terms?: string
           created_at?: string
           description?: string
           description_ar?: string
+          era?: string
+          export_permit_ref?: string
+          heritage_type?: string | null
           id?: string
           image_path?: string | null
+          is_heritage?: boolean
           medium?: string
+          origin_region?: string
+          owner_approved_at?: string | null
           owner_declared?: boolean
+          owner_email?: string | null
+          owner_name?: string
           price?: number | null
+          provenance?: Json
           published_at?: string | null
           published_by?: string | null
           published_listing_id?: string | null
@@ -754,6 +795,7 @@ export type Database = {
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          seller_role?: string
           status?: string
           submitted_at?: string | null
           tags?: string[]
@@ -1817,6 +1859,7 @@ export type Database = {
         Args: { _kind: string; _listing: string }
         Returns: string
       }
+      approve_listing_as_owner: { Args: { _draft: string }; Returns: undefined }
       auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
       award_auction: { Args: { _auction: string }; Returns: undefined }
       caller_is_staff: { Args: never; Returns: boolean }
@@ -1889,6 +1932,10 @@ export type Database = {
           _kind: string
         }
         Returns: undefined
+      }
+      ownership_heritage_issues: {
+        Args: { d: Database["public"]["Tables"]["listing_drafts"]["Row"] }
+        Returns: string[]
       }
       pass_auction_to_next: { Args: { _auction: string }; Returns: undefined }
       platform_validation_issues: { Args: { _id: string }; Returns: string[] }

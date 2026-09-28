@@ -64,6 +64,7 @@ export function AccountNav() {
               <DropdownMenuItem asChild><Link to="/search-terms">{locale === "ar" ? "كلمات البحث والوسوم" : "Search terms & tags"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/crop-helper">{locale === "ar" ? "مساعد القص للهاتف" : "Mobile crop helper"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/revision-check">{locale === "ar" ? "فحص التعديلات المطلوبة" : "Revision check"}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/owner-approvals">{locale === "ar" ? "موافقات المالك" : "Owner approvals"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/review-invites">{locale === "ar" ? "دعوات المراجعة" : "Review invitations"}</Link></DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild><Link to="/orders">{t("nav.orders")}</Link></DropdownMenuItem>
