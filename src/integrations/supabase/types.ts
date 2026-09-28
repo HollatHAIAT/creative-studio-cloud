@@ -711,6 +711,44 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_version_comments: {
+        Row: {
+          author: string
+          body: string
+          created_at: string
+          draft_id: string
+          field: string
+          id: string
+          version: number
+        }
+        Insert: {
+          author?: string
+          body: string
+          created_at?: string
+          draft_id: string
+          field: string
+          id?: string
+          version: number
+        }
+        Update: {
+          author?: string
+          body?: string
+          created_at?: string
+          draft_id?: string
+          field?: string
+          id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_version_comments_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "listing_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings: {
         Row: {
           category: string
