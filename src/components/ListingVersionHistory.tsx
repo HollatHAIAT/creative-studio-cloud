@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { ResubmissionCheck } from "./ResubmissionCheck";
+import { RecurringIssues } from "./RecurringIssues";
 import { FieldComments, useVersionComments } from "./FieldComments";
 
 type V = { id: string; version: number; title: string; title_ar: string; description: string; description_ar: string; alt_text: string; alt_text_ar: string; tags: string[]; medium: string; image_path: string | null; previous_review_note: string | null; created_at: string };
@@ -86,6 +87,7 @@ export function ListingVersionHistory({ draftId }: { draftId: string }) {
           <div><dt className="font-medium">{L("Image", "الصورة")}</dt><dd>{imageChanged ? L("A new image was uploaded.", "رُفعت صورة جديدة.") : L("unchanged", "بلا تغيير")}</dd>{imageChanged && <FieldComments draftId={draftId} version={cur!.version} field="image" comments={cs} />}</div>
         </dl>
         <ResubmissionCheck key={cur!.id} draftId={draftId} version={cur!.version} initialNotes={cur!.previous_review_note ?? ""} />
+        <RecurringIssues key={`ri-${draftId}`} draftId={draftId} />
       </>)}
     </section>
   );
