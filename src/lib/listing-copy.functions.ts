@@ -427,3 +427,71 @@ ${data.context ? `Seller's context (use only to name things correctly, never to 
       return { alt: { ...a, altText: clip(a.altText), altTextAr: clip(a.altTextAr), notes: a.notes.slice(0, 3), notesAr: a.notesAr.slice(0, 3) } };
     } catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const AltComplement = z.object({
+  revision: z.string(), revisionAr: z.string().default(""),
+  repeats: z.array(z.string()).max(10).default([]), repeatsAr: z.array(z.string()).max(10).default([]),
+  adds: z.array(z.string()).max(8).default([]), addsAr: z.array(z.string()).max(8).default([]),
+  rationale: z.string().default(""), rationaleAr: z.string().default(""),
+});
+export type AltComplement = z.infer<typeof AltComplement>;
+
+/** Suggests a concise, accurate alt-text revision that complements (doesn't repeat) the listing title and description. */
+export const complementAltText = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    path: z.string().min(3).max(300),
+    altText: z.string().trim().max(1000).default(""),
+    title: z.string().trim().min(1).max(200),
+    description: z.string().trim().max(4000).default(""),
+  }).parse(d))
+  .handler(async ({ data, context }): Promise<{ result?: AltComplement; error?: string }> => {
+    if (!data.path.startsWith(`${context.userId}/`)) return { error: "You can only use your own uploads." };
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const { data: blob, error: dlErr } = await context.supabase.storage.from("artwork-images").download(data.path);
+    if (dlErr || !blob || blob.size === 0) return { error: "The uploaded image couldn't be read. Please upload it again." };
+    const mime = blob.type || "image/jpeg";
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(mime)) return { error: "Please upload a PNG, JPG, WEBP or GIF image." };
+    const b64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
+    const prompt = `You revise artwork alt text for Arwiqa, a Saudi art marketplace. A screen reader reads the alt text right before the listing title and description, so the alt text must COMPLEMENT that copy, not repeat it.
+Rules for the revision:
+- Describe only what is visible in the image: subject, composition, key colours, visible text/calligraphy (transcribe short text).
+- Do NOT repeat the title, the artist name, the medium or facts already stated in the description. No price, praise or claims you can't see.
+- Keep what is accurate in the saved alt text; fix what is wrong. Max 140 characters. Never start with "image of"/"picture of".
+- revisionAr: natural Arabic equivalent, max 140 characters.
+Also return:
+- repeats / repeatsAr: words or phrases in the SAVED alt text that duplicate the title or description (empty if none).
+- adds / addsAr: short notes of the visual information the revision adds that the listing copy doesn't cover.
+- rationale / rationaleAr: one sentence explaining the change.
+TITLE: ${JSON.stringify(data.title)}
+DESCRIPTION: ${JSON.stringify(data.description)}
+SAVED ALT TEXT: ${JSON.stringify(data.altText || "(none)")}
+Reply with ONLY JSON: {"revision":"","revisionAr":"","repeats":[],"repeatsAr":[],"adds":[],"addsAr":[],"rationale":"","rationaleAr":""}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [
+          { type: "input_text", text: prompt },
+          { type: "input_image", image_url: `data:${mime};base64,${b64}` },
+        ] }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Alt complement AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no suggestion." };
+    try { return { result: AltComplement.parse(JSON.parse(json)) }; }
+    catch { return { error: "The AI returned an unreadable answer." }; }
+  });

@@ -1,3 +1,4 @@
+import { AltComplement } from "@/components/AltComplement";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -167,6 +168,7 @@ function AltChecker() {
               </button>
             </>
           )}
+          <AltComplement path={path} alt={alt} title={title} description={desc} onUse={setAlt} />
         </section>
       </div>
     </SiteShell>
