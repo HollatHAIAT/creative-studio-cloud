@@ -227,6 +227,7 @@ function Collaborators({ draftId, invite, mode }: { draftId: string; invite: boo
           <p className="text-xs text-muted-foreground">{L("Reviewers sign in with the invited email and find it under “Review invitations”. They can't sell or manage the listing.", "يدخل المراجع بالبريد المدعو ويجدها في «دعوات المراجعة». لا يستطيع البيع أو إدارة الإعلان.")}</p>
         </div>
       )}
+      <ChecklistProgress draftId={draftId} canEdit />
       <div className="space-y-2">
         <h3 className="font-medium">{L("Comments", "التعليقات")}</h3>
         <ul className="space-y-2">
