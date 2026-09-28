@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "sonner";
 import { BidsLiveProvider } from "@/components/BidsLiveProvider";
+import { BrushTransition } from "@/components/BrushTransition";
 import { AccountSync } from "@/lib/marketplace";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -138,6 +139,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <BrushTransition />
       <BidsLiveProvider />
       <AccountSync />
       <Toaster position="bottom-right" />
