@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { findRecurringIssues, type RecurringIssuesResult } from "@/lib/policy-review.functions";
 import { useLocale } from "@/lib/i18n";
 import { useCanViewPrivateComments } from "./FieldComments";
+import { FocusedChecks, CheckResultsHistory } from "./FocusedChecks";
 
 const ST: Record<string, [string, string, string]> = {
   unresolved: ["Unresolved", "لم تُحل", "bg-destructive/10 text-destructive"],
@@ -36,6 +37,7 @@ export function RecurringIssues({ draftId }: { draftId: string }) {
     <div className="space-y-3 rounded-xl border border-border p-3">
       <p className="font-medium">{L("AI: recurring issues & checks for the next review", "ذكاء اصطناعي: المشكلات المتكررة وفحوص المراجعة القادمة")}</p>
       <p className="text-sm text-muted-foreground">{L("Uses every version, the reviewer notes and all private field comments on this listing.", "يستخدم كل الإصدارات وملاحظات المراجعين وجميع التعليقات الخاصة على هذا الإعلان.")}</p>
+      <CheckResultsHistory draftId={draftId} />
       <label className="block text-sm">{L("Extra context (optional)", "سياق إضافي (اختياري)")}
         <textarea value={extra} onChange={(e) => setExtra(e.target.value)} maxLength={3000} rows={2} className="mt-1 w-full rounded-xl border border-border bg-background p-2" /></label>
       <button type="button" onClick={go} disabled={busy} aria-busy={busy} className="rounded-full bg-primary px-4 py-1.5 text-sm text-primary-foreground disabled:opacity-50">
@@ -50,7 +52,7 @@ export function RecurringIssues({ draftId }: { draftId: string }) {
               {unresolved.length ? <ul className="mt-1 space-y-2">{unresolved.map((i, k) => <Item key={k} i={i} />)}</ul> : <p className="text-muted-foreground">{L("Nothing recurring is still open.", "لا مشكلات متكررة مفتوحة.")}</p>}</div>
             {resolved.length > 0 && <details><summary className="cursor-pointer">{L(`Resolved recurring issues (${resolved.length})`, `مشكلات متكررة حُلّت (${resolved.length})`)}</summary><ul className="mt-1 space-y-2">{resolved.map((i, k) => <Item key={k} i={i} />)}</ul></details>}
             <div><p className="font-medium">{L("Focused checks for the next review", "فحوص مركّزة للمراجعة القادمة")}</p>
-              <ol className="mt-1 list-decimal space-y-1 ps-5">{res.checks.map((c, k) => <li key={k}><span className="text-xs uppercase text-muted-foreground">{c.field} · {L(...(PR[c.priority] ?? ["", ""]) as [string, string])}</span> — {ar ? c.checkAr || c.check : c.check}</li>)}</ol></div>
+              <FocusedChecks draftId={draftId} checks={res.checks.map((c) => ({ ...c, priority: L(...(PR[c.priority] ?? ["", ""]) as [string, string]) }))} /></div>
             <p className="text-xs text-muted-foreground">{L("Advice only — you make the decision. Comments stay private to staff.", "للاستئناس فقط — القرار لك. تبقى التعليقات خاصة بالفريق.")}</p>
           </div>)}
       </div>
