@@ -1,0 +1,1 @@
+REVOKE ALL ON public.listing_check_results FROM anon;
