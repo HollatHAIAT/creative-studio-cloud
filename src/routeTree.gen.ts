@@ -25,6 +25,7 @@ import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as SuppliesRouteImport } from './routes/supplies'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AuthenticatedAltCheckerRouteImport } from './routes/_authenticated/alt-checker'
 import { Route as AuthenticatedCropHelperRouteImport } from './routes/_authenticated/crop-helper'
@@ -132,6 +133,11 @@ const ReportsRoute = ReportsRouteImport.update({
 const SellRoute = SellRouteImport.update({
   id: '/sell',
   path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuppliesRoute = SuppliesRouteImport.update({
+  id: '/supplies',
+  path: '/supplies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -309,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/supplies': typeof SuppliesRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/crop-helper': typeof AuthenticatedCropHelperRoute
@@ -355,6 +362,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/supplies': typeof SuppliesRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/crop-helper': typeof AuthenticatedCropHelperRoute
@@ -403,6 +411,7 @@ export interface FileRoutesById {
   '/favorites': typeof FavoritesRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
+  '/supplies': typeof SuppliesRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/_authenticated/crop-helper': typeof AuthenticatedCropHelperRoute
@@ -451,6 +460,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/supplies'
     | '/unsubscribe'
     | '/alt-checker'
     | '/crop-helper'
@@ -497,6 +507,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/supplies'
     | '/unsubscribe'
     | '/alt-checker'
     | '/crop-helper'
@@ -544,6 +555,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/reports'
     | '/sell'
+    | '/supplies'
     | '/unsubscribe'
     | '/_authenticated/alt-checker'
     | '/_authenticated/crop-helper'
@@ -592,6 +604,7 @@ export interface RootRouteChildren {
   FavoritesRoute: typeof FavoritesRoute
   ReportsRoute: typeof ReportsRoute
   SellRoute: typeof SellRoute
+  SuppliesRoute: typeof SuppliesRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   ArtworkIdRoute: typeof ArtworkIdRoute
   AssetsIdRoute: typeof AssetsIdRoute
@@ -711,6 +724,13 @@ declare module '@tanstack/react-router' {
       path: '/sell'
       fullPath: '/sell'
       preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/supplies': {
+      id: '/supplies'
+      path: '/supplies'
+      fullPath: '/supplies'
+      preLoaderRoute: typeof SuppliesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/unsubscribe': {
@@ -1022,6 +1042,7 @@ const rootRouteChildren: RootRouteChildren = {
   FavoritesRoute: FavoritesRoute,
   ReportsRoute: ReportsRoute,
   SellRoute: SellRoute,
+  SuppliesRoute: SuppliesRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   ArtworkIdRoute: ArtworkIdRoute,
   AssetsIdRoute: AssetsIdRoute,
