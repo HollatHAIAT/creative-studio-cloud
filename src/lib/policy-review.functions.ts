@@ -90,3 +90,77 @@ Reply with ONLY JSON: {"risk":"","recommendation":"","summary":"","summaryAr":""
     if (!json) return { error: "The AI returned no review." };
     try { return { review: Review.parse(JSON.parse(json)) }; } catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const Guidance = z.object({
+  summary: z.string(), summaryAr: z.string(),
+  steps: z.array(z.object({
+    area: z.enum(["image", "title", "description", "altText", "tags", "pricing", "other"]),
+    action: z.string(), actionAr: z.string(),
+    example: z.string().nullable(), exampleAr: z.string().nullable(),
+  })).min(1).max(10),
+  message: z.string(), messageAr: z.string(),
+});
+export type RevisionGuidance = z.infer<typeof Guidance>;
+
+/** Staff-only: turns a rejected listing + decision notes into clear, actionable seller guidance. */
+export const draftRevisionGuidance = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ draftId: z.string().uuid(), notes: z.string().trim().min(5).max(2000) }).parse(d))
+  .handler(async ({ data, context }): Promise<{ guidance?: RevisionGuidance; error?: string }> => {
+    try { await assertStaff(context.supabase as never, context.userId); } catch { return { error: "Staff only." }; }
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: d } = await supabaseAdmin.from("listing_drafts").select("*").eq("id", data.draftId).maybeSingle();
+    if (!d) return { error: "Listing not found." };
+    if (d.status !== "rejected") return { error: "Guidance can only be drafted for rejected listings." };
+    const copy = { title: d.title, titleAr: d.title_ar, description: d.description, descriptionAr: d.description_ar, altText: d.alt_text, altTextAr: d.alt_text_ar, tags: d.tags, medium: d.medium, hasImage: !!d.image_path };
+    const prompt = `You help moderators at Arwiqa, a Saudi-based global art marketplace, explain listing rejections to sellers.
+Using ONLY the moderator's decision notes and the listing below, draft revision guidance the seller can act on. Be respectful, specific and encouraging. Do not add new reasons the moderator didn't give, do not invent policies, and do not promise approval.
+Return:
+- summary / summaryAr: one or two sentences on why it was rejected.
+- steps: ordered, concrete fixes, each tied to an area (image, title, description, altText, tags, pricing, other), with action (English) and actionAr (Arabic), and an optional short rewritten example (example/exampleAr, null if not useful). Examples must stay factual to the listing.
+- message / messageAr: a short, friendly note to the seller (under 120 words) that summarises the steps and invites them to edit and resubmit.
+Moderator notes: ${JSON.stringify(data.notes)}
+Listing: ${JSON.stringify(copy)}
+Reply with ONLY JSON: {"summary":"","summaryAr":"","steps":[{"area":"","action":"","actionAr":"","example":null,"exampleAr":null}],"message":"","messageAr":""}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "medium", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [{ type: "input_text", text: prompt }] }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Revision guidance AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no guidance." };
+    try { return { guidance: Guidance.parse(JSON.parse(json)) }; } catch { return { error: "The AI returned an unreadable answer." }; }
+  });
+
+/** Staff-only: saves the (edited) guidance on the listing and notifies the seller. */
+export const sendRevisionGuidance = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ draftId: z.string().uuid(), message: z.string().trim().min(5).max(3000), messageAr: z.string().trim().min(5).max(3000) }).parse(d))
+  .handler(async ({ data, context }): Promise<{ ok?: true; error?: string }> => {
+    try { await assertStaff(context.supabase as never, context.userId); } catch { return { error: "Staff only." }; }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: d } = await supabaseAdmin.from("listing_drafts").select("id,user_id,status,title,title_ar").eq("id", data.draftId).maybeSingle();
+    if (!d || d.status !== "rejected") return { error: "Only rejected listings can get revision guidance." };
+    const note = `${data.message}\n\n${data.messageAr}`.slice(0, 6000);
+    // Staff-only flag lets the publish guard accept a note change on a reviewed draft.
+    const { error } = await supabaseAdmin.rpc("admin_set_listing_guidance" as never, { _id: d.id, _note: note, _actor: context.userId } as never);
+    if (error) { console.error(error); return { error: "Couldn't save the guidance." }; }
+    await supabaseAdmin.rpc("push_notification", { _uid: d.user_id, _kind: "order", _t: "How to fix your listing", _tar: "كيف تعدّل إعلانك", _b: `${d.title}: ${data.message}`.slice(0, 500), _bar: `${d.title_ar}: ${data.messageAr}`.slice(0, 500), _link: "/listing-writer" });
+    return { ok: true };
+  });
