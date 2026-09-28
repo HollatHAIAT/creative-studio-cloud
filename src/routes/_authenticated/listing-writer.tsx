@@ -1,3 +1,4 @@
+import { ScreenReaderPreview } from "@/components/ScreenReaderPreview";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
@@ -386,10 +387,7 @@ function ListingWriter() {
                       ) : body}
                       </div>
                       <A11yAudit target={previewRef} watch={[copy, pvDevice, pvLang, preview]} />
-                      <div className="rounded-sm bg-muted p-3 text-sm">
-                        <p className="mb-1 font-medium">{L("What a screen reader says", "ما يقرؤه قارئ الشاشة")}</p>
-                        <p className="text-muted-foreground">{isAr ? "صورة، " : "Image, "}{alt || (isAr ? "بلا وصف" : "no description")}. {isAr ? "عنوان، " : "Heading, "}{t || "—"}.</p>
-                      </div>
+                      <ScreenReaderPreview lang={pvLang} alt={alt} title={t} medium={medium} description={dsc} tags={copy.tags} hasImage={!!preview} />
                       {issues.length > 0 ? (
                         <ul className="space-y-1 text-sm text-destructive">{issues.map((i) => <li key={i}>• {i}</li>)}</ul>
                       ) : <p className="text-sm text-success">{L("Ready: title, description and alt text look good.", "جاهز: العنوان والوصف والنص البديل سليمة.")}</p>}
