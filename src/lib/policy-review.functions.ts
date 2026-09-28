@@ -345,3 +345,71 @@ Reply with ONLY JSON: {"summary":"","summaryAr":"","issues":[{"issue":"","issueA
     if (!json) return { error: "The AI returned no analysis." };
     try { const r = RecurringResult.parse(JSON.parse(json)); return { result: { ...r, checks: r.checks.slice(0, 6) } }; } catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const EvidenceResult = z.object({
+  risk: z.string().default("medium"),
+  summary: z.string().default(""), summaryAr: z.string().default(""),
+  inconsistencies: z.array(z.object({ issue: z.string(), issueAr: z.string().default(""), photo: z.string().default("all"), severity: z.string().default("medium") })).default([]),
+  missingEvidence: z.array(z.object({ item: z.string(), itemAr: z.string().default(""), why: z.string().default(""), whyAr: z.string().default("") })).default([]),
+  checks: z.array(z.object({ check: z.string(), checkAr: z.string().default("") })).default([]),
+});
+export type EvidenceCheckResult = z.infer<typeof EvidenceResult>;
+
+/** Staff-only: compares a listing's photos (its main image + up to 5 staff-uploaded ones) against its description and flags visual inconsistencies and missing evidence. */
+export const checkListingEvidence = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    draftId: z.string().uuid(),
+    extraPaths: z.array(z.string().min(3).max(300)).max(5).default([]),
+    description: z.string().trim().max(6000).default(""),
+  }).parse(d))
+  .handler(async ({ data, context }): Promise<{ result?: EvidenceCheckResult; error?: string }> => {
+    try { await assertStaff(context.supabase as never, context.userId); } catch { return { error: "Staff only." }; }
+    if (data.extraPaths.some((p) => !p.startsWith(`${context.userId}/`))) return { error: "Extra photos must be ones you uploaded." };
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: d } = await supabaseAdmin.from("listing_drafts").select("title,title_ar,description,description_ar,alt_text,medium,tags,category,price,image_path").eq("id", data.draftId).single();
+    if (!d) return { error: "Listing not found." };
+    const paths = [...(d.image_path ? [d.image_path] : []), ...data.extraPaths];
+    if (!paths.length) return { error: "Add at least one photo to check." };
+    const images: { type: "input_image"; image_url: string }[] = [];
+    for (const p of paths) {
+      const { data: blob } = await supabaseAdmin.storage.from("artwork-images").download(p);
+      if (!blob) continue;
+      const mime = blob.type || "image/jpeg";
+      if (!/^image\/(png|jpeg|webp|gif)$/.test(mime)) continue;
+      images.push({ type: "input_image", image_url: `data:${mime};base64,${Buffer.from(await blob.arrayBuffer()).toString("base64")}` });
+    }
+    if (!images.length) return { error: "The photos couldn't be read." };
+    const desc = data.description || `${d.description}\n\n${d.description_ar}`;
+    const prompt = `You help moderators at Arwiqa, a Saudi-based global art & heritage marketplace, review a listing's photos against its written claims.
+Photos are numbered in order: photo 1 is the seller's main image${data.extraPaths.length ? `, photos 2–${images.length} were added by the moderator (e.g. back, signature, detail, certificate)` : ""}.
+1) inconsistencies: things in the photos that contradict the text or each other — different medium, size cues, colours, subject, signature/date mismatch, signs of a print sold as an original, digital mock-up, stock/watermarked image, other artwork or brand logos, damage not disclosed. Give "photo" as "1", "2"… or "all", severity high|medium|low.
+2) missingEvidence: evidence a reviewer would expect but can't see, based on the claims (e.g. signature close-up, back of canvas, certificate of authenticity, edition number for prints, provenance for heritage/antique claims, condition detail, scale reference, export permit for cultural objects). Include why it's needed.
+3) checks: 2–5 concrete things the moderator should verify next.
+risk: low|medium|high overall. summary 1–2 sentences.
+Only flag what the photos and text actually support; say "can't tell from the photos" rather than guessing. Don't invent policy. English + Arabic for every text field.
+LISTING: ${JSON.stringify({ title: d.title, titleAr: d.title_ar, medium: d.medium, category: d.category, price: d.price, tags: d.tags, altText: d.alt_text, description: desc })}
+Reply with ONLY JSON: {"risk":"","summary":"","summaryAr":"","inconsistencies":[{"issue":"","issueAr":"","photo":"","severity":""}],"missingEvidence":[{"item":"","itemAr":"","why":"","whyAr":""}],"checks":[{"check":"","checkAr":""}]}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({ model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "medium", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [{ type: "input_text", text: prompt }, ...images] }] }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Evidence check AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no assessment." };
+    try { return { result: EvidenceResult.parse(JSON.parse(json)) }; } catch { return { error: "The AI returned an unreadable answer." }; }
+  });
