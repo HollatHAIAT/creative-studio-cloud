@@ -361,3 +361,65 @@ Reply with ONLY JSON: {"focalX":0.5,"focalY":0.5,"subject":{"x":0,"y":0,"w":1,"h
     try { return { result: Focal.parse(JSON.parse(json)) }; }
     catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const AltGen = z.object({
+  altText: z.string(), altTextAr: z.string(),
+  longDescription: z.string().default(""), longDescriptionAr: z.string().default(""),
+  notes: z.array(z.string()).default([]), notesAr: z.array(z.string()).default([]),
+});
+export type AltGen = z.infer<typeof AltGen>;
+
+/** Writes accessible bilingual alt text (≤140 chars) for the seller's own uploaded artwork image. */
+export const generateAltText = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    path: z.string().min(3).max(300),
+    context: z.string().trim().max(500).default(""),
+  }).parse(d))
+  .handler(async ({ data, context }): Promise<{ alt?: AltGen; error?: string }> => {
+    if (!data.path.startsWith(`${context.userId}/`)) return { error: "You can only use your own uploads." };
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const { data: blob, error: dlErr } = await context.supabase.storage.from("artwork-images").download(data.path);
+    if (dlErr || !blob || blob.size === 0) return { error: "The uploaded image couldn't be read. Please upload it again." };
+    const mime = blob.type || "image/jpeg";
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(mime)) return { error: "Please upload a PNG, JPG, WEBP or GIF image." };
+    const b64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
+    const prompt = `You write accessible alt text for artworks on Arwiqa, a Saudi art marketplace.
+Rules for altText (English) and altTextAr (natural Arabic, not a literal translation):
+- At most 140 characters each. Describe only what is visible: medium/type if obvious, main subject, key colours, composition.
+- Do not start with "image of", "picture of", "photo of" or "صورة". No praise or opinions ("stunning"), no prices, no unverifiable claims (artist, age, value).
+- Don't just repeat the title.
+longDescription / longDescriptionAr: 2-4 sentences for screen-reader users who want more detail (layout, textures, text or calligraphy visible and what it says if legible). Empty if the image is simple.
+notes / notesAr: up to 3 short tips to the seller (e.g. "calligraphy isn't legible — add the text in the description"). Empty arrays if none.
+${data.context ? `Seller's context (use only to name things correctly, never to describe what isn't visible): ${JSON.stringify(data.context)}\n` : ""}Reply with ONLY JSON: {"altText":"","altTextAr":"","longDescription":"","longDescriptionAr":"","notes":[],"notesAr":[]}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [
+          { type: "input_text", text: prompt },
+          { type: "input_image", image_url: `data:${mime};base64,${b64}` },
+        ] }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Alt generate AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no alt text." };
+    try {
+      const a = AltGen.parse(JSON.parse(json));
+      const clip = (s: string) => s.trim().slice(0, 140);
+      return { alt: { ...a, altText: clip(a.altText), altTextAr: clip(a.altTextAr), notes: a.notes.slice(0, 3), notesAr: a.notesAr.slice(0, 3) } };
+    } catch { return { error: "The AI returned an unreadable answer." }; }
+  });
