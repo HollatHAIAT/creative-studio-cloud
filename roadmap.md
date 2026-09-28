@@ -148,7 +148,15 @@
 
 ## Heritage marketplace brief (110 sections) — building in phases
 - [x] Phase 1 (§1–8): optional, policy-driven review — review modes, direct publish, platform checks, reviewer invites with dates/permissions/watermark, comment visibility, staff review policy
-- [ ] Phase 2 (§9–23): seller vs owner, agents, agreements, consignment, heirs, joint ownership, owner approval
+- [x] Phase 2 (§9–23): seller vs owner, agents, consignment, heirs, joint ownership, galleries, owner approval (Owner approvals page)
 - [ ] Phase 3 (§24–55): heritage categories, cultural-property compliance, provenance, condition reports, experts
 - [ ] Phase 4 (§56–73): advanced listing creation, workflow engine, teams, agency dashboards
 - [ ] Phase 5 (§74–110): Explore Saudi/Gulf, heritage map, museum labels, AI heritage assistants, trust panel, restricted sales, taxonomy
+
+## "Complete all stages" request (in progress)
+- [x] Heritage phase 3 core: heritage type, region, era, ownership history, condition report, export permit; required before publishing
+- [x] Heritage phase 5 start: Explore Saudi & the Gulf heritage map with museum labels
+- [ ] Heritage phase 4: team/gallery accounts, custom workflows, agent dashboards
+- [ ] Heritage phase 5 rest: heritage AI assistants, trust panel on artwork pages, full taxonomy
+- [ ] Design phases 2–5 (see above)
+- [ ] Other open items above (seller dashboard in database, inventory, E2E tests, etc.)
