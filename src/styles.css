@@ -325,3 +325,29 @@ svg.lucide { stroke-width: 1.6; }
 .sell-cta:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 @keyframes sell-sheen { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
 @media (prefers-reduced-motion: reduce) { .banner-rise, .banner-shimmer { opacity: 1; } .banner-brush { transform: rotate(-6deg); } .banner-weave { transform: none; } }
+
+/* ---------- Logo painted by a brush on load ---------- */
+.logo-paint-img {
+  -webkit-mask: linear-gradient(to top, #000 45%, transparent 55%) 0 100% / 100% 220% no-repeat;
+          mask: linear-gradient(to top, #000 45%, transparent 55%) 0 100% / 100% 220% no-repeat;
+  animation: logo-paint-reveal 1.6s cubic-bezier(.5,.1,.3,1) .15s both;
+}
+.logo-paint-brush {
+  position: absolute; width: 38%; height: 38%; inset-inline-start: 50%; bottom: 0; pointer-events: none;
+  border-radius: 55% 45% 50% 50% / 70% 70% 30% 30%;
+  background: radial-gradient(circle at 40% 35%, var(--gold), color-mix(in oklab, var(--gold) 50%, var(--clay)) 60%, transparent 72%);
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--gold) 70%, transparent));
+  opacity: 0; transform: translate(-50%, 0) rotate(-20deg);
+  animation: logo-paint-brush 1.6s cubic-bezier(.5,.1,.3,1) .15s both;
+}
+[dir="rtl"] .logo-paint-brush { transform: translate(50%, 0) rotate(20deg); }
+.logo-paint:hover .logo-paint-img { animation: logo-paint-reveal 1.2s cubic-bezier(.5,.1,.3,1) both; }
+.logo-paint:hover .logo-paint-brush { animation: logo-paint-brush 1.2s cubic-bezier(.5,.1,.3,1) both; }
+@keyframes logo-paint-reveal { from { -webkit-mask-position: 0 0; mask-position: 0 0; } to { -webkit-mask-position: 0 100%; mask-position: 0 100%; } }
+@keyframes logo-paint-brush {
+  0% { opacity: 0; bottom: -5%; margin-inline-start: 0; }
+  10% { opacity: 1; }
+  25% { margin-inline-start: -18%; } 45% { margin-inline-start: 14%; } 65% { margin-inline-start: -12%; } 85% { opacity: 1; margin-inline-start: 6%; }
+  100% { opacity: 0; bottom: 80%; margin-inline-start: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .logo-paint-img { -webkit-mask: none; mask: none; animation: none; } .logo-paint-brush { display: none; } }
