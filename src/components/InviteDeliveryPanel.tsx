@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
+import { DeliveryDiagnosis } from "./DeliveryDiagnosis";
 
 type Inv = { id: string; draft_id: string; email: string; status: string; starts_at: string; expires_at: string | null; created_at: string };
 type Mail = { id: string; ref_id: string; kind: string; status: string; attempts: number; last_error: string | null; sent_at: string | null; created_at: string };
@@ -49,6 +50,10 @@ export function InviteDeliveryPanel() {
   });
   const st = (r: (typeof rows)[number]) => r.latest?.status ?? "none";
   const shown = rows.filter((r) => f === "all" || st(r) === f);
+
+  const mask = (e: string) => { const [u = "", d = ""] = e.split("@"); return `${u.slice(0, 1)}***@${d}`; };
+  const prefill = shown.slice(0, 40).map((r) => [mask(r.i.email), `email: ${st(r)}`, r.latest ? `attempts: ${r.latest.attempts}` : "", r.latest?.last_error ? `error: ${r.latest.last_error.slice(0, 300)}` : "",
+    `invite: ${r.expired ? "expired" : r.i.status}`, r.sends > 1 ? `sends: ${r.sends}` : ""].filter(Boolean).join(" — ")).join("\n");
 
   async function resend(id: string) {
     if (busy) return; setBusy(id);
@@ -105,6 +110,7 @@ export function InviteDeliveryPanel() {
               </tr>); })}</tbody>
           </table>
         </div>)}
+      <DeliveryDiagnosis prefill={prefill} />
     </section>
   );
 }
