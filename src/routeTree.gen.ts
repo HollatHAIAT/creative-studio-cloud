@@ -30,6 +30,7 @@ import { Route as AuthenticatedAltCheckerRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCropHelperRouteImport } from './routes/_authenticated/crop-helper'
 import { Route as AuthenticatedListingWriterRouteImport } from './routes/_authenticated/listing-writer'
 import { Route as AuthenticatedMatchExplainerRouteImport } from './routes/_authenticated/match-explainer'
+import { Route as AuthenticatedMyAuctionsRouteImport } from './routes/_authenticated/my-auctions'
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOrderHelpRouteImport } from './routes/_authenticated/order-help'
@@ -43,6 +44,7 @@ import { Route as AssetsIdRouteImport } from './routes/assets.$id'
 import { Route as AuctionsIdRouteImport } from './routes/auctions.$id'
 import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.saudi-banks'
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
+import { Route as AuthenticatedAdminAuctionsRouteImport } from './routes/_authenticated/admin.auctions'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
 import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin.listings'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
@@ -159,6 +161,11 @@ const AuthenticatedMatchExplainerRoute =
     path: '/match-explainer',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMyAuctionsRoute = AuthenticatedMyAuctionsRouteImport.update({
+  id: '/my-auctions',
+  path: '/my-auctions',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMyReviewsRoute = AuthenticatedMyReviewsRouteImport.update({
   id: '/my-reviews',
   path: '/my-reviews',
@@ -227,6 +234,12 @@ const ExhibitionsIdRoute = ExhibitionsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ExhibitionsRoute,
 } as any)
+const AuthenticatedAdminAuctionsRoute =
+  AuthenticatedAdminAuctionsRouteImport.update({
+    id: '/admin/auctions',
+    path: '/admin/auctions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminEmailsRoute =
   AuthenticatedAdminEmailsRouteImport.update({
     id: '/admin/emails',
@@ -301,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/crop-helper': typeof AuthenticatedCropHelperRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
+  '/my-auctions': typeof AuthenticatedMyAuctionsRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
@@ -314,6 +328,7 @@ export interface FileRoutesByFullPath {
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/assets/': typeof AssetsIndexRoute
+  '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -345,6 +360,7 @@ export interface FileRoutesByTo {
   '/crop-helper': typeof AuthenticatedCropHelperRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
+  '/my-auctions': typeof AuthenticatedMyAuctionsRoute
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
@@ -358,6 +374,7 @@ export interface FileRoutesByTo {
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/assets': typeof AssetsIndexRoute
+  '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -391,6 +408,7 @@ export interface FileRoutesById {
   '/_authenticated/crop-helper': typeof AuthenticatedCropHelperRoute
   '/_authenticated/listing-writer': typeof AuthenticatedListingWriterRoute
   '/_authenticated/match-explainer': typeof AuthenticatedMatchExplainerRoute
+  '/_authenticated/my-auctions': typeof AuthenticatedMyAuctionsRoute
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/order-help': typeof AuthenticatedOrderHelpRoute
@@ -404,6 +422,7 @@ export interface FileRoutesById {
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/assets/': typeof AssetsIndexRoute
+  '/_authenticated/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -437,6 +456,7 @@ export interface FileRouteTypes {
     | '/crop-helper'
     | '/listing-writer'
     | '/match-explainer'
+    | '/my-auctions'
     | '/my-reviews'
     | '/notifications'
     | '/order-help'
@@ -450,6 +470,7 @@ export interface FileRouteTypes {
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
     | '/assets/'
+    | '/admin/auctions'
     | '/admin/emails'
     | '/admin/listings'
     | '/admin/orders'
@@ -481,6 +502,7 @@ export interface FileRouteTypes {
     | '/crop-helper'
     | '/listing-writer'
     | '/match-explainer'
+    | '/my-auctions'
     | '/my-reviews'
     | '/notifications'
     | '/order-help'
@@ -494,6 +516,7 @@ export interface FileRouteTypes {
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
     | '/assets'
+    | '/admin/auctions'
     | '/admin/emails'
     | '/admin/listings'
     | '/admin/orders'
@@ -526,6 +549,7 @@ export interface FileRouteTypes {
     | '/_authenticated/crop-helper'
     | '/_authenticated/listing-writer'
     | '/_authenticated/match-explainer'
+    | '/_authenticated/my-auctions'
     | '/_authenticated/my-reviews'
     | '/_authenticated/notifications'
     | '/_authenticated/order-help'
@@ -539,6 +563,7 @@ export interface FileRouteTypes {
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
     | '/assets/'
+    | '/_authenticated/admin/auctions'
     | '/_authenticated/admin/emails'
     | '/_authenticated/admin/listings'
     | '/_authenticated/admin/orders'
@@ -723,6 +748,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMatchExplainerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/my-auctions': {
+      id: '/_authenticated/my-auctions'
+      path: '/my-auctions'
+      fullPath: '/my-auctions'
+      preLoaderRoute: typeof AuthenticatedMyAuctionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/my-reviews': {
       id: '/_authenticated/my-reviews'
       path: '/my-reviews'
@@ -814,6 +846,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExhibitionsIdRouteImport
       parentRoute: typeof ExhibitionsRoute
     }
+    '/_authenticated/admin/auctions': {
+      id: '/_authenticated/admin/auctions'
+      path: '/admin/auctions'
+      fullPath: '/admin/auctions'
+      preLoaderRoute: typeof AuthenticatedAdminAuctionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/emails': {
       id: '/_authenticated/admin/emails'
       path: '/admin/emails'
@@ -885,12 +924,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCropHelperRoute: typeof AuthenticatedCropHelperRoute
   AuthenticatedListingWriterRoute: typeof AuthenticatedListingWriterRoute
   AuthenticatedMatchExplainerRoute: typeof AuthenticatedMatchExplainerRoute
+  AuthenticatedMyAuctionsRoute: typeof AuthenticatedMyAuctionsRoute
   AuthenticatedMyReviewsRoute: typeof AuthenticatedMyReviewsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOrderHelpRoute: typeof AuthenticatedOrderHelpRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
   AuthenticatedSearchTermsRoute: typeof AuthenticatedSearchTermsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedAdminAuctionsRoute: typeof AuthenticatedAdminAuctionsRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
@@ -907,12 +948,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCropHelperRoute: AuthenticatedCropHelperRoute,
   AuthenticatedListingWriterRoute: AuthenticatedListingWriterRoute,
   AuthenticatedMatchExplainerRoute: AuthenticatedMatchExplainerRoute,
+  AuthenticatedMyAuctionsRoute: AuthenticatedMyAuctionsRoute,
   AuthenticatedMyReviewsRoute: AuthenticatedMyReviewsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOrderHelpRoute: AuthenticatedOrderHelpRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
   AuthenticatedSearchTermsRoute: AuthenticatedSearchTermsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedAdminAuctionsRoute: AuthenticatedAdminAuctionsRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,

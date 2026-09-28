@@ -64,6 +64,7 @@ export function AccountNav() {
               <DropdownMenuItem asChild><Link to="/crop-helper">{locale === "ar" ? "مساعد القص للهاتف" : "Mobile crop helper"}</Link></DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild><Link to="/orders">{t("nav.orders")}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/my-auctions">{locale === "ar" ? "مزاداتي" : "My auctions"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/my-reviews">{locale === "ar" ? "تقييماتي" : "My reviews"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/notifications">{t("nav.notifications")}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/settings">{t("nav.settings")}</Link></DropdownMenuItem>
@@ -74,6 +75,7 @@ export function AccountNav() {
                 <DropdownMenuItem asChild><Link to="/admin/emails">{locale === "ar" ? "حالة البريد" : "Email delivery"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/scan">{t("adm.scan")}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/reviews">{locale === "ar" ? "الإشراف على التقييمات" : "Review moderation"}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/admin/auctions">{locale === "ar" ? "إدارة المزادات" : "Auction administration"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/listings">{locale === "ar" ? "مراجعة الإعلانات" : "Listing review"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/policy-review">{locale === "ar" ? "مراجعة سياسات الإعلانات" : "Listing policy review"}</Link></DropdownMenuItem>
               </>)}
