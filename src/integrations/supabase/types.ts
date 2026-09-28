@@ -644,10 +644,12 @@ export type Database = {
           id: string
           image_path: string | null
           medium: string
+          owner_declared: boolean
           price: number | null
           published_at: string | null
           published_by: string | null
           published_listing_id: string | null
+          review_mode: string
           review_note: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -669,10 +671,12 @@ export type Database = {
           id?: string
           image_path?: string | null
           medium?: string
+          owner_declared?: boolean
           price?: number | null
           published_at?: string | null
           published_by?: string | null
           published_listing_id?: string | null
+          review_mode?: string
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -694,10 +698,12 @@ export type Database = {
           id?: string
           image_path?: string | null
           medium?: string
+          owner_declared?: boolean
           price?: number | null
           published_at?: string | null
           published_by?: string | null
           published_listing_id?: string | null
+          review_mode?: string
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -710,6 +716,97 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      listing_review_comments: {
+        Row: {
+          author: string
+          body: string
+          created_at: string
+          draft_id: string
+          id: string
+          recommendation: string | null
+          score: number | null
+          visibility: string
+        }
+        Insert: {
+          author?: string
+          body: string
+          created_at?: string
+          draft_id: string
+          id?: string
+          recommendation?: string | null
+          score?: number | null
+          visibility?: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          created_at?: string
+          draft_id?: string
+          id?: string
+          recommendation?: string | null
+          score?: number | null
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_review_comments_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "listing_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_reviewers: {
+        Row: {
+          allow_download: boolean
+          created_at: string
+          draft_id: string
+          email: string
+          expires_at: string | null
+          id: string
+          invited_by: string
+          permission: string
+          role: string
+          starts_at: string
+          watermark: boolean
+        }
+        Insert: {
+          allow_download?: boolean
+          created_at?: string
+          draft_id: string
+          email: string
+          expires_at?: string | null
+          id?: string
+          invited_by?: string
+          permission?: string
+          role?: string
+          starts_at?: string
+          watermark?: boolean
+        }
+        Update: {
+          allow_download?: boolean
+          created_at?: string
+          draft_id?: string
+          email?: string
+          expires_at?: string | null
+          id?: string
+          invited_by?: string
+          permission?: string
+          role?: string
+          starts_at?: string
+          watermark?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_reviewers_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "listing_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listing_version_comments: {
         Row: {
@@ -1188,6 +1285,33 @@ export type Database = {
           },
         ]
       }
+      review_policies: {
+        Row: {
+          allow_direct_publish: boolean
+          id: number
+          platform_review_categories: string[]
+          platform_review_price_over: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          allow_direct_publish?: boolean
+          id?: number
+          platform_review_categories?: string[]
+          platform_review_price_over?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          allow_direct_publish?: boolean
+          id?: number
+          platform_review_categories?: string[]
+          platform_review_price_over?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       review_reports: {
         Row: {
           created_at: string
@@ -1567,6 +1691,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      active_reviewer: {
+        Args: { _draft: string; _uid: string }
+        Returns: string
+      }
       admin_auction_reserves: {
         Args: never
         Returns: {
@@ -1667,6 +1795,7 @@ export type Database = {
         Returns: string
       }
       delete_my_review: { Args: { _review: string }; Returns: undefined }
+      draft_owner: { Args: { _draft: string }; Returns: string }
       edit_my_review: {
         Args: { _body: string; _rating: number; _review: string }
         Returns: undefined
@@ -1703,6 +1832,7 @@ export type Database = {
         Returns: undefined
       }
       pass_auction_to_next: { Args: { _auction: string }; Returns: undefined }
+      platform_validation_issues: { Args: { _id: string }; Returns: string[] }
       process_due_auctions: { Args: never; Returns: number }
       push_notification: {
         Args: {
@@ -1727,6 +1857,7 @@ export type Database = {
       retry_payment: { Args: { _order: string }; Returns: undefined }
       revoke_auction_invite: { Args: { _invite: string }; Returns: undefined }
       saved_search_token: { Args: { _uid: string }; Returns: string }
+      seller_publish_direct: { Args: { _id: string }; Returns: string }
       send_saved_search_digests: {
         Args: { _frequency: string }
         Returns: number
