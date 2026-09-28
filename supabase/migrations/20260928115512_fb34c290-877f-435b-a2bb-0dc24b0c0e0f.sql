@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.draft_owner(uuid), public.active_reviewer(uuid, uuid), public.platform_validation_issues(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.draft_owner(uuid), public.active_reviewer(uuid, uuid), public.platform_validation_issues(uuid) TO authenticated;

@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { A11yAudit } from "@/components/A11yAudit";
 import { PublishGate, publishIssues } from "@/components/PublishGate";
+import { ReviewPath } from "@/components/ReviewPath";
 import { ImagePlus, Copy as CopyIcon, Trash2, Monitor, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
@@ -47,7 +48,8 @@ function ListingWriter() {
   const [submitted, setSubmitted] = useState(false);
   const [pubErr, setPubErr] = useState("");
   const loadDrafts = async () => {
-    const { data } = await supabase.from("listing_drafts").select("*").order("updated_at", { ascending: false }).limit(20);
+    const uid = (await supabase.auth.getUser()).data.user?.id ?? "";
+    const { data } = await supabase.from("listing_drafts").select("*").eq("user_id", uid).order("updated_at", { ascending: false }).limit(20);
     setDrafts((data ?? []) as Draft[]);
   };
   useEffect(() => { void loadDrafts(); }, []);
@@ -64,6 +66,18 @@ function ListingWriter() {
     setDraftId(data.id);
     await loadDrafts();
   });
+  const saveNow = async (): Promise<string | null> => {
+    if (!copy) return null;
+    const row = { title: copy.title, title_ar: copy.titleAr, description: copy.description, description_ar: copy.descriptionAr,
+      alt_text: copy.altText, alt_text_ar: copy.altTextAr, tags: copy.tags, medium, image_path: path };
+    const q = draftId
+      ? supabase.from("listing_drafts").update(row).eq("id", draftId).select("id").single()
+      : supabase.from("listing_drafts").insert(row).select("id").single();
+    const { data, error } = await q;
+    if (error || !data) { toast.error(L("Couldn't save the draft.", "تعذّر حفظ المسودة.")); return null; }
+    setDraftId(data.id); await loadDrafts();
+    return data.id;
+  };
   const setStatus = async (status: "draft" | "submitted") => {
     if (!copy) return;
     const row = { title: copy.title, title_ar: copy.titleAr, description: copy.description, description_ar: copy.descriptionAr,
@@ -400,6 +414,7 @@ function ListingWriter() {
                   );
                 })()}
               </div>
+              <ReviewPath draftId={draftId} onSave={saveNow} submitted={submitted} onPublished={() => void loadDrafts()} />
               <PublishGate issues={publishIssues(copy, !!path, { ratio: imgRatio, width: imgW }, L)} submitted={submitted}
                 state={publish.state} error={pubErr} onPublish={() => publish.run()} onRetry={publish.retry}
                 onUnpublish={() => { void setStatus("draft").catch(() => toast.error(L("Couldn't withdraw.", "تعذّر السحب."))); }} />
