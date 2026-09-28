@@ -223,3 +223,69 @@ Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","requests":[{"re
     if (!json) return { error: "The AI returned no assessment." };
     try { return { result: RevisionCheck.parse(JSON.parse(json)) }; } catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+const VersionCompare = z.object({
+  verdict: z.enum(["addressed", "partly", "not_addressed"]),
+  summary: z.string(), summaryAr: z.string(),
+  requests: z.array(z.object({
+    request: z.string(), requestAr: z.string(),
+    status: z.enum(["addressed", "partly", "not_addressed", "unclear"]),
+    evidence: z.string(), evidenceAr: z.string(),
+  })).max(12),
+  flags: z.array(z.object({
+    area: z.enum(["image", "title", "description", "altText", "tags", "medium", "other"]),
+    reason: z.string(), reasonAr: z.string(),
+    severity: z.enum(["low", "medium", "high"]),
+  })).max(10),
+});
+export type VersionCompareResult = z.infer<typeof VersionCompare>;
+
+/** Staff-only: AI compares a resubmitted version with the previous one against the decision notes. Advisory. */
+export const compareResubmission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ draftId: z.string().uuid(), version: z.number().int().min(2), notes: z.string().trim().min(5).max(6000) }).parse(d))
+  .handler(async ({ data, context }): Promise<{ result?: VersionCompareResult; error?: string }> => {
+    try { await assertStaff(context.supabase as never, context.userId); } catch { return { error: "Staff only." }; }
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin.from("listing_draft_versions" as never).select("*")
+      .eq("draft_id", data.draftId).in("version", [data.version - 1, data.version]);
+    const list = (rows ?? []) as Array<Record<string, unknown>>;
+    const pick = (n: number) => list.find((r) => r.version === n);
+    const prev = pick(data.version - 1), cur = pick(data.version);
+    if (!prev || !cur) return { error: "Both versions are needed to compare." };
+    const shape = (r: Record<string, unknown>) => ({ title: r.title, titleAr: r.title_ar, description: r.description, descriptionAr: r.description_ar, altText: r.alt_text, altTextAr: r.alt_text_ar, tags: r.tags, medium: r.medium });
+    const imageChanged = prev.image_path !== cur.image_path;
+    const prompt = `You assist moderators at Arwiqa, a Saudi-based global art marketplace, reviewing a seller's resubmission of a rejected listing.
+Split the moderator's decision notes into the individual changes requested. For each, compare the PREVIOUS and RESUBMITTED versions and judge: addressed, partly, not_addressed, or unclear (e.g. image content can't be judged from text; only whether the image file changed is known). Give short evidence quoting what changed (English + Arabic).
+Then list flags: anything that still needs a human look — requests not addressed, new problems introduced by the edits (new claims, contact details, English/Arabic mismatch, removed required info), or changes you can't verify. Do not invent new policy requirements. If nothing needs flagging, return an empty array.
+verdict: "addressed" if all requests addressed, "partly" if some, "not_addressed" if none.
+Decision notes: ${JSON.stringify(data.notes)}
+PREVIOUS (v${data.version - 1}): ${JSON.stringify(shape(prev))}
+RESUBMITTED (v${data.version}): ${JSON.stringify(shape(cur))}
+Image file changed: ${imageChanged}
+Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","requests":[{"request":"","requestAr":"","status":"","evidence":"","evidenceAr":""}],"flags":[{"area":"","reason":"","reasonAr":"","severity":""}]}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "medium", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [{ type: "input_text", text: prompt }] }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Resubmission compare AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no assessment." };
+    try { return { result: VersionCompare.parse(JSON.parse(json)) }; } catch { return { error: "The AI returned an unreadable answer." }; }
+  });
