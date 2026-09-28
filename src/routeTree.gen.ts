@@ -42,6 +42,7 @@ import { Route as AuthenticatedReviewInvitesRouteImport } from './routes/_authen
 import { Route as AuthenticatedRevisionCheckRouteImport } from './routes/_authenticated/revision-check'
 import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
 import { Route as AuthenticatedSearchTermsRouteImport } from './routes/_authenticated/search-terms'
+import { Route as AuthenticatedSellerDashboardRouteImport } from './routes/_authenticated/seller-dashboard'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
 import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
@@ -53,6 +54,7 @@ import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as AuthenticatedAdminAuctionsRouteImport } from './routes/_authenticated/admin.auctions'
+import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
 import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin.listings'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
@@ -236,6 +238,12 @@ const AuthenticatedSearchTermsRoute =
     path: '/search-terms',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSellerDashboardRoute =
+  AuthenticatedSellerDashboardRouteImport.update({
+    id: '/seller-dashboard',
+    path: '/seller-dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -290,6 +298,12 @@ const AuthenticatedAdminAuctionsRoute =
   AuthenticatedAdminAuctionsRouteImport.update({
     id: '/admin/auctions',
     path: '/admin/auctions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: '/admin/dashboard',
+    path: '/admin/dashboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminEmailsRoute =
@@ -384,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/search-terms': typeof AuthenticatedSearchTermsRoute
+  '/seller-dashboard': typeof AuthenticatedSellerDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
@@ -395,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -439,6 +455,7 @@ export interface FileRoutesByTo {
   '/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/search-terms': typeof AuthenticatedSearchTermsRoute
+  '/seller-dashboard': typeof AuthenticatedSellerDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
@@ -450,6 +467,7 @@ export interface FileRoutesByTo {
   '/listing/$id': typeof ListingIdRoute
   '/assets': typeof AssetsIndexRoute
   '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -496,6 +514,7 @@ export interface FileRoutesById {
   '/_authenticated/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/_authenticated/search-terms': typeof AuthenticatedSearchTermsRoute
+  '/_authenticated/seller-dashboard': typeof AuthenticatedSellerDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
@@ -507,6 +526,7 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/_authenticated/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -553,6 +573,7 @@ export interface FileRouteTypes {
     | '/revision-check'
     | '/saved-searches'
     | '/search-terms'
+    | '/seller-dashboard'
     | '/settings'
     | '/teams'
     | '/artists/$id'
@@ -564,6 +585,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets/'
     | '/admin/auctions'
+    | '/admin/dashboard'
     | '/admin/emails'
     | '/admin/listings'
     | '/admin/orders'
@@ -608,6 +630,7 @@ export interface FileRouteTypes {
     | '/revision-check'
     | '/saved-searches'
     | '/search-terms'
+    | '/seller-dashboard'
     | '/settings'
     | '/teams'
     | '/artists/$id'
@@ -619,6 +642,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets'
     | '/admin/auctions'
+    | '/admin/dashboard'
     | '/admin/emails'
     | '/admin/listings'
     | '/admin/orders'
@@ -664,6 +688,7 @@ export interface FileRouteTypes {
     | '/_authenticated/revision-check'
     | '/_authenticated/saved-searches'
     | '/_authenticated/search-terms'
+    | '/_authenticated/seller-dashboard'
     | '/_authenticated/settings'
     | '/_authenticated/teams'
     | '/artists/$id'
@@ -675,6 +700,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets/'
     | '/_authenticated/admin/auctions'
+    | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/emails'
     | '/_authenticated/admin/listings'
     | '/_authenticated/admin/orders'
@@ -947,6 +973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSearchTermsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/seller-dashboard': {
+      id: '/_authenticated/seller-dashboard'
+      path: '/seller-dashboard'
+      fullPath: '/seller-dashboard'
+      preLoaderRoute: typeof AuthenticatedSellerDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -1022,6 +1055,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/auctions'
       fullPath: '/admin/auctions'
       preLoaderRoute: typeof AuthenticatedAdminAuctionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/dashboard': {
+      id: '/_authenticated/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/emails': {
@@ -1112,9 +1152,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRevisionCheckRoute: typeof AuthenticatedRevisionCheckRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
   AuthenticatedSearchTermsRoute: typeof AuthenticatedSearchTermsRoute
+  AuthenticatedSellerDashboardRoute: typeof AuthenticatedSellerDashboardRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
   AuthenticatedAdminAuctionsRoute: typeof AuthenticatedAdminAuctionsRoute
+  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
@@ -1142,9 +1184,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRevisionCheckRoute: AuthenticatedRevisionCheckRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
   AuthenticatedSearchTermsRoute: AuthenticatedSearchTermsRoute,
+  AuthenticatedSellerDashboardRoute: AuthenticatedSellerDashboardRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
   AuthenticatedAdminAuctionsRoute: AuthenticatedAdminAuctionsRoute,
+  AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
