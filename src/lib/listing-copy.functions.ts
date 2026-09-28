@@ -126,6 +126,7 @@ const AltReview = z.object({
   summary: z.string(), summaryAr: z.string(),
   issues: z.array(z.string()).max(8), issuesAr: z.array(z.string()).max(8),
   suggestion: z.string(), suggestionAr: z.string(),
+  gaps: z.array(z.object({ gap: z.string(), gapAr: z.string().default(""), severity: z.string().default("medium") })).max(10).default([]),
 });
 export type AltReview = z.infer<typeof AltReview>;
 
@@ -135,6 +136,7 @@ export const reviewAltText = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({
     path: z.string().min(3).max(300),
     altText: z.string().trim().min(1).max(1000),
+    details: z.object({ title: z.string().max(200).default(""), medium: z.string().max(100).default(""), description: z.string().max(4000).default("") }).optional(),
   }).parse(d))
   .handler(async ({ data, context }): Promise<{ review?: AltReview; error?: string }> => {
     if (!data.path.startsWith(`${context.userId}/`)) return { error: "You can only check your own uploads." };
@@ -150,8 +152,10 @@ export const reviewAltText = createServerFn({ method: "POST" })
 - summary (English, 1-2 sentences) and summaryAr (Arabic).
 - issues: short concrete problems (e.g. wrong colour, starts with "image of", too long, subjective praise, missing main subject); issuesAr same in Arabic. Empty arrays if none.
 - suggestion: clearer objective alt text, max 140 characters, describe only what is visible, no "image of"; suggestionAr natural Arabic equivalent, max 140 characters.
-Current alt text: ${JSON.stringify(data.altText)}
-Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","issues":[],"issuesAr":[],"suggestion":"","suggestionAr":""}`;
+- gaps: accessibility gaps with severity high|medium|low, e.g. main subject missing, visible text/calligraphy not transcribed, colours or contrast important to meaning not mentioned, alt text contradicts the listing's medium/title, relies on the title alone, over 140 characters, jargon, detail needed for a long description is missing from the listing description. Each with gapAr in Arabic. Empty array if none.
+Use the listing details only as context to judge consistency; describe only what is visible.
+${data.details ? `Listing details: ${JSON.stringify(data.details)}\n` : ""}Current alt text: ${JSON.stringify(data.altText)}
+Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","issues":[],"issuesAr":[],"suggestion":"","suggestionAr":"","gaps":[{"gap":"","gapAr":"","severity":""}]}`;
     const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
