@@ -60,6 +60,7 @@ export function AccountNav() {
               <DropdownMenuItem asChild><Link to="/analytics">{t("nav.analytics")}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/listing-writer">{locale === "ar" ? "كاتب الإعلانات الذكي" : "AI listing writer"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/alt-checker">{locale === "ar" ? "فاحص النص البديل" : "Alt text checker"}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/alt-writer">{locale === "ar" ? "كاتب النص البديل" : "Alt text writer"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/search-terms">{locale === "ar" ? "كلمات البحث والوسوم" : "Search terms & tags"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/crop-helper">{locale === "ar" ? "مساعد القص للهاتف" : "Mobile crop helper"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/revision-check">{locale === "ar" ? "فحص التعديلات المطلوبة" : "Revision check"}</Link></DropdownMenuItem>
