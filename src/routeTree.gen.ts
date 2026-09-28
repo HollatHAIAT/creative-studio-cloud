@@ -44,6 +44,7 @@ import { Route as AuctionsIdRouteImport } from './routes/auctions.$id'
 import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.saudi-banks'
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
+import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin.listings'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as AuthenticatedAdminPolicyReviewRouteImport } from './routes/_authenticated/admin.policy-review'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
@@ -232,6 +233,12 @@ const AuthenticatedAdminEmailsRoute =
     path: '/admin/emails',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminListingsRoute =
+  AuthenticatedAdminListingsRouteImport.update({
+    id: '/admin/listings',
+    path: '/admin/listings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminOrdersRoute =
   AuthenticatedAdminOrdersRouteImport.update({
     id: '/admin/orders',
@@ -308,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -351,6 +359,7 @@ export interface FileRoutesByTo {
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/assets': typeof AssetsIndexRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -396,6 +405,7 @@ export interface FileRoutesById {
   '/exhibitions/$id': typeof ExhibitionsIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/_authenticated/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/exhibitions/$id'
     | '/assets/'
     | '/admin/emails'
+    | '/admin/listings'
     | '/admin/orders'
     | '/admin/policy-review'
     | '/admin/reports'
@@ -484,6 +495,7 @@ export interface FileRouteTypes {
     | '/exhibitions/$id'
     | '/assets'
     | '/admin/emails'
+    | '/admin/listings'
     | '/admin/orders'
     | '/admin/policy-review'
     | '/admin/reports'
@@ -528,6 +540,7 @@ export interface FileRouteTypes {
     | '/exhibitions/$id'
     | '/assets/'
     | '/_authenticated/admin/emails'
+    | '/_authenticated/admin/listings'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/policy-review'
     | '/_authenticated/admin/reports'
@@ -808,6 +821,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/listings': {
+      id: '/_authenticated/admin/listings'
+      path: '/admin/listings'
+      fullPath: '/admin/listings'
+      preLoaderRoute: typeof AuthenticatedAdminListingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/orders': {
       id: '/_authenticated/admin/orders'
       path: '/admin/orders'
@@ -872,6 +892,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSearchTermsRoute: typeof AuthenticatedSearchTermsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
+  AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminPolicyReviewRoute: typeof AuthenticatedAdminPolicyReviewRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
@@ -893,6 +914,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSearchTermsRoute: AuthenticatedSearchTermsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
+  AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminPolicyReviewRoute: AuthenticatedAdminPolicyReviewRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
