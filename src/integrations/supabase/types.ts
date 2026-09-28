@@ -699,6 +699,7 @@ export type Database = {
           image_path: string | null
           is_heritage: boolean
           medium: string
+          org_id: string | null
           origin_region: string
           owner_approved_at: string | null
           owner_declared: boolean
@@ -721,6 +722,8 @@ export type Database = {
           title_ar: string
           updated_at: string
           user_id: string
+          workflow_id: string | null
+          workflow_step: number
         }
         Insert: {
           alt_text?: string
@@ -740,6 +743,7 @@ export type Database = {
           image_path?: string | null
           is_heritage?: boolean
           medium?: string
+          org_id?: string | null
           origin_region?: string
           owner_approved_at?: string | null
           owner_declared?: boolean
@@ -762,6 +766,8 @@ export type Database = {
           title_ar?: string
           updated_at?: string
           user_id?: string
+          workflow_id?: string | null
+          workflow_step?: number
         }
         Update: {
           alt_text?: string
@@ -781,6 +787,7 @@ export type Database = {
           image_path?: string | null
           is_heritage?: boolean
           medium?: string
+          org_id?: string | null
           origin_region?: string
           owner_approved_at?: string | null
           owner_declared?: boolean
@@ -803,8 +810,25 @@ export type Database = {
           title_ar?: string
           updated_at?: string
           user_id?: string
+          workflow_id?: string | null
+          workflow_step?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "listing_drafts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_drafts_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "org_review_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listing_review_comments: {
         Row: {
@@ -1233,6 +1257,169 @@ export type Database = {
           total?: number
           user_id?: string
           vat?: number
+        }
+        Relationships: []
+      }
+      org_review_workflows: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_default: boolean
+          name: string
+          org_id: string
+          steps: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          org_id: string
+          steps?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          org_id?: string
+          steps?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_review_workflows_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_workflow_decisions: {
+        Row: {
+          actor: string
+          created_at: string
+          decision: string
+          draft_id: string
+          id: string
+          note: string
+          step: number
+          workflow_id: string
+        }
+        Insert: {
+          actor?: string
+          created_at?: string
+          decision: string
+          draft_id: string
+          id?: string
+          note?: string
+          step: number
+          workflow_id: string
+        }
+        Update: {
+          actor?: string
+          created_at?: string
+          decision?: string
+          draft_id?: string
+          id?: string
+          note?: string
+          step?: number
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_workflow_decisions_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "listing_drafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_workflow_decisions_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "org_review_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_members: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          invited_by: string | null
+          org_id: string
+          role: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          invited_by?: string | null
+          org_id: string
+          role?: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string | null
+          org_id?: string
+          role?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_members_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          city: string
+          created_at: string
+          created_by: string
+          id: string
+          kind: string
+          name: string
+          name_ar: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          kind?: string
+          name: string
+          name_ar?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          kind?: string
+          name?: string
+          name_ar?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1842,6 +2029,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_org_invite: { Args: { _invite: string }; Returns: undefined }
       active_reviewer: {
         Args: { _draft: string; _uid: string }
         Returns: string
@@ -1953,6 +2141,10 @@ export type Database = {
         }
         Returns: string
       }
+      decide_workflow_step: {
+        Args: { _approve: boolean; _draft: string; _note: string }
+        Returns: number
+      }
       delete_my_review: { Args: { _review: string }; Returns: undefined }
       draft_owner: { Args: { _draft: string }; Returns: string }
       edit_my_review: {
@@ -1990,6 +2182,8 @@ export type Database = {
         }
         Returns: undefined
       }
+      my_org_role: { Args: { _org: string }; Returns: string }
+      org_rank: { Args: { _role: string }; Returns: number }
       ownership_heritage_issues: {
         Args: { d: Database["public"]["Tables"]["listing_drafts"]["Row"] }
         Returns: string[]
@@ -2039,6 +2233,10 @@ export type Database = {
         Returns: undefined
       }
       settle_auction_if_due: { Args: { _auction: string }; Returns: string }
+      share_draft_with_org: {
+        Args: { _draft: string; _org: string; _workflow: string }
+        Returns: undefined
+      }
       slot_bookings: {
         Args: { _date: string; _exhibition_id: string }
         Returns: {

@@ -43,6 +43,7 @@ import { Route as AuthenticatedRevisionCheckRouteImport } from './routes/_authen
 import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
 import { Route as AuthenticatedSearchTermsRouteImport } from './routes/_authenticated/search-terms'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
 import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
 import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
 import { Route as AssetsIndexRouteImport } from './routes/assets.index'
@@ -240,6 +241,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ArtistsIdRoute = ArtistsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -379,6 +385,7 @@ export interface FileRoutesByFullPath {
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/search-terms': typeof AuthenticatedSearchTermsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
   '/assets/$id': typeof AssetsIdRoute
@@ -433,6 +440,7 @@ export interface FileRoutesByTo {
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/search-terms': typeof AuthenticatedSearchTermsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
   '/assets/$id': typeof AssetsIdRoute
@@ -489,6 +497,7 @@ export interface FileRoutesById {
   '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/_authenticated/search-terms': typeof AuthenticatedSearchTermsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
   '/assets/$id': typeof AssetsIdRoute
@@ -545,6 +554,7 @@ export interface FileRouteTypes {
     | '/saved-searches'
     | '/search-terms'
     | '/settings'
+    | '/teams'
     | '/artists/$id'
     | '/artwork/$id'
     | '/assets/$id'
@@ -599,6 +609,7 @@ export interface FileRouteTypes {
     | '/saved-searches'
     | '/search-terms'
     | '/settings'
+    | '/teams'
     | '/artists/$id'
     | '/artwork/$id'
     | '/assets/$id'
@@ -654,6 +665,7 @@ export interface FileRouteTypes {
     | '/_authenticated/saved-searches'
     | '/_authenticated/search-terms'
     | '/_authenticated/settings'
+    | '/_authenticated/teams'
     | '/artists/$id'
     | '/artwork/$id'
     | '/assets/$id'
@@ -942,6 +954,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/teams': {
+      id: '/_authenticated/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof AuthenticatedTeamsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/artists/$id': {
       id: '/artists/$id'
       path: '/$id'
@@ -1094,6 +1113,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
   AuthenticatedSearchTermsRoute: typeof AuthenticatedSearchTermsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
   AuthenticatedAdminAuctionsRoute: typeof AuthenticatedAdminAuctionsRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
@@ -1123,6 +1143,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
   AuthenticatedSearchTermsRoute: AuthenticatedSearchTermsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
   AuthenticatedAdminAuctionsRoute: AuthenticatedAdminAuctionsRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
