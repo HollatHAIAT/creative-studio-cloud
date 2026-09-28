@@ -6,6 +6,7 @@ import { priceCart } from "./pricing";
 const cartItem = z.union([
   z.object({ key: z.string().max(200), kind: z.literal("artwork"), listingId: z.string().max(100), variantId: z.string().max(50), qty: z.number().int().min(1).max(10) }),
   z.object({ key: z.string().max(200), kind: z.literal("ticket"), exhibitionId: z.string().max(100), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), slot: z.string().max(20), tickets: z.record(z.string().max(20), z.number().int().min(0).max(20)) }),
+  z.object({ key: z.string().max(200), kind: z.literal("supply"), supplyId: z.string().max(100), qty: z.number().int().min(1).max(20) }),
 ]);
 
 const input = z.object({
@@ -28,7 +29,7 @@ export const placeOrder = createServerFn({ method: "POST" })
     const priced = priceCart(data.items);
     if (priced.errors.length) return { ok: false as const, error: priced.errors.join("; ") };
     // Seller authorization: listing must be live; agent-sold listings need a valid, owner-approved license covering this format.
-    for (const l of priced.lines.filter((x) => x.kind !== "ticket")) {
+    for (const l of priced.lines.filter((x) => x.kind !== "ticket" && x.kind !== "supply")) {
       const listingId = String(l.ref["listingId"]);
       const { data: row } = await supabase.from("listings").select("id, status").eq("id", listingId).maybeSingle();
       if (!row || row.status !== "published") return { ok: false as const, error: "LISTING_UNAVAILABLE" };

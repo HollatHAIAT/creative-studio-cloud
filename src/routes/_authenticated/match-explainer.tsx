@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/match-explainer")({
 });
 
 type Saved = { id: string; name: string; keywords: string; categories: string[]; min_price: number | null; max_price: number | null };
-const CAT_AR: Record<string, string> = { Painting: "رسم", Photography: "تصوير", Calligraphy: "خط عربي", Illustration: "رسوم توضيحية", Digital: "رقمي", Print: "مطبوعات" };
+const CAT_AR: Record<string, string> = { Painting: "رسم", Photography: "تصوير", Calligraphy: "خط عربي", Illustration: "رسوم توضيحية", Digital: "رقمي", Print: "مطبوعات", Sadu: "نسيج السدو", Qatt: "القط العسيري", Pottery: "فخار" };
 const input = "w-full rounded-md border border-border bg-card px-3 py-2 text-sm outline-none focus:border-primary";
 const num = (v: string) => (v.trim() === "" || isNaN(+v) ? null : +v);
 

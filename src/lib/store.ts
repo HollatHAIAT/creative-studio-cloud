@@ -12,7 +12,8 @@ export type Delivery = { id: string; at: string; status: "sent" | "failed" | "up
 type State = { mine: Listing[]; removed: string[]; favorites: string[]; views: SavedView[]; reports: Report[]; alerts: AlertConfig; review: Record<string, "acknowledged" | "resolved">; notify: NotifyPrefs; alertSort: { by: "latest" | "repeats" | "drop" | "duration" | "ongoing"; dir: "desc" | "asc" }; alertPresets: AlertPreset[]; overdueNotified: Record<string, number>; owners: Record<string, { name: string; at: number }>; responder: string; maintenance: MaintenanceWindow[]; escalation: Escalation; routes: RouteRule[]; retry: RetryPolicy; manualDeliveries: Record<string, Channel>; slos: Slo[]; breachNotify: { destinations: Channel[]; renotifyHours: number }; breachNotified: Record<string, number>; audit: AuditEvent[]; locale: "en" | "ar"; cart: CartItem[]; bids: Record<string, Bid[]>; bookings: Booking[] };
 export type CartItem =
   | { key: string; kind: "artwork"; listingId: string; variantId: string; qty: number }
-  | { key: string; kind: "ticket"; exhibitionId: string; date: string; slot: string; tickets: Record<string, number> };
+  | { key: string; kind: "ticket"; exhibitionId: string; date: string; slot: string; tickets: Record<string, number> }
+  | { key: string; kind: "supply"; supplyId: string; qty: number };
 export type Bid = { id: string; bidder: string; amount: number; at: number; mine?: boolean };
 export type Booking = { id: string; exhibitionId: string; date: string; slot: string; tickets: Record<string, number>; total: number; at: number };
 export type AuditEvent = { key: string; at: number; type: "status" | "acknowledged" | "resolved" | "reopened" | "claimed" | "released" | "notification" | "escalation"; actor: string; detail: string };
