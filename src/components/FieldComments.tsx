@@ -2,11 +2,20 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
+import { useStaff } from "@/lib/auth";
 
 export type Comment = { id: string; version: number; field: string; body: string; created_at: string };
 
+/** Only moderators and admins may see private field comments (enforced by the database too). */
+export function useCanViewPrivateComments() {
+  const { isStaff, loading } = useStaff();
+  return { allowed: isStaff, loading };
+}
+
 export function useVersionComments(draftId: string) {
+  const { allowed } = useCanViewPrivateComments();
   return useQuery({
+    enabled: allowed,
     queryKey: ["admin", "version-comments", draftId],
     queryFn: async () => {
       const { data, error } = await supabase.from("listing_version_comments" as never).select("id,version,field,body,created_at").eq("draft_id", draftId).order("created_at");
@@ -20,6 +29,7 @@ export function FieldComments({ draftId, version, field, comments }: { draftId: 
   const { locale } = useLocale(); const ar = locale === "ar"; const L = (e: string, a: string) => (ar ? a : e);
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const { allowed } = useCanViewPrivateComments();
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -36,6 +46,7 @@ export function FieldComments({ draftId, version, field, comments }: { draftId: 
   }
   const fmt = (t: string) => new Date(t).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" });
 
+  if (!allowed) return null;
   return (
     <div className="mt-1 space-y-1 text-xs">
       {[...earlier, ...mine].map((c) => (

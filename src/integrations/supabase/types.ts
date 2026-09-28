@@ -1764,6 +1764,7 @@ export type Database = {
       award_auction: { Args: { _auction: string }; Returns: undefined }
       can_manage_auction: { Args: { _auction: string }; Returns: boolean }
       can_review: { Args: { _listing: string }; Returns: boolean }
+      can_view_private_comments: { Args: { _uid: string }; Returns: boolean }
       cancel_auction: {
         Args: { _auction: string; _reason: string }
         Returns: undefined
