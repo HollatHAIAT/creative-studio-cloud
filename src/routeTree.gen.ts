@@ -23,6 +23,7 @@ import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ExhibitionsRouteImport } from './routes/exhibitions'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as HeritageRouteImport } from './routes/heritage'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as SuppliesRouteImport } from './routes/supplies'
@@ -129,6 +130,11 @@ const ExploreRoute = ExploreRouteImport.update({
 const FavoritesRoute = FavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeritageRoute = HeritageRouteImport.update({
+  id: '/heritage',
+  path: '/heritage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportsRoute = ReportsRouteImport.update({
@@ -353,6 +359,7 @@ export interface FileRoutesByFullPath {
   '/exhibitions': typeof ExhibitionsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
+  '/heritage': typeof HeritageRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/supplies': typeof SuppliesRoute
@@ -406,6 +413,7 @@ export interface FileRoutesByTo {
   '/exhibitions': typeof ExhibitionsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
+  '/heritage': typeof HeritageRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/supplies': typeof SuppliesRoute
@@ -461,6 +469,7 @@ export interface FileRoutesById {
   '/exhibitions': typeof ExhibitionsRouteWithChildren
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
+  '/heritage': typeof HeritageRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/supplies': typeof SuppliesRoute
@@ -516,6 +525,7 @@ export interface FileRouteTypes {
     | '/exhibitions'
     | '/explore'
     | '/favorites'
+    | '/heritage'
     | '/reports'
     | '/sell'
     | '/supplies'
@@ -569,6 +579,7 @@ export interface FileRouteTypes {
     | '/exhibitions'
     | '/explore'
     | '/favorites'
+    | '/heritage'
     | '/reports'
     | '/sell'
     | '/supplies'
@@ -623,6 +634,7 @@ export interface FileRouteTypes {
     | '/exhibitions'
     | '/explore'
     | '/favorites'
+    | '/heritage'
     | '/reports'
     | '/sell'
     | '/supplies'
@@ -678,6 +690,7 @@ export interface RootRouteChildren {
   ExhibitionsRoute: typeof ExhibitionsRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   FavoritesRoute: typeof FavoritesRoute
+  HeritageRoute: typeof HeritageRoute
   ReportsRoute: typeof ReportsRoute
   SellRoute: typeof SellRoute
   SuppliesRoute: typeof SuppliesRoute
@@ -787,6 +800,13 @@ declare module '@tanstack/react-router' {
       path: '/favorites'
       fullPath: '/favorites'
       preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heritage': {
+      id: '/heritage'
+      path: '/heritage'
+      fullPath: '/heritage'
+      preLoaderRoute: typeof HeritageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reports': {
@@ -1169,6 +1189,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExhibitionsRoute: ExhibitionsRouteWithChildren,
   ExploreRoute: ExploreRoute,
   FavoritesRoute: FavoritesRoute,
+  HeritageRoute: HeritageRoute,
   ReportsRoute: ReportsRoute,
   SellRoute: SellRoute,
   SuppliesRoute: SuppliesRoute,
