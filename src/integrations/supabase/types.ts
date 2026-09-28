@@ -1493,6 +1493,10 @@ export type Database = {
         Args: { _approve: boolean; _id: string; _note: string }
         Returns: undefined
       }
+      admin_set_listing_guidance: {
+        Args: { _actor: string; _id: string; _note: string }
+        Returns: undefined
+      }
       admin_set_order_status: {
         Args: { _note?: string; _order_id: string; _status: string }
         Returns: undefined
