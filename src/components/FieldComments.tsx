@@ -46,6 +46,7 @@ export function FieldComments({ draftId, version, field, comments }: { draftId: 
   }
   const fmt = (t: string) => new Date(t).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" });
 
+  if (!allowed) return null;
   return (
     <div className="mt-1 space-y-1 text-xs">
       {[...earlier, ...mine].map((c) => (

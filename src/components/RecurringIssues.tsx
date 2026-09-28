@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { findRecurringIssues, type RecurringIssuesResult } from "@/lib/policy-review.functions";
 import { useLocale } from "@/lib/i18n";
+import { useCanViewPrivateComments } from "./FieldComments";
 
 const ST: Record<string, [string, string, string]> = {
   unresolved: ["Unresolved", "لم تُحل", "bg-destructive/10 text-destructive"],
@@ -23,12 +24,14 @@ export function RecurringIssues({ draftId }: { draftId: string }) {
     try { const r = await run({ data: { draftId, extra } }); if (r.error) setErr(r.error); else setRes(r.result ?? null); }
     catch (e) { setErr(e instanceof Error ? e.message : "Error"); } finally { setBusy(false); }
   }
+  const { allowed } = useCanViewPrivateComments();
   const unresolved = res?.issues.filter((i) => i.status !== "resolved") ?? [];
   const resolved = res?.issues.filter((i) => i.status === "resolved") ?? [];
   const Item = ({ i }: { i: RecurringIssuesResult["issues"][number] }) => { const s = ST[i.status] ?? ST["unclear"]!; return (
     <li className="rounded-lg bg-muted/40 p-2"><div className="flex flex-wrap items-center gap-2"><span className={`rounded-full px-2 py-0.5 text-xs ${s[2]}`}>{L(s[0], s[1])}</span>
       <span className="font-medium">{ar ? i.issueAr || i.issue : i.issue}</span><span className="text-xs text-muted-foreground">{i.field}{i.versions.length ? ` · v${i.versions.join(", v")}` : ""}</span></div>
       <p className="mt-1 text-muted-foreground">{ar ? i.evidenceAr || i.evidence : i.evidence}</p></li>); };
+  if (!allowed) return null;
   return (
     <div className="space-y-3 rounded-xl border border-border p-3">
       <p className="font-medium">{L("AI: recurring issues & checks for the next review", "ذكاء اصطناعي: المشكلات المتكررة وفحوص المراجعة القادمة")}</p>
