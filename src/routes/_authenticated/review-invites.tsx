@@ -22,52 +22,110 @@ export const Route = createFileRoute("/_authenticated/review-invites")({
   component: ReviewInvites,
 });
 
-type Invite = { id: string; draft_id: string; permission: string; starts_at: string; expires_at: string | null; allow_download: boolean; watermark: boolean };
+type Invite = { id: string; draft_id: string; email: string; permission: string; starts_at: string; expires_at: string | null; allow_download: boolean; watermark: boolean; status?: "pending" | "accepted" | "declined"; responded_at?: string | null };
 type Draft = { id: string; title: string; title_ar: string; description: string; description_ar: string; image_path: string | null };
+
+type Status = "pending" | "accepted" | "declined" | "expired";
+const STATUS: Record<Status, [string, string, string]> = {
+  pending: ["Pending", "بانتظار الرد", "bg-warning/15 text-warning"],
+  accepted: ["Accepted", "مقبولة", "bg-success/15 text-success"],
+  declined: ["Declined", "مرفوضة", "bg-destructive/10 text-destructive"],
+  expired: ["Expired", "منتهية", "bg-muted text-muted-foreground"],
+};
+const statusOf = (i: Invite): Status => (i.expires_at && new Date(i.expires_at).getTime() <= Date.now() ? "expired" : (i.status ?? "pending"));
+
+function StatusPill({ s, L }: { s: Status; L: (e: string, a: string) => string }) {
+  const x = STATUS[s];
+  return <span className={`rounded-full px-3 py-1 text-xs font-medium ${x[2]}`}>{L(x[0], x[1])}</span>;
+}
 
 function ReviewInvites() {
   const { locale } = useLocale();
   const L = (en: string, ar: string) => (locale === "ar" ? ar : en);
   const [invites, setInvites] = useState<Invite[]>([]);
+  const [sent, setSent] = useState<Invite[]>([]);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [open, setOpen] = useState<string | null>(null);
+  const [filter, setFilter] = useState<Status | "all">("all");
 
-  useEffect(() => {
-    void (async () => {
-      const email = (await supabase.auth.getUser()).data.user?.email?.toLowerCase() ?? "";
-      const { data } = await sb.from("listing_reviewers").select("*").eq("email", email).order("created_at", { ascending: false });
-      setInvites(data ?? []);
-      const ids = (data ?? []).map((i: Invite) => i.draft_id);
-      if (ids.length) {
-        const { data: d } = await sb.from("listing_drafts").select("id,title,title_ar,description,description_ar,image_path").in("id", ids);
-        setDrafts(Object.fromEntries((d ?? []).map((x: Draft) => [x.id, x])));
-      }
-    })();
-  }, []);
+  const load = async () => {
+    const { data: u } = await supabase.auth.getUser();
+    const email = u.user?.email?.toLowerCase() ?? "";
+    const [mine, out] = await Promise.all([
+      sb.from("listing_reviewers").select("*").eq("email", email).order("created_at", { ascending: false }),
+      sb.from("listing_reviewers").select("*").eq("invited_by", u.user?.id ?? "").order("created_at", { ascending: false }),
+    ]);
+    setInvites(mine.data ?? []); setSent(out.data ?? []);
+    const ids = [...new Set([...(mine.data ?? []), ...(out.data ?? [])].map((i: Invite) => i.draft_id))];
+    if (ids.length) {
+      const { data: d } = await sb.from("listing_drafts").select("id,title,title_ar,description,description_ar,image_path").in("id", ids);
+      setDrafts(Object.fromEntries((d ?? []).map((x: Draft) => [x.id, x])));
+    }
+  };
+  useEffect(() => { void load(); }, []);
 
-  const now = Date.now();
-  const state = (i: Invite) => new Date(i.starts_at).getTime() > now ? "upcoming" : i.expires_at && new Date(i.expires_at).getTime() <= now ? "expired" : "active";
-  const stateL: Record<string, [string, string]> = { upcoming: ["Not open yet", "لم تبدأ بعد"], expired: ["Expired", "انتهت"], active: ["Open", "مفتوحة"] };
+  const respond = async (id: string, accept: boolean) => {
+    const { error } = await sb.rpc("respond_review_invite", { _id: id, _accept: accept });
+    if (error) { toast.error(error.message.includes("expired") ? L("This invitation has expired.", "انتهت هذه الدعوة.") : L("Couldn't send your answer.", "تعذّر إرسال ردك.")); return; }
+    toast.success(accept ? L("Invitation accepted", "قُبلت الدعوة") : L("Invitation declined", "رُفضت الدعوة"));
+    void load();
+  };
+
+  const title = (id: string) => { const d = drafts[id]; return d ? L(d.title || "Untitled", d.title_ar || "بلا عنوان") : L("Listing", "إعلان"); };
+  const dates = (i: Invite) => `${new Date(i.starts_at).toLocaleDateString()}${i.expires_at ? ` → ${new Date(i.expires_at).toLocaleDateString()}` : ` · ${L("no end date", "بلا تاريخ انتهاء")}`}`;
+  const counts = (["pending", "accepted", "declined", "expired"] as Status[]).map((s) => [s, sent.filter((i) => statusOf(i) === s).length] as const);
+  const shown = sent.filter((i) => filter === "all" || statusOf(i) === filter);
 
   return (
     <SiteShell>
-      <PageTitle eyebrow={L("Arwiqa", "أروقة")} title={L("Review invitations", "دعوات المراجعة")} sub={L("Artworks artists asked you to review. You can't sell or change them.", "أعمال طلب منك أصحابها مراجعتها. لا يمكنك بيعها أو تعديلها.")} />
-      <div className="container mx-auto max-w-4xl space-y-4 px-4 pb-16">
-        {!invites.length && <p className="text-muted-foreground">{L("No invitations yet.", "لا دعوات بعد.")}</p>}
-        {invites.map((i) => {
-          const d = drafts[i.draft_id]; const s = state(i);
-          return (
-            <article key={i.id} className="rounded-2xl border border-border bg-card p-5">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="font-display text-lg">{d ? L(d.title || "Untitled", d.title_ar || "بلا عنوان") : L("Not available", "غير متاح")}</h2>
-                <span className="rounded-full bg-muted px-3 py-1 text-xs">{L((stateL[s] ?? ["",""])[0], (stateL[s] ?? ["",""])[1])}{i.expires_at ? ` · ${L("until", "حتى")} ${new Date(i.expires_at).toLocaleDateString()}` : ""}</span>
-              </div>
-              {s === "active" && d && (open === i.id
-                ? <ReviewPanel draft={d} invite={i} />
-                : <button type="button" onClick={() => setOpen(i.id)} className="mt-3 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">{L("Open review", "افتح المراجعة")}</button>)}
-            </article>
-          );
-        })}
+      <PageTitle eyebrow={L("Arwiqa", "أروقة")} title={L("Review invitations", "دعوات المراجعة")} sub={L("Invitations you've received, and the ones you've sent for your listings.", "الدعوات التي وصلتك، والتي أرسلتها لإعلاناتك.")} />
+      <div className="container mx-auto max-w-4xl space-y-10 px-4 pb-16">
+        <section aria-labelledby="sent-h" className="space-y-3">
+          <h2 id="sent-h" className="font-display text-xl">{L("Invitations you sent", "دعوات أرسلتها")}</h2>
+          <div className="flex flex-wrap gap-2 text-sm" role="group" aria-label={L("Filter by status", "تصفية حسب الحالة")}>
+            <button type="button" aria-pressed={filter === "all"} onClick={() => setFilter("all")} className={`rounded-full border px-3 py-1 ${filter === "all" ? "border-primary bg-primary/10" : "border-border"}`}>{L("All", "الكل")} ({sent.length})</button>
+            {counts.map(([s, n]) => (
+              <button key={s} type="button" aria-pressed={filter === s} onClick={() => setFilter(s)} className={`rounded-full border px-3 py-1 ${filter === s ? "border-primary bg-primary/10" : "border-border"}`}>{L(STATUS[s][0], STATUS[s][1])} ({n})</button>
+            ))}
+          </div>
+          {!sent.length ? <p className="text-muted-foreground">{L("You haven't invited anyone yet. Invite reviewers from the AI listing writer.", "لم تدعُ أحداً بعد. ادعُ المراجعين من كاتب الإعلانات الذكي.")}</p> : (
+            <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
+              {shown.map((i) => (
+                <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 p-4 text-sm">
+                  <div><p className="font-medium">{i.email}</p><p className="text-muted-foreground">{title(i.draft_id)} · {dates(i)}{i.responded_at ? ` · ${L("answered", "ردّ في")} ${new Date(i.responded_at).toLocaleDateString()}` : ""}</p></div>
+                  <StatusPill s={statusOf(i)} L={L} />
+                </li>
+              ))}
+              {!shown.length && <li className="p-4 text-muted-foreground">{L("No invitations with this status.", "لا دعوات بهذه الحالة.")}</li>}
+            </ul>
+          )}
+        </section>
+
+        <section aria-labelledby="recv-h" className="space-y-4">
+          <h2 id="recv-h" className="font-display text-xl">{L("Invitations for you", "دعوات لك")}</h2>
+          {!invites.length && <p className="text-muted-foreground">{L("No invitations yet.", "لا دعوات بعد.")}</p>}
+          {invites.map((i) => {
+            const d = drafts[i.draft_id]; const s = statusOf(i);
+            const notOpen = new Date(i.starts_at).getTime() > Date.now();
+            return (
+              <article key={i.id} className="rounded-2xl border border-border bg-card p-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="font-display text-lg">{title(i.draft_id)}</h3>
+                  <StatusPill s={s} L={L} />
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">{L("Review dates", "مدة المراجعة")}: {dates(i)}{notOpen ? ` · ${L("not open yet", "لم تبدأ بعد")}` : ""}</p>
+                {s === "pending" && (
+                  <div className="mt-3 flex gap-2">
+                    <button type="button" onClick={() => respond(i.id, true)} className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">{L("Accept", "اقبل")}</button>
+                    <button type="button" onClick={() => respond(i.id, false)} className="rounded-full border border-border px-4 py-2 text-sm">{L("Decline", "اعتذر")}</button>
+                  </div>)}
+                {s === "accepted" && !notOpen && d && (open === i.id
+                  ? <ReviewPanel draft={d} invite={i} />
+                  : <button type="button" onClick={() => setOpen(i.id)} className="mt-3 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">{L("Open review", "افتح المراجعة")}</button>)}
+              </article>
+            );
+          })}
+        </section>
       </div>
     </SiteShell>
   );

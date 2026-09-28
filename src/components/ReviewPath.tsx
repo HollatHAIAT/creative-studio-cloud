@@ -32,7 +32,7 @@ const ISSUE: Record<string, [string, string]> = {
   policy_price_needs_review: ["Works above the price limit need platform review", "الأعمال فوق حد السعر تتطلب مراجعة المنصة"],
 };
 
-type Reviewer = { id: string; email: string; role: string; permission: string; starts_at: string; expires_at: string | null; allow_download: boolean; watermark: boolean };
+type Reviewer = { status?: string; id: string; email: string; role: string; permission: string; starts_at: string; expires_at: string | null; allow_download: boolean; watermark: boolean };
 type Comment = { id: string; body: string; visibility: string; score: number | null; recommendation: string | null; created_at: string; author: string };
 
 export function ReviewPath({ draftId, onSave, onPublished, submitted }: {
@@ -211,7 +211,7 @@ function Collaborators({ draftId, invite, mode }: { draftId: string; invite: boo
           <ul className="divide-y divide-border">
             {list.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                <span>{r.email} · {L((permL[r.permission] ?? ["",""])[0], (permL[r.permission] ?? ["",""])[1])} · {new Date(r.starts_at).toLocaleDateString()}{r.expires_at ? ` → ${new Date(r.expires_at).toLocaleDateString()}` : ""}{r.watermark ? " · 💧" : ""}{r.allow_download ? " · ⬇" : ""}</span>
+                <span>{r.email} · {r.expires_at && new Date(r.expires_at) <= new Date() ? L("Expired", "منتهية") : r.status === "accepted" ? L("Accepted", "مقبولة") : r.status === "declined" ? L("Declined", "مرفوضة") : L("Pending", "بانتظار الرد")} · {L((permL[r.permission] ?? ["",""])[0], (permL[r.permission] ?? ["",""])[1])} · {new Date(r.starts_at).toLocaleDateString()}{r.expires_at ? ` → ${new Date(r.expires_at).toLocaleDateString()}` : ""}{r.watermark ? " · 💧" : ""}{r.allow_download ? " · ⬇" : ""}</span>
                 <button type="button" onClick={() => remove(r.id)} className="text-xs text-destructive underline">{L("Remove", "إزالة")}</button>
               </li>
             ))}
