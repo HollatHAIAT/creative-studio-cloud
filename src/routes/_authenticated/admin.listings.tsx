@@ -129,7 +129,7 @@ function ListingsReview() {
                     </div>
                     <p className="text-xs text-muted-foreground">{L("The seller is notified either way. Every decision is logged.", "يُبلَّغ البائع في الحالتين، ويُسجَّل كل قرار.")}</p>
                   </div>
-                ) : d.status === "rejected" ? <RevisionGuidance key={d.id} draftId={d.id} initialNotes={d.review_note ?? ""} /> : <p className="text-sm text-muted-foreground">{L("This listing has already been reviewed. If the seller edits it, it returns to draft and can be submitted again.", "تمت مراجعة هذا الإعلان. إذا عدّله البائع يعود مسودة ويمكن إرساله مجدداً.")}</p>}
+                ) : d.status === "rejected" ? (<RevisionGuidance key={d.id} draftId={d.id} initialNotes={d.review_note ?? ""} />) : <p className="text-sm text-muted-foreground">{L("This listing has already been reviewed. If the seller edits it, it returns to draft and can be submitted again.", "تمت مراجعة هذا الإعلان. إذا عدّله البائع يعود مسودة ويمكن إرساله مجدداً.")}</p>}
               </div>
             </article>
           )}
