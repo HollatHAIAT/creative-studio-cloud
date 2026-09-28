@@ -283,3 +283,45 @@ svg.lucide { stroke-width: 1.6; }
   .brush-reveal, .art-drift, .art-living:hover .art-sheen { animation: none; }
   .art-living > button { transform: none; }
 }
+
+/* ---------- Live page banner ---------- */
+.banner-live { background-color: var(--background); }
+.banner-glow { position: absolute; z-index: -1; border-radius: 9999px; filter: blur(60px); opacity: .55; pointer-events: none; }
+.banner-glow-a { width: 26rem; height: 26rem; inset-inline-end: -6rem; top: -10rem; background: color-mix(in oklab, var(--gold) 45%, transparent); animation: banner-float 14s ease-in-out infinite; }
+.banner-glow-b { width: 20rem; height: 20rem; inset-inline-end: 30%; bottom: -12rem; background: color-mix(in oklab, var(--primary) 30%, transparent); animation: banner-float 18s ease-in-out infinite reverse; }
+.banner-brush { position: absolute; z-index: -1; inset-inline-end: -5%; top: 18%; width: 55%; height: 5.5rem; border-radius: 60% 40% 55% 45% / 70% 50% 50% 30%;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--clay) 18%, transparent) 25%, color-mix(in oklab, var(--gold) 28%, transparent) 70%, transparent);
+  transform-origin: right center; transform: rotate(-6deg) scaleX(0); animation: banner-stroke 1.4s cubic-bezier(.2,.8,.2,1) .2s forwards; }
+[dir="rtl"] .banner-brush { transform-origin: left center; }
+.banner-diamond { position: absolute; z-index: -1; transform: rotate(45deg); border: 1.5px solid color-mix(in oklab, var(--gold) 70%, transparent); animation: banner-bob 7s ease-in-out infinite; }
+.banner-diamond-slow { background: color-mix(in oklab, var(--sadu) 25%, transparent); animation-duration: 10s; }
+.banner-diamond-fast { background: var(--gold); animation-duration: 5s; }
+.banner-rise { opacity: 0; animation: banner-rise .8s cubic-bezier(.2,.8,.2,1) forwards; }
+.banner-spin { animation: banner-spin 6s linear infinite; }
+.banner-shimmer { background: linear-gradient(100deg, var(--foreground) 40%, var(--gold) 50%, var(--foreground) 60%) 0 0 / 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: banner-rise .8s cubic-bezier(.2,.8,.2,1) forwards, banner-sheen 6s ease-in-out 1.2s infinite; }
+.banner-weave { height: 6px; background: repeating-linear-gradient(90deg, var(--sadu) 0 10px, var(--gold) 10px 14px, var(--foreground) 14px 24px, var(--gold) 24px 28px) 0 0 / 56px 6px;
+  transform-origin: left; transform: scaleX(0); animation: banner-grow 1s ease-out .4s forwards, banner-weave 3s linear 1.4s infinite; }
+[dir="rtl"] .banner-weave { transform-origin: right; }
+@keyframes banner-float { 50% { transform: translate(-2rem, 1.5rem) scale(1.08); } }
+@keyframes banner-bob { 50% { transform: rotate(45deg) translateY(-10px); } }
+@keyframes banner-stroke { to { transform: rotate(-6deg) scaleX(1); } }
+@keyframes banner-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes banner-spin { to { transform: rotate(405deg); } }
+@keyframes banner-sheen { 0%, 60% { background-position: 100% 0; } 100% { background-position: -50% 0; } }
+@keyframes banner-grow { to { transform: scaleX(1); } }
+@keyframes banner-weave { to { background-position: 56px 0; } }
+
+/* ---------- Sell your art CTA ---------- */
+.sell-cta { position: relative; overflow: hidden; isolation: isolate;
+  background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--primary) 70%, var(--gold)));
+  box-shadow: 0 6px 18px -8px color-mix(in oklab, var(--primary) 70%, transparent), inset 0 1px 0 color-mix(in oklab, var(--primary-foreground) 25%, transparent);
+  transition: transform .25s ease, box-shadow .25s ease; }
+.sell-cta::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, transparent 35%, color-mix(in oklab, var(--primary-foreground) 35%, transparent) 50%, transparent 65%);
+  transform: translateX(-120%); animation: sell-sheen 4.5s ease-in-out 2s infinite; }
+.sell-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -10px color-mix(in oklab, var(--primary) 80%, transparent); }
+.sell-cta:active { transform: translateY(0) scale(.97); }
+.sell-cta:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+@keyframes sell-sheen { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+@media (prefers-reduced-motion: reduce) { .banner-rise, .banner-shimmer { opacity: 1; } .banner-brush { transform: rotate(-6deg); } .banner-weave { transform: none; } }
