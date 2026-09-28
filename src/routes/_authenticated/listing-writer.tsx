@@ -1,3 +1,4 @@
+import { FocusOrderPreview } from "@/components/FocusOrderPreview";
 import { OwnershipHeritage } from "@/components/OwnershipHeritage";
 import { ScreenReaderPreview } from "@/components/ScreenReaderPreview";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -388,6 +389,7 @@ function ListingWriter() {
                       ) : body}
                       </div>
                       <A11yAudit target={previewRef} watch={[copy, pvDevice, pvLang, preview]} />
+                      <FocusOrderPreview target={previewRef} watch={[copy, pvDevice, pvLang, preview]} />
                       <ScreenReaderPreview lang={pvLang} alt={alt} title={t} medium={medium} description={dsc} tags={copy.tags} hasImage={!!preview} />
                       {issues.length > 0 ? (
                         <ul className="space-y-1 text-sm text-destructive">{issues.map((i) => <li key={i}>• {i}</li>)}</ul>
