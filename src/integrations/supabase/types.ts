@@ -571,6 +571,68 @@ export type Database = {
           },
         ]
       }
+      listing_draft_versions: {
+        Row: {
+          alt_text: string
+          alt_text_ar: string
+          created_at: string
+          description: string
+          description_ar: string
+          draft_id: string
+          id: string
+          image_path: string | null
+          medium: string
+          previous_review_note: string | null
+          tags: string[]
+          title: string
+          title_ar: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          alt_text: string
+          alt_text_ar: string
+          created_at?: string
+          description: string
+          description_ar: string
+          draft_id: string
+          id?: string
+          image_path?: string | null
+          medium?: string
+          previous_review_note?: string | null
+          tags?: string[]
+          title: string
+          title_ar: string
+          user_id: string
+          version: number
+        }
+        Update: {
+          alt_text?: string
+          alt_text_ar?: string
+          created_at?: string
+          description?: string
+          description_ar?: string
+          draft_id?: string
+          id?: string
+          image_path?: string | null
+          medium?: string
+          previous_review_note?: string | null
+          tags?: string[]
+          title?: string
+          title_ar?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_draft_versions_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "listing_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_drafts: {
         Row: {
           alt_text: string
