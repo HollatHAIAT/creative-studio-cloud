@@ -68,7 +68,12 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <button onClick={toggle} className={`items-center gap-1 rounded-full border border-border px-3 py-1.5 ${scrolled ? "hidden md:flex" : "flex"}`} aria-label="Switch language"><Languages className="h-4 w-4" />{t("lang.switch")}</button>
             <Link to="/favorites" className="relative" aria-label={t("nav.favorites")}><Heart className="h-5 w-5" />{favorites.length > 0 && <span className="absolute -end-2 -top-2 rounded-full bg-primary px-1.5 text-[10px] text-primary-foreground">{favorites.length}</span>}</Link>
             <AccountNav />
-            <Link to="/sell" className="hidden rounded-full bg-primary px-4 py-2 text-primary-foreground transition hover:bg-primary-hover sm:inline-block">{L("Sell your art", "بع أعمالك")}</Link>
+            <Link to="/sell" className="sell-cta group hidden items-center gap-2 whitespace-nowrap rounded-full py-1.5 ps-1.5 pe-4 text-sm font-medium text-primary-foreground sm:inline-flex">
+              <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-primary-foreground/15 transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110">
+                <Brush className="h-3.5 w-3.5" />
+              </span>
+              {L("Sell your art", "بع أعمالك")}
+            </Link>
           </div>
         </div>
         <nav className={`no-scrollbar flex gap-5 overflow-x-auto px-6 text-sm transition-all lg:hidden ${scrolled ? "pb-2" : "pb-3"}`} aria-label={L("Main", "الرئيسية")}>
@@ -142,12 +147,21 @@ export function ArtCard({ a }: { a: Artwork }) {
 
 export function PageTitle({ eyebrow, title, sub }: { eyebrow: ReactNode; title: ReactNode; sub?: ReactNode }) {
   return (
-    <div className="sadu-bg border-b border-border">
-      <div className="mx-auto max-w-7xl px-6 pb-10 pt-16">
-        <p className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-primary"><span aria-hidden className="inline-block h-2.5 w-2.5 rotate-45 bg-gold" />{eyebrow}</p>
-        <h1 className="mt-3 font-display text-5xl md:text-6xl">{title}</h1>
-        {sub && <p className="mt-4 max-w-2xl text-muted-foreground">{sub}</p>}
-        <div aria-hidden className="sadu-thin mt-8 w-40" />
+    <div className="banner-live sadu-bg relative isolate overflow-hidden border-b border-border">
+      <span aria-hidden className="banner-glow banner-glow-a" />
+      <span aria-hidden className="banner-glow banner-glow-b" />
+      <span aria-hidden className="banner-brush" />
+      <span aria-hidden className="banner-diamond end-[12%] top-10 h-10 w-10" />
+      <span aria-hidden className="banner-diamond banner-diamond-slow end-[24%] bottom-8 h-5 w-5" />
+      <span aria-hidden className="banner-diamond banner-diamond-fast end-[6%] bottom-14 h-3 w-3" />
+      <div className="relative mx-auto max-w-7xl px-6 pb-12 pt-16">
+        <p className="banner-rise flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-primary">
+          <span aria-hidden className="banner-spin inline-block h-2.5 w-2.5 rotate-45 bg-gold" />{eyebrow}
+          <span aria-hidden className="h-px w-12 bg-gradient-to-r from-gold to-transparent rtl:bg-gradient-to-l" />
+        </p>
+        <h1 className="banner-rise banner-shimmer mt-3 font-display text-5xl md:text-7xl [animation-delay:120ms]">{title}</h1>
+        {sub && <p className="banner-rise mt-4 max-w-2xl text-muted-foreground [animation-delay:240ms]">{sub}</p>}
+        <div aria-hidden className="banner-weave mt-8 w-56" />
       </div>
     </div>
   );
