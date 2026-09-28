@@ -62,6 +62,7 @@ export function AccountNav() {
               <DropdownMenuItem asChild><Link to="/alt-checker">{locale === "ar" ? "فاحص النص البديل" : "Alt text checker"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/search-terms">{locale === "ar" ? "كلمات البحث والوسوم" : "Search terms & tags"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/crop-helper">{locale === "ar" ? "مساعد القص للهاتف" : "Mobile crop helper"}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/revision-check">{locale === "ar" ? "فحص التعديلات المطلوبة" : "Revision check"}</Link></DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild><Link to="/orders">{t("nav.orders")}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/my-auctions">{locale === "ar" ? "مزاداتي" : "My auctions"}</Link></DropdownMenuItem>
