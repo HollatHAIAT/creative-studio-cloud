@@ -39,7 +39,7 @@ function OwnerApprovals() {
   const rows = q.data ?? [];
   return (
     <SiteShell>
-      <PageTitle title={L("Owner approvals", "موافقات المالك")} subtitle={L("Listings that someone wants to sell on your behalf. Nothing goes live until you approve.", "إعلانات يريد أحدهم بيعها نيابة عنك. لا يُنشر شيء قبل موافقتك.")} />
+      <PageTitle eyebrow={L("Selling for someone else", "البيع نيابة عن الغير")} title={L("Owner approvals", "موافقات المالك")} sub={L("Listings that someone wants to sell on your behalf. Nothing goes live until you approve.", "إعلانات يريد أحدهم بيعها نيابة عنك. لا يُنشر شيء قبل موافقتك.")} />
       <div className="mx-auto max-w-3xl space-y-3 px-4 pb-16">
         {q.isLoading ? <p>…</p> : q.error ? <p role="alert" className="text-destructive">{L("Couldn't load.", "تعذّر التحميل.")}</p>
           : rows.length === 0 ? <p className="text-muted-foreground">{L("No listings name you as the owner.", "لا توجد إعلانات تذكرك مالكاً.")}</p>

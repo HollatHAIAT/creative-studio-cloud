@@ -36,6 +36,7 @@ import { Route as AuthenticatedMyAuctionsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOrderHelpRouteImport } from './routes/_authenticated/order-help'
+import { Route as AuthenticatedOwnerApprovalsRouteImport } from './routes/_authenticated/owner-approvals'
 import { Route as AuthenticatedReviewInvitesRouteImport } from './routes/_authenticated/review-invites'
 import { Route as AuthenticatedRevisionCheckRouteImport } from './routes/_authenticated/revision-check'
 import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
@@ -198,6 +199,12 @@ const AuthenticatedOrderHelpRoute = AuthenticatedOrderHelpRouteImport.update({
   path: '/order-help',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOwnerApprovalsRoute =
+  AuthenticatedOwnerApprovalsRouteImport.update({
+    id: '/owner-approvals',
+    path: '/owner-approvals',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReviewInvitesRoute =
   AuthenticatedReviewInvitesRouteImport.update({
     id: '/review-invites',
@@ -359,6 +366,7 @@ export interface FileRoutesByFullPath {
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
+  '/owner-approvals': typeof AuthenticatedOwnerApprovalsRoute
   '/review-invites': typeof AuthenticatedReviewInvitesRoute
   '/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -411,6 +419,7 @@ export interface FileRoutesByTo {
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
+  '/owner-approvals': typeof AuthenticatedOwnerApprovalsRoute
   '/review-invites': typeof AuthenticatedReviewInvitesRoute
   '/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -465,6 +474,7 @@ export interface FileRoutesById {
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/order-help': typeof AuthenticatedOrderHelpRoute
+  '/_authenticated/owner-approvals': typeof AuthenticatedOwnerApprovalsRoute
   '/_authenticated/review-invites': typeof AuthenticatedReviewInvitesRoute
   '/_authenticated/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -519,6 +529,7 @@ export interface FileRouteTypes {
     | '/my-reviews'
     | '/notifications'
     | '/order-help'
+    | '/owner-approvals'
     | '/review-invites'
     | '/revision-check'
     | '/saved-searches'
@@ -571,6 +582,7 @@ export interface FileRouteTypes {
     | '/my-reviews'
     | '/notifications'
     | '/order-help'
+    | '/owner-approvals'
     | '/review-invites'
     | '/revision-check'
     | '/saved-searches'
@@ -624,6 +636,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-reviews'
     | '/_authenticated/notifications'
     | '/_authenticated/order-help'
+    | '/_authenticated/owner-approvals'
     | '/_authenticated/review-invites'
     | '/_authenticated/revision-check'
     | '/_authenticated/saved-searches'
@@ -867,6 +880,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrderHelpRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/owner-approvals': {
+      id: '/_authenticated/owner-approvals'
+      path: '/owner-approvals'
+      fullPath: '/owner-approvals'
+      preLoaderRoute: typeof AuthenticatedOwnerApprovalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/review-invites': {
       id: '/_authenticated/review-invites'
       path: '/review-invites'
@@ -1048,6 +1068,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyReviewsRoute: typeof AuthenticatedMyReviewsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOrderHelpRoute: typeof AuthenticatedOrderHelpRoute
+  AuthenticatedOwnerApprovalsRoute: typeof AuthenticatedOwnerApprovalsRoute
   AuthenticatedReviewInvitesRoute: typeof AuthenticatedReviewInvitesRoute
   AuthenticatedRevisionCheckRoute: typeof AuthenticatedRevisionCheckRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
@@ -1076,6 +1097,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyReviewsRoute: AuthenticatedMyReviewsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOrderHelpRoute: AuthenticatedOrderHelpRoute,
+  AuthenticatedOwnerApprovalsRoute: AuthenticatedOwnerApprovalsRoute,
   AuthenticatedReviewInvitesRoute: AuthenticatedReviewInvitesRoute,
   AuthenticatedRevisionCheckRoute: AuthenticatedRevisionCheckRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
