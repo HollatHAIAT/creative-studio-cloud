@@ -257,7 +257,7 @@ function OrgPanel({ org, role, uid, members, reload, L, ar }: { org: Org; role: 
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-medium">{(ar ? d.title_ar : d.title) || L("Untitled", "بدون عنوان")}</span>
                   <span className="flex items-center gap-2 text-xs">
-                    {edit && <a href={`/listing-writer?draft=${d.id}`} className="underline">{L("Open", "افتح")}</a>}
+                    {d.user_id === uid && <a href="/listing-writer" className="underline">{L("Edit in listing writer", "حرّر في كاتب الإعلانات")}</a>}
                     {d.user_id === uid && <button type="button" onClick={() => share(d.id, null, null)} className="underline">{L("Stop sharing", "أوقف المشاركة")}</button>}
                   </span>
                 </div>
