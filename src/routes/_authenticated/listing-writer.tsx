@@ -275,9 +275,19 @@ function ListingWriter() {
                   {prev && <button type="button" onClick={() => { setCopy(prev); setPrev(null); }} className="text-sm underline">{L("Undo revision", "تراجع عن التعديل")}</button>}
                 </div>
               </form>
-              {copy.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">{copy.tags.map((t) => <span key={t} className="rounded-full border border-border px-3 py-1 text-sm">#{t}</span>)}</div>
-              )}
+              <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">{copy.tags.map((t) => (
+                  <span key={t} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-sm">#{t}
+                    <button type="button" aria-label={L(`Remove tag ${t}`, `إزالة الوسم ${t}`)} onClick={() => setCopy({ ...copy, tags: copy.tags.filter((x) => x !== t) })} className="text-muted-foreground hover:text-destructive">×</button>
+                  </span>))}</div>
+                <input aria-label={L("Add a tag", "أضف وسماً")} placeholder={L("Add a tag and press Enter", "أضف وسماً واضغط Enter")} maxLength={40}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return; e.preventDefault();
+                    const v = e.currentTarget.value.trim().replace(/^#/, "");
+                    if (v && !copy.tags.includes(v) && copy.tags.length < 20) setCopy({ ...copy, tags: [...copy.tags, v] });
+                    e.currentTarget.value = "";
+                  }} className="w-full rounded-full border border-border bg-background px-4 py-2 text-sm" />
+              </div>
               <div className="space-y-3 rounded-sm border border-border p-4">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                   <div className="min-w-0">
