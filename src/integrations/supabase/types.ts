@@ -390,11 +390,13 @@ export type Database = {
           last_attempt_at: string | null
           last_error: string | null
           link: string | null
+          ref_id: string | null
           sent_at: string | null
           status: string
           subject: string
           subject_ar: string
-          user_id: string
+          to_email: string | null
+          user_id: string | null
         }
         Insert: {
           attempts?: number
@@ -406,11 +408,13 @@ export type Database = {
           last_attempt_at?: string | null
           last_error?: string | null
           link?: string | null
+          ref_id?: string | null
           sent_at?: string | null
           status?: string
           subject: string
           subject_ar: string
-          user_id: string
+          to_email?: string | null
+          user_id?: string | null
         }
         Update: {
           attempts?: number
@@ -422,11 +426,13 @@ export type Database = {
           last_attempt_at?: string | null
           last_error?: string | null
           link?: string | null
+          ref_id?: string | null
           sent_at?: string | null
           status?: string
           subject?: string
           subject_ar?: string
-          user_id?: string
+          to_email?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1782,6 +1788,10 @@ export type Database = {
         Args: { _category: string; _id: string; _price: number }
         Returns: string
       }
+      admin_resend_reviewer_invite: {
+        Args: { _invite: string }
+        Returns: string
+      }
       admin_retry_email: { Args: { _id: string }; Returns: undefined }
       admin_review_listing: {
         Args: { _approve: boolean; _id: string; _note: string }
@@ -1894,6 +1904,10 @@ export type Database = {
           _uid: string
         }
         Returns: undefined
+      }
+      queue_reviewer_invite_email: {
+        Args: { _invite: string }
+        Returns: string
       }
       reply_to_review: {
         Args: { _reply: string; _review: string }
