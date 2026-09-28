@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ImagePlus, Trash2, Copy as CopyIcon } from "lucide-react";
 import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
@@ -32,6 +32,24 @@ function AltChecker() {
   const [alt, setAlt] = useState("");
   const [review, setReview] = useState<AltReview | null>(null);
   const [err, setErr] = useState("");
+  const [title, setTitle] = useState(""); const [medium, setMedium] = useState(""); const [desc, setDesc] = useState("");
+  type D = { id: string; title: string; title_ar: string; medium: string; description: string; alt_text: string; alt_text_ar: string; image_path: string | null };
+  const [drafts, setDrafts] = useState<D[]>([]);
+  useEffect(() => { void (async () => {
+    const uid = (await supabase.auth.getUser()).data.user?.id ?? "";
+    const { data } = await supabase.from("listing_drafts").select("id,title,title_ar,medium,description,alt_text,alt_text_ar,image_path").eq("user_id", uid).order("updated_at", { ascending: false }).limit(30);
+    setDrafts((data ?? []) as D[]);
+  })(); }, []);
+  const loadDraft = async (id: string) => {
+    const d = drafts.find((x) => x.id === id); if (!d) return;
+    setTitle(ar ? d.title_ar || d.title : d.title); setMedium(d.medium); setDesc(d.description);
+    setAlt(ar ? d.alt_text_ar || d.alt_text : d.alt_text); setReview(null);
+    if (d.image_path) {
+      setPath(d.image_path);
+      const { data } = await supabase.storage.from("artwork-images").createSignedUrl(d.image_path, 600);
+      setPreview(data?.signedUrl ?? null);
+    }
+  };
 
   const upload = useAction(async (file: File) => {
     if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) throw new Error(L("Please choose a PNG, JPG, WEBP or GIF image.", "اختر صورة PNG أو JPG أو WEBP أو GIF."));
@@ -48,13 +66,13 @@ function AltChecker() {
   const run = useAction(async () => {
     if (!path) return;
     setErr("");
-    const r = await check({ data: { path, altText: alt } });
+    const r = await check({ data: { path, altText: alt, details: { title, medium, description: desc } } });
     if (r.error || !r.review) { setErr(r.error ?? ""); throw new Error(r.error); }
     setReview(r.review);
   });
 
   const removeImage = async () => {
-    if (path) await supabase.storage.from("artwork-images").remove([path]);
+    if (path && !drafts.some((d) => d.image_path === path)) await supabase.storage.from("artwork-images").remove([path]);
     setPath(null); setPreview(null); setReview(null);
   };
   const copyText = async (s: string) => { await navigator.clipboard.writeText(s); toast.success(L("Copied", "تم النسخ")); };
@@ -68,7 +86,7 @@ function AltChecker() {
   return (
     <SiteShell>
       <PageTitle eyebrow={L("Seller tools", "أدوات البائع")} title={L("Alt text checker", "فاحص النص البديل")}
-        sub={L("Upload your artwork and paste its current alt text. The AI checks whether it matches what's visible and suggests a clearer version.", "ارفع عملك والصق نصه البديل الحالي. يتحقق الذكاء الاصطناعي من مطابقته لما يظهر ويقترح نصاً أوضح.")} />
+        sub={L("Upload your artwork or load a saved draft, add its details and alt text. The AI checks whether the text matches what's visible, flags accessibility gaps and suggests a clearer version.", "ارفع عملك والصق نصه البديل الحالي. يتحقق الذكاء الاصطناعي من مطابقته لما يظهر ويقترح نصاً أوضح.")} />
       <div className="mx-auto grid max-w-6xl gap-8 px-6 pb-16 lg:grid-cols-2">
         <section className="space-y-4">
           {preview ? (
@@ -86,6 +104,19 @@ function AltChecker() {
             </label>
           )}
           {upload.state === "error" && <p role="alert" className="text-sm text-destructive">{(upload.error as Error)?.message}</p>}
+          {drafts.length > 0 && (
+            <label className="block text-sm">{L("Load from a saved listing draft", "حمّل من مسودة إعلان محفوظة")}
+              <select defaultValue="" onChange={(e) => void loadDraft(e.target.value)} className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2">
+                <option value="">{L("Choose a draft…", "اختر مسودة…")}</option>
+                {drafts.map((d) => <option key={d.id} value={d.id}>{(ar ? d.title_ar : d.title) || L("Untitled", "بلا عنوان")}</option>)}
+              </select>
+            </label>)}
+          <fieldset className="space-y-2 rounded-xl border border-border p-3 text-sm">
+            <legend className="px-1">{L("Listing details (optional, helps the check)", "تفاصيل الإعلان (اختياري، تساعد الفحص)")}</legend>
+            <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} aria-label={L("Title", "العنوان")} placeholder={L("Title", "العنوان")} className="w-full rounded-xl border border-border bg-background px-3 py-2" />
+            <input value={medium} onChange={(e) => setMedium(e.target.value)} maxLength={100} aria-label={L("Medium", "الوسيط")} placeholder={L("Medium, e.g. oil on canvas", "الوسيط، مثل زيت على قماش")} className="w-full rounded-xl border border-border bg-background px-3 py-2" />
+            <textarea value={desc} onChange={(e) => setDesc(e.target.value)} maxLength={4000} rows={3} aria-label={L("Description", "الوصف")} placeholder={L("Description", "الوصف")} className="w-full rounded-xl border border-border bg-background px-3 py-2" />
+          </fieldset>
           <label className="block text-sm">{L("Current alt text", "النص البديل الحالي")}
             <textarea value={alt} onChange={(e) => setAlt(e.target.value)} maxLength={1000} rows={4}
               placeholder={L("e.g. Beautiful painting of the desert", "مثال: لوحة جميلة للصحراء")} className="mt-1 w-full rounded-sm border border-border bg-background px-3 py-2" />
@@ -112,6 +143,13 @@ function AltChecker() {
                 <div>
                   <h2 className="mb-2 font-medium">{L("Issues found", "المشكلات")}</h2>
                   <ul className="list-disc space-y-1 ps-5 text-sm">{(ar ? review.issuesAr : review.issues).map((i) => <li key={i}>{i}</li>)}</ul>
+                </div>
+              )}
+              {review.gaps.length > 0 && (
+                <div>
+                  <h2 className="mb-2 font-medium">{L("Accessibility gaps", "ثغرات إمكانية الوصول")}</h2>
+                  <ul className="space-y-1 text-sm">{review.gaps.map((g, i) => (
+                    <li key={i} className="rounded-lg bg-muted/40 p-2"><span className={`me-2 rounded-full px-2 py-0.5 text-xs ${g.severity === "high" ? "bg-destructive/10 text-destructive" : g.severity === "low" ? "bg-muted text-muted-foreground" : "bg-warning/15 text-warning"}`}>{g.severity === "high" ? L("High", "عالية") : g.severity === "low" ? L("Low", "منخفضة") : L("Medium", "متوسطة")}</span>{ar ? g.gapAr || g.gap : g.gap}</li>))}</ul>
                 </div>
               )}
               {([["English", review.suggestion, "ltr"], ["العربية", review.suggestionAr, "rtl"]] as const).map(([label, s, dir]) => (
