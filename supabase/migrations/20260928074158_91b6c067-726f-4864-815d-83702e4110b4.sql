@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.log_version_comment() FROM PUBLIC, anon, authenticated;
