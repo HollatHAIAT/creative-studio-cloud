@@ -239,3 +239,22 @@ html[lang="ar"] h1.font-display, html[lang="ar"] h2.font-display { font-family: 
 @utility arch { border-start-start-radius: 999px 60%; border-start-end-radius: 999px 60%; }
 @utility arch-soft { border-start-start-radius: 50% 18%; border-start-end-radius: 50% 18%; }
 @utility gold-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+
+/* ---------- Modern soft & rounded controls (unlayered so they win over utility radii) ---------- */
+:is(button, a, [role="button"])[class*="px-"][class*="py-"]:is(.rounded-sm, .rounded-md, .rounded, .rounded-lg) {
+  border-radius: 9999px;
+}
+:is(button, a, [role="button"])[class*="px-"][class*="py-"] {
+  transition: background-color var(--dur-fast, 150ms) ease, color 150ms ease, border-color 150ms ease, box-shadow 200ms ease, transform 150ms ease;
+}
+:is(button, a)[class*="px-"][class*="py-"]:is(.bg-primary, .bg-success, .bg-foreground) {
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--foreground) 12%, transparent), 0 6px 16px -8px color-mix(in oklab, var(--primary) 55%, transparent);
+}
+:is(button, a)[class*="px-"][class*="py-"]:not(:disabled):hover { transform: translateY(-1px); }
+:is(button, a)[class*="px-"][class*="py-"]:not(:disabled):active { transform: translateY(0) scale(0.98); }
+:is(button, a):focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+input[class*="border"]:is(.rounded-sm, .rounded-md), select[class*="border"]:is(.rounded-sm, .rounded-md) { border-radius: 0.875rem; }
+svg.lucide { stroke-width: 1.6; }
+@media (prefers-reduced-motion: reduce) {
+  :is(button, a)[class*="px-"][class*="py-"] { transition: none; transform: none !important; }
+}
