@@ -478,6 +478,9 @@ export type Database = {
           id: string
           image_path: string | null
           medium: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           submitted_at: string | null
           tags: string[]
@@ -495,6 +498,9 @@ export type Database = {
           id?: string
           image_path?: string | null
           medium?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           submitted_at?: string | null
           tags?: string[]
@@ -512,6 +518,9 @@ export type Database = {
           id?: string
           image_path?: string | null
           medium?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           submitted_at?: string | null
           tags?: string[]
@@ -1377,6 +1386,10 @@ export type Database = {
         Returns: undefined
       }
       admin_retry_email: { Args: { _id: string }; Returns: undefined }
+      admin_review_listing: {
+        Args: { _approve: boolean; _id: string; _note: string }
+        Returns: undefined
+      }
       admin_set_order_status: {
         Args: { _note?: string; _order_id: string; _status: string }
         Returns: undefined
