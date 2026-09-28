@@ -137,7 +137,7 @@
 - [ ] Phase 2: artwork detail page (type selector, story, image viewer), artist page
 - [ ] Phase 3: explore page + mobile filter sheet, mega menu, recently viewed, personalized home
 - [ ] Phase 4: Saudi-bank catalog mode (hover checkboxes, sticky ZIP toolbar), cart/favorites/auth polish, loading/empty/error states
-- [ ] Phase 5: seller dashboard + admin visual refresh ("action required" panels)
+- [x] Phase 5: seller dashboard + admin dashboard (listings, stock, approvals, review activity) — sales charts still open (lines 123, 126)
 
 ## Auctions, supplies, modern controls (done)
 - [x] Soft & rounded buttons/inputs, thinner icons site-wide
