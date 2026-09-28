@@ -67,8 +67,8 @@ function AltWriter() {
 
   const apply = useAction(async () => {
     if (!target) return;
-    const row: Record<string, string> = { alt_text: en.trim(), alt_text_ar: arTxt.trim() };
-    if (path) row["image_path"] = path;
+    const row: { alt_text: string; alt_text_ar: string; image_path?: string } = { alt_text: en.trim(), alt_text_ar: arTxt.trim() };
+    if (path) row.image_path = path;
     const { error } = await supabase.from("listing_drafts").update(row).eq("id", target);
     if (error) throw new Error(L("Couldn't update the draft.", "تعذّر تحديث المسودة."));
     toast.success(L("Alt text saved to your draft", "حُفظ النص البديل في مسودتك"));
