@@ -571,6 +571,47 @@ export type Database = {
           },
         ]
       }
+      listing_check_results: {
+        Row: {
+          author: string
+          check_text: string
+          created_at: string
+          draft_id: string
+          field: string
+          id: string
+          note: string
+          result: string
+        }
+        Insert: {
+          author?: string
+          check_text: string
+          created_at?: string
+          draft_id: string
+          field?: string
+          id?: string
+          note?: string
+          result: string
+        }
+        Update: {
+          author?: string
+          check_text?: string
+          created_at?: string
+          draft_id?: string
+          field?: string
+          id?: string
+          note?: string
+          result?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_check_results_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "listing_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_draft_versions: {
         Row: {
           alt_text: string
