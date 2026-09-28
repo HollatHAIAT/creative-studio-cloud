@@ -55,6 +55,22 @@ export function InviteDeliveryPanel() {
   const prefill = shown.slice(0, 40).map((r) => [mask(r.i.email), `email: ${st(r)}`, r.latest ? `attempts: ${r.latest.attempts}` : "", r.latest?.last_error ? `error: ${r.latest.last_error.slice(0, 300)}` : "",
     `invite: ${r.expired ? "expired" : r.i.status}`, r.sends > 1 ? `sends: ${r.sends}` : ""].filter(Boolean).join(" — ")).join("\n");
 
+  async function retryReminder(id: string) {
+    if (busy) return; setBusy(`rem-${id}`);
+    const { error } = await sb.rpc("admin_retry_reminder_email", { _id: id });
+    setBusy(null);
+    if (error) {
+      const m = String(error.message);
+      toast.error(m.includes("EXPIRED") ? L("The invitation has ended or was declined — no reminder needed.", "انتهت الدعوة أو رُفضت — لا حاجة للتذكير.")
+        : m.includes("TOO_MANY") ? L("Retried too many times (10).", "أُعيدت المحاولة مرات كثيرة (10).")
+        : m.includes("NOT_RETRYABLE") ? L("Only failed, bounced or cancelled reminders can be retried.", "يمكن إعادة محاولة التذكيرات الفاشلة أو المرتدّة أو الملغاة فقط.")
+        : L("Couldn't retry the reminder.", "تعذّرت إعادة محاولة التذكير."));
+      return;
+    }
+    toast.success(L("Reminder queued again and logged.", "أُعيد التذكير إلى قائمة الإرسال وسُجّل."));
+    void qc.invalidateQueries({ queryKey: ["invite-delivery"] });
+  }
+
   async function resend(id: string) {
     if (busy) return; setBusy(id);
     const { error } = await sb.rpc("admin_resend_reviewer_invite", { _invite: id });
@@ -98,7 +114,14 @@ export function InviteDeliveryPanel() {
                     {r.latest?.sent_at ? `${L("Sent", "أُرسلت")} ${new Date(r.latest.sent_at).toLocaleString()}` : r.latest ? `${L("Added", "أُضيفت")} ${new Date(r.latest.created_at).toLocaleString()}` : ""}
                     {r.sends > 1 ? ` · ${L("sent", "أُرسلت")} ${r.sends}×` : ""}
                   </div>
-                  {r.reminder && <div className="mt-1 text-xs">{L("Deadline reminder", "تذكير الموعد")}: {L(DS[r.reminder.status]?.[0] ?? r.reminder.status, DS[r.reminder.status]?.[1] ?? r.reminder.status)}</div>}
+                  {r.reminder && <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">{L("Deadline reminder", "تذكير الموعد")}: {L(DS[r.reminder.status]?.[0] ?? r.reminder.status, DS[r.reminder.status]?.[1] ?? r.reminder.status)}
+                    {["failed", "bounced", "cancelled"].includes(r.reminder.status) && !r.expired && r.i.status !== "declined" && (
+                      <button type="button" disabled={busy === `rem-${r.reminder.id}` || r.reminder.attempts >= 10} onClick={() => void retryReminder(r.reminder!.id)}
+                        aria-label={L(`Retry deadline reminder to ${r.i.email}`, `أعد محاولة تذكير الموعد إلى ${r.i.email}`)}
+                        className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 disabled:opacity-50">
+                        <RefreshCw className="h-3 w-3" aria-hidden />{L("Retry reminder", "أعد محاولة التذكير")}</button>)}
+                    {r.reminder.last_error && <span className="basis-full text-destructive">{r.reminder.last_error}</span>}
+                  </div>}
                   {r.latest?.last_error && <div className="mt-1 text-xs text-destructive">{r.latest.last_error}</div>}
                 </td>
                 <td className="p-2 text-xs">{r.expired ? L("Ended", "انتهت") : r.i.status === "accepted" ? L("Accepted", "مقبولة") : r.i.status === "declined" ? L("Declined", "مرفوضة") : L("Pending", "بانتظار الرد")}</td>
