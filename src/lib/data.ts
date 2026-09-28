@@ -2,8 +2,11 @@ import art1 from "@/assets/art1.jpg";
 import art2 from "@/assets/art2.jpg";
 import art3 from "@/assets/art3.jpg";
 import gallery from "@/assets/gallery.jpg";
+import artSadu from "@/assets/art-sadu.jpg";
+import artQatt from "@/assets/art-qatt.jpg";
+import artPottery from "@/assets/art-pottery.jpg";
 
-export const categories = ["Painting", "Photography", "Calligraphy", "Illustration", "Digital", "Print"] as const;
+export const categories = ["Painting", "Photography", "Calligraphy", "Sadu", "Qatt", "Pottery", "Illustration", "Digital", "Print"] as const;
 export type Category = (typeof categories)[number];
 
 export type VariantKind = "original" | "print" | "license";
@@ -72,6 +75,31 @@ export const seedListings: Listing[] = [
   { id: "alif", title: "Alif", titleAr: "ألف", creatorId: "noor-al-sayed", category: "Calligraphy", images: [art3], medium: "Ink on handmade paper", mediumAr: "حبر على ورق مصنوع يدويًا", year: 2025, price: 1800, createdAt: d(14), formats: ["Original", "Print"],
     description: "The first letter of the alphabet, studied in a hundred rhythms.", descriptionAr: "الحرف الأول من الأبجدية، مدروسًا في مئة إيقاع.",
     variants: [{ id: "orig", kind: "original", price: 1800, edition: 1, sold: 0 }, ...prints(70, 40)] },
+  { id: "sadu-bands", title: "Sadu Bands", titleAr: "أشرطة السدو", creatorId: "noor-al-sayed", category: "Sadu", images: [artSadu], medium: "Hand-woven wool (Al Sadu)", mediumAr: "صوف منسوج يدويًا (السدو)", year: 2026, price: 1800, createdAt: d(24), formats: ["Original"],
+    description: "Red, black and ochre bands woven on a ground loom in the Bedouin Sadu tradition, listed by UNESCO as intangible heritage.", descriptionAr: "أشرطة بالأحمر والأسود والمغرة منسوجة على النول الأرضي وفق تقاليد السدو البدوية المدرجة في قائمة اليونسكو للتراث غير المادي.",
+    variants: [{ id: "orig", kind: "original", price: 1800, edition: 1, sold: 0 }] },
+  { id: "asir-colours", title: "Colours of Asir", titleAr: "ألوان عسير", creatorId: "layla-haddad", category: "Qatt", images: [artQatt], medium: "Mineral paint on plaster panel", mediumAr: "ألوان معدنية على لوح جصّي", year: 2026, price: 2600, createdAt: d(23), formats: ["Original", "Limited print"],
+    description: "Triangles and stripes in the Al-Qatt Al-Asiri tradition, the wall painting once made by the women of Asir.", descriptionAr: "مثلثات وخطوط على طريقة القط العسيري، فن الجدران الذي أبدعته نساء عسير.",
+    variants: [{ id: "orig", kind: "original", price: 2600, edition: 1, sold: 0 }, ...prints(110, 30)] },
+  { id: "najd-vessel", title: "Najd Vessel", titleAr: "جرّة نجدية", creatorId: "omar-rahman", category: "Pottery", images: [artPottery], medium: "Hand-built incised clay", mediumAr: "طين مشكّل يدويًا بنقوش محفورة", year: 2025, price: 950, createdAt: d(21), formats: ["Original"],
+    description: "A hand-built clay vessel with incised Najdi triangles, fired in a traditional kiln.", descriptionAr: "جرّة طينية مشكّلة يدويًا بمثلثات نجدية محفورة، مشويّة في فرن تقليدي.",
+    variants: [{ id: "orig", kind: "original", price: 950, edition: 1, sold: 0 }] },
+];
+
+// ---------- Saudi art supplies (sample catalogue — replace with real products/brands) ----------
+export type Supply = { id: string; name: string; nameAr: string; maker: string; makerAr: string; city: string; cityAr: string; type: "paint" | "brush" | "canvas" | "calligraphy" | "clay" | "textile"; price: number; swatch: string; description: string; descriptionAr: string };
+export const supplyTypes = ["paint", "brush", "canvas", "calligraphy", "clay", "textile"] as const;
+export const supplies: Supply[] = [
+  { id: "najdi-clay-red", name: "Najdi Clay Red — oil paint 60 ml", nameAr: "أحمر الطين النجدي — زيتي ٦٠ مل", maker: "Diriyah Pigments", makerAr: "أصباغ الدرعية", city: "Riyadh", cityAr: "الرياض", type: "paint", price: 9, swatch: "oklch(0.52 0.14 35)", description: "Earth pigment inspired by the mud walls of At-Turaif.", descriptionAr: "صبغة ترابية مستوحاة من جدران الطين في حي الطريف." },
+  { id: "palm-green", name: "Palm Green — acrylic 75 ml", nameAr: "أخضر النخيل — أكريليك ٧٥ مل", maker: "Al-Ahsa Colour Works", makerAr: "ألوان الأحساء", city: "Al-Ahsa", cityAr: "الأحساء", type: "paint", price: 7, swatch: "oklch(0.45 0.09 150)", description: "Deep green from the world's largest palm oasis.", descriptionAr: "أخضر عميق من أكبر واحة نخيل في العالم." },
+  { id: "desert-gold", name: "Desert Gold — oil paint 60 ml", nameAr: "ذهبي الصحراء — زيتي ٦٠ مل", maker: "Diriyah Pigments", makerAr: "أصباغ الدرعية", city: "Riyadh", cityAr: "الرياض", type: "paint", price: 11, swatch: "oklch(0.75 0.13 85)", description: "Warm ochre-gold for dune light.", descriptionAr: "ذهبي مغرّي دافئ لضوء الكثبان." },
+  { id: "qatt-set", name: "Al-Qatt Al-Asiri set — 6 mineral colours", nameAr: "طقم القط العسيري — ٦ ألوان معدنية", maker: "Abha Heritage Studio", makerAr: "استوديو أبها للتراث", city: "Abha", cityAr: "أبها", type: "paint", price: 38, swatch: "oklch(0.7 0.16 95)", description: "The bright yellow, green, red and blue of Asir wall painting.", descriptionAr: "الأصفر والأخضر والأحمر والأزرق الزاهية في فن جدران عسير." },
+  { id: "palm-fibre-brushes", name: "Palm-fibre brush set (5)", nameAr: "طقم فرش من ليف النخيل (٥)", maker: "Qassim Craft House", makerAr: "دار القصيم للحرف", city: "Buraydah", cityAr: "بريدة", type: "brush", price: 24, swatch: "oklch(0.6 0.07 70)", description: "Hand-tied brushes for texture and wide washes.", descriptionAr: "فرش مربوطة يدويًا للملمس والمساحات العريضة." },
+  { id: "linen-canvas", name: "Stretched linen canvas 50×70 cm", nameAr: "كانفس كتان مشدود ٥٠×٧٠ سم", maker: "Jeddah Frame Co.", makerAr: "إطارات جدة", city: "Jeddah", cityAr: "جدة", type: "canvas", price: 42, swatch: "oklch(0.9 0.03 85)", description: "Primed linen on kiln-dried wood, ready to paint.", descriptionAr: "كتان مجهّز على خشب مجفف، جاهز للرسم." },
+  { id: "qalam-set", name: "Reed qalam set with ink", nameAr: "طقم أقلام قصب مع حبر", maker: "Madinah Khatt Supplies", makerAr: "مستلزمات الخط بالمدينة", city: "Madinah", cityAr: "المدينة المنورة", type: "calligraphy", price: 29, swatch: "oklch(0.25 0.02 60)", description: "Three cut reeds and a bottle of soot ink for Naskh and Thuluth.", descriptionAr: "ثلاثة أقلام قصب مبرية وقارورة حبر للنسخ والثلث." },
+  { id: "gold-ink", name: "24k-look gold calligraphy ink 30 ml", nameAr: "حبر خط ذهبي ٣٠ مل", maker: "Madinah Khatt Supplies", makerAr: "مستلزمات الخط بالمدينة", city: "Madinah", cityAr: "المدينة المنورة", type: "calligraphy", price: 18, swatch: "oklch(0.78 0.14 88)", description: "Luminous metallic ink for illumination.", descriptionAr: "حبر معدني لامع للتذهيب." },
+  { id: "hasa-clay", name: "Al-Ahsa pottery clay 5 kg", nameAr: "طين فخار الأحساء ٥ كغ", maker: "Al-Ahsa Colour Works", makerAr: "ألوان الأحساء", city: "Al-Ahsa", cityAr: "الأحساء", type: "clay", price: 22, swatch: "oklch(0.6 0.11 45)", description: "Red earthenware clay from the oasis kilns.", descriptionAr: "طين فخاري أحمر من أفران الواحة." },
+  { id: "sadu-yarn", name: "Sadu wool yarn bundle", nameAr: "حزمة صوف السدو", maker: "Hail Weavers", makerAr: "نسّاجات حائل", city: "Hail", cityAr: "حائل", type: "textile", price: 34, swatch: "oklch(0.45 0.16 28)", description: "Hand-spun sheep wool dyed in the classic red, black and white.", descriptionAr: "صوف أغنام مغزول يدويًا مصبوغ بالأحمر والأسود والأبيض." },
 ];
 
 /** Legacy listings (made before variants) get options derived from their price. */

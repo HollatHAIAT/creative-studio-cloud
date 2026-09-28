@@ -61,36 +61,139 @@ export type Database = {
           },
         ]
       }
+      auction_events: {
+        Row: {
+          actor: string | null
+          amount: number | null
+          auction_id: string
+          created_at: string
+          details: Json
+          id: string
+          kind: string
+        }
+        Insert: {
+          actor?: string | null
+          amount?: number | null
+          auction_id: string
+          created_at?: string
+          details?: Json
+          id?: string
+          kind: string
+        }
+        Update: {
+          actor?: string | null
+          amount?: number | null
+          auction_id?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          kind?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_events_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auction_invites: {
+        Row: {
+          auction_id: string
+          created_at: string
+          email: string
+          id: string
+          invited_by: string
+          responded_at: string | null
+          status: string
+        }
+        Insert: {
+          auction_id: string
+          created_at?: string
+          email: string
+          id?: string
+          invited_by: string
+          responded_at?: string | null
+          status?: string
+        }
+        Update: {
+          auction_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string
+          responded_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_invites_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auctions: {
         Row: {
+          closed_at: string | null
           created_at: string
           ends_at: string
           id: string
           increment: number
           listing_id: string
+          order_id: string | null
+          owner_user_id: string | null
+          pay_by: string | null
           reserve: number
           start_bid: number
           starts_at: string
+          status: string
+          visibility: string
+          winner_user_id: string | null
+          winning_amount: number | null
+          winning_bid_id: string | null
         }
         Insert: {
+          closed_at?: string | null
           created_at?: string
           ends_at: string
           id: string
           increment?: number
           listing_id: string
+          order_id?: string | null
+          owner_user_id?: string | null
+          pay_by?: string | null
           reserve: number
           start_bid: number
           starts_at: string
+          status?: string
+          visibility?: string
+          winner_user_id?: string | null
+          winning_amount?: number | null
+          winning_bid_id?: string | null
         }
         Update: {
+          closed_at?: string | null
           created_at?: string
           ends_at?: string
           id?: string
           increment?: number
           listing_id?: string
+          order_id?: string | null
+          owner_user_id?: string | null
+          pay_by?: string | null
           reserve?: number
           start_bid?: number
           starts_at?: string
+          status?: string
+          visibility?: string
+          winner_user_id?: string | null
+          winning_amount?: number | null
+          winning_bid_id?: string | null
         }
         Relationships: []
       }
@@ -1403,7 +1506,13 @@ export type Database = {
         Returns: string
       }
       auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
+      award_auction: { Args: { _auction: string }; Returns: undefined }
+      can_manage_auction: { Args: { _auction: string }; Returns: boolean }
       can_review: { Args: { _listing: string }; Returns: boolean }
+      cancel_auction: {
+        Args: { _auction: string; _reason: string }
+        Returns: undefined
+      }
       check_in_ticket: {
         Args: { _code: string }
         Returns: {
@@ -1416,7 +1525,20 @@ export type Database = {
         }[]
       }
       claim_pending_role: { Args: never; Returns: boolean }
+      close_auction: { Args: { _auction: string }; Returns: undefined }
       close_expired_blocks: { Args: never; Returns: undefined }
+      create_auction: {
+        Args: {
+          _ends: string
+          _increment: number
+          _listing: string
+          _reserve: number
+          _start: number
+          _starts: string
+          _visibility: string
+        }
+        Returns: string
+      }
       delete_my_review: { Args: { _review: string }; Returns: undefined }
       edit_my_review: {
         Args: { _body: string; _rating: number; _review: string }
@@ -1433,6 +1555,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_to_auction: {
+        Args: { _auction: string; _email: string }
+        Returns: undefined
+      }
       is_blocked: { Args: { _uid: string }; Returns: boolean }
       is_staff: { Args: { _uid: string }; Returns: boolean }
       issue_tickets: { Args: { _booking_id: string }; Returns: undefined }
@@ -1440,6 +1566,17 @@ export type Database = {
         Args: { d: Database["public"]["Tables"]["listing_drafts"]["Row"] }
         Returns: string[]
       }
+      log_auction: {
+        Args: {
+          _amount: number
+          _auction: string
+          _details: Json
+          _kind: string
+        }
+        Returns: undefined
+      }
+      pass_auction_to_next: { Args: { _auction: string }; Returns: undefined }
+      process_due_auctions: { Args: never; Returns: number }
       push_notification: {
         Args: {
           _b: string
@@ -1456,12 +1593,18 @@ export type Database = {
         Args: { _reply: string; _review: string }
         Returns: undefined
       }
+      respond_auction_invite: {
+        Args: { _accept: boolean; _invite: string }
+        Returns: undefined
+      }
       retry_payment: { Args: { _order: string }; Returns: undefined }
+      revoke_auction_invite: { Args: { _invite: string }; Returns: undefined }
       saved_search_token: { Args: { _uid: string }; Returns: string }
       send_saved_search_digests: {
         Args: { _frequency: string }
         Returns: number
       }
+      settle_auction_if_due: { Args: { _auction: string }; Returns: string }
       slot_bookings: {
         Args: { _date: string; _exhibition_id: string }
         Returns: {
@@ -1472,6 +1615,16 @@ export type Database = {
       unsubscribe_saved_search_emails: {
         Args: { _token: string }
         Returns: boolean
+      }
+      update_auction: {
+        Args: {
+          _auction: string
+          _ends: string
+          _increment: number
+          _reserve: number
+          _visibility: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

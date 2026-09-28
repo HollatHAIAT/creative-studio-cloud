@@ -10,10 +10,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
 
 export const Route = createFileRoute("/auctions/$id")({
-  loader: ({ params }) => {
-    const a = auctions.find((x) => x.id === params.id);
-    if (!a) throw notFound();
-    return { id: a.id, art: toArtwork(seedListings.find((l) => l.id === a.listingId)!) };
+  loader: async ({ params }) => {
+    let listingId = auctions.find((x) => x.id === params.id)?.listingId;
+    if (!listingId) listingId = (await supabase.from("auctions").select("listing_id").eq("id", params.id).maybeSingle()).data?.listing_id;
+    const l = listingId && seedListings.find((x) => x.id === listingId);
+    if (!l) throw notFound();
+    return { id: params.id, art: toArtwork(l) };
   },
   head: ({ loaderData }) => loaderData ? { meta: [
     { title: `Auction: ${loaderData.art.title} — Arwiqa أروقة` },
@@ -38,10 +40,13 @@ function AuctionPage() {
   const [amount, setAmount] = useState("");
   const [reason, setReason] = useState<string | null>(null);
   const a = q.data?.auctions.find((x) => x.id === id);
+  // Settle as soon as anyone views a due auction (close + offer winner, or pass to next bidder after 48h).
+  const due = !!a && now > 0 && ((["scheduled", "live", "ended"].includes(a.status) && now >= Date.parse(a.ends_at)) || (a.status === "awaiting_payment" && !!a.pay_by && now > Date.parse(a.pay_by)));
+  useEffect(() => { if (due) void supabase.rpc("settle_auction_if_due" as never, { _auction: id } as never).then(() => qc.invalidateQueries({ queryKey: ["auctions"] })); }, [due, id, qc]);
   const bids = (q.data?.bids ?? []).filter((b) => b.auction_id === id);
   const top = bids.reduce<(typeof bids)[number] | null>((m, b) => (!m || b.amount > m.amount ? b : m), null);
   const min = a ? (top ? top.amount + a.increment : a.start_bid) : 0;
-  const st = a && now ? dbStatus(a, now) : "live";
+  const st = a && now ? (["cancelled", "sold", "unsold", "awaiting_payment"].includes(a.status) ? "closed" : dbStatus(a, now)) : "live";
   const mineTop = !!user && top?.user_id === user.id;
   const prevMine = useRef<boolean | undefined>(undefined);
   useEffect(() => {
@@ -81,6 +86,10 @@ function AuctionPage() {
           <p className="text-xs uppercase tracking-widest text-primary">{t(st === "live" ? "auc.live" : st === "upcoming" ? "auc.upcoming" : "auc.closed")}</p>
           <h1 className="mt-2 font-display text-5xl">{pick(art, "title")}</h1>
           <Link to="/artwork/$id" params={{ id: art.id }} className="mt-2 inline-block underline">{pick(art, "artist")}</Link>
+          {a?.visibility === "invite" && <p className="mt-3 inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs">{locale === "ar" ? "مزاد بالدعوة فقط" : "Invite-only auction"}</p>}
+          {a?.status === "cancelled" && <p className="mt-3 rounded-2xl bg-muted p-3 text-sm">{locale === "ar" ? "أُلغي هذا المزاد." : "This auction was cancelled."}</p>}
+          {a?.status === "awaiting_payment" && user && a.winner_user_id === user.id && (
+            <p className="mt-3 rounded-2xl bg-success/10 p-3 text-sm">{locale === "ar" ? "فزت! ادفع خلال 48 ساعة من " : "You won! Pay within 48 hours from "}<Link to="/my-auctions" className="font-medium underline">{locale === "ar" ? "مزاداتي" : "My auctions"}</Link>.</p>)}
 
           <div className="mt-8 grid grid-cols-2 gap-4 rounded-sm border border-border bg-card p-6">
             <div><p className="text-xs text-muted-foreground">{top ? t("auc.current") : t("auc.start")}</p><p className="font-display text-4xl">{a ? fmt(top?.amount ?? a.start_bid) : "…"}</p></div>

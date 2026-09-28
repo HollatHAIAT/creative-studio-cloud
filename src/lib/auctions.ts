@@ -34,7 +34,7 @@ export function useNow(ms = 1000) {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type DbAuction = { id: string; listing_id: string; start_bid: number; increment: number; starts_at: string; ends_at: string };
+export type DbAuction = { id: string; listing_id: string; start_bid: number; increment: number; starts_at: string; ends_at: string; status: string; visibility: string; winner_user_id: string | null; winning_amount: number | null; pay_by: string | null; owner_user_id: string | null };
 export type DbBid = { id: string; auction_id: string; user_id: string | null; bidder_name: string; amount: number; created_at: string };
 
 export function useDbAuctions() {
@@ -42,7 +42,7 @@ export function useDbAuctions() {
     queryKey: ["auctions"],
     queryFn: async () => {
       const [a, b] = await Promise.all([
-        supabase.from("auctions").select("id, listing_id, start_bid, increment, starts_at, ends_at"),
+        supabase.from("auctions").select("id, listing_id, start_bid, increment, starts_at, ends_at, status, visibility, winner_user_id, winning_amount, pay_by, owner_user_id"),
         supabase.from("bids").select("id, auction_id, user_id, bidder_name, amount, created_at").order("created_at", { ascending: false }),
       ]);
       if (a.error) throw a.error;
@@ -59,7 +59,7 @@ export function useReserveMet(id: string) {
 }
 /** Maps database rejection codes to a reason the bidder can understand. */
 export function bidRejection(message: string): { code: string; min?: number } {
-  const m = message.match(/(AUCTION_NOT_FOUND|AUCTION_NOT_STARTED|AUCTION_ENDED|BID_TOO_HIGH|BID_TOO_LOW)(?::([\d.]+))?/);
+  const m = message.match(/(AUCTION_NOT_FOUND|AUCTION_NOT_STARTED|AUCTION_ENDED|INVITE_REQUIRED|OWNER_CANNOT_BID|ACCOUNT_SUSPENDED|BID_TOO_HIGH|BID_TOO_LOW)(?::([\d.]+))?/);
   if (!m) return { code: "failed" };
   return m[2] ? { code: m[1]!, min: Number(m[2]) } : { code: m[1]! };
 }

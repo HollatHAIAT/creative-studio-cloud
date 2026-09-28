@@ -24,6 +24,7 @@ const nav = [
 const more = [
   { to: "/collections/saudi-banks", en: "Collections", ar: "المجموعات" },
   { to: "/assets", en: "Images & digital assets", ar: "الصور والأصول الرقمية" },
+  { to: "/supplies", en: "Saudi art supplies", ar: "مستلزمات الفن السعودية" },
   { to: "/collections/saudi-banks", en: "Saudi banks", ar: "البنوك السعودية" },
   { to: "/artists", en: "Galleries", ar: "صالات العرض" },
   { to: "/advisor", en: "Art advisor (AI)", ar: "مستشار الفن الذكي" },

@@ -138,3 +138,10 @@
 - [ ] Phase 3: explore page + mobile filter sheet, mega menu, recently viewed, personalized home
 - [ ] Phase 4: Saudi-bank catalog mode (hover checkboxes, sticky ZIP toolbar), cart/favorites/auth polish, loading/empty/error states
 - [ ] Phase 5: seller dashboard + admin visual refresh ("action required" panels)
+
+## Auctions, supplies, modern controls (done)
+- [x] Soft & rounded buttons/inputs, thinner icons site-wide
+- [x] Saudi art forms (Sadu, Al-Qatt Al-Asiri, Pottery) + sample artworks
+- [x] Saudi art supplies shop (/supplies), priced server-side
+- [x] Auction lifecycle: open/invite-only, invites, owner + staff management, auto winner, 48h payment, next bidder, sold, full log
+- [ ] Replace sample supply makers with real Saudi suppliers (needs user data)

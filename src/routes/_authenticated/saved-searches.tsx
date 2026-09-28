@@ -30,7 +30,7 @@ const FREQS: { v: Freq; en: string; ar: string }[] = [
   { v: "off", en: "No emails", ar: "بدون بريد" }, { v: "instant", en: "Email instantly", ar: "بريد فوري" },
   { v: "daily", en: "Daily digest", ar: "ملخص يومي" }, { v: "weekly", en: "Weekly digest", ar: "ملخص أسبوعي" },
 ];
-const CAT_AR: Record<string, string> = { Painting: "رسم", Photography: "تصوير", Calligraphy: "خط عربي", Illustration: "رسوم توضيحية", Digital: "رقمي", Print: "مطبوعات" };
+const CAT_AR: Record<string, string> = { Painting: "رسم", Photography: "تصوير", Calligraphy: "خط عربي", Illustration: "رسوم توضيحية", Digital: "رقمي", Print: "مطبوعات", Sadu: "نسيج السدو", Qatt: "القط العسيري", Pottery: "فخار" };
 // Generated types may lag the new table; keep one narrow cast.
 const table = () => (supabase as unknown as { from: (t: string) => ReturnType<typeof supabase.from> }).from("saved_searches");
 
