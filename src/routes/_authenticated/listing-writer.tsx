@@ -1,3 +1,4 @@
+import { OwnershipHeritage } from "@/components/OwnershipHeritage";
 import { ScreenReaderPreview } from "@/components/ScreenReaderPreview";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -442,6 +443,7 @@ function ListingWriter() {
                   );
                 })()}
               </div>
+              <OwnershipHeritage draftId={draftId} onSave={saveNow} />
               <ReviewPath draftId={draftId} onSave={saveNow} submitted={submitted} onPublished={() => void loadDrafts()} />
               <PublishGate issues={publishIssues(copy, !!path, { ratio: imgRatio, width: imgW }, L)} submitted={submitted}
                 state={publish.state} error={pubErr} onPublish={() => publish.run()} onRetry={publish.retry}

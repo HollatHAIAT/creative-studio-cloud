@@ -29,6 +29,13 @@ const ISSUE: Record<string, [string, string]> = {
   category: ["Choose a category", "اختر التصنيف"],
   policy_direct_disabled: ["Direct publishing is turned off by Arwiqa right now", "النشر المباشر موقوف حالياً من أروقة"],
   policy_category_needs_review: ["This category always needs platform review", "هذا التصنيف يتطلب مراجعة المنصة دائماً"],
+  owner_details: ["Add the owner's name and email", "أضف اسم المالك وبريده"],
+  owner_approval: ["Waiting for the owner to approve", "بانتظار موافقة المالك"],
+  consignment_terms: ["Add the consignment terms", "أضف شروط الأمانة"],
+  heritage_type: ["Choose the heritage type", "اختر نوع القطعة التراثية"],
+  heritage_origin: ["Add the region of origin and era", "أضف منطقة المنشأ والحقبة"],
+  provenance: ["Add at least one ownership history entry", "أضف مرحلة واحدة على الأقل من سجل الملكية"],
+  condition_report: ["Add a condition grade and report", "أضف تقييم الحالة وتقريرها"],
   policy_price_needs_review: ["Works above the price limit need platform review", "الأعمال فوق حد السعر تتطلب مراجعة المنصة"],
 };
 
