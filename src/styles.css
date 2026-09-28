@@ -258,3 +258,28 @@ svg.lucide { stroke-width: 1.6; }
 @media (prefers-reduced-motion: reduce) {
   :is(button, a)[class*="px-"][class*="py-"] { transition: none; transform: none !important; }
 }
+
+/* ——— Painter's motion: brush page sweep, brush reveal, living artworks ——— */
+@keyframes brush-sweep { 0% { transform: translateX(-110%); } 45% { transform: translateX(0); } 55% { transform: translateX(0); } 100% { transform: translateX(110%); } }
+@keyframes brush-reveal { from { clip-path: polygon(0 0, 0 0, -20% 100%, 0 100%); filter: saturate(0.4) blur(2px); } to { clip-path: polygon(0 0, 120% 0, 100% 100%, 0 100%); filter: none; } }
+@keyframes art-drift { 0% { transform: scale(1.04) translate(0, 0); } 50% { transform: scale(1.08) translate(-1.2%, -0.8%); } 100% { transform: scale(1.04) translate(0, 0); } }
+@keyframes art-sheen { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(220%) skewX(-18deg); } }
+.brush-sweep { animation: brush-fade 0.9s ease-in-out forwards; }
+@keyframes brush-fade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+.brush-stroke { animation: brush-sweep 0.85s cubic-bezier(0.7, 0, 0.3, 1) forwards; transform: translateX(-110%); opacity: 0.92; }
+.brush-stroke-2 { animation-delay: 0.05s; }
+.brush-stroke-3 { animation-delay: 0.1s; }
+[dir="rtl"] .brush-sweep svg { transform: scaleX(-1); }
+.brush-reveal { animation: brush-reveal 0.7s cubic-bezier(0.6, 0, 0.2, 1) both; }
+[dir="rtl"] .brush-reveal { animation-name: brush-reveal-rtl; }
+@keyframes brush-reveal-rtl { from { clip-path: polygon(100% 0, 100% 0, 120% 100%, 100% 100%); filter: saturate(0.4) blur(2px); } to { clip-path: polygon(-20% 0, 100% 0, 100% 100%, 0 100%); filter: none; } }
+.art-living { --tx: 0; --ty: 0; perspective: 1200px; }
+.art-living > button { transform: rotateY(calc(var(--tx) * 6deg)) rotateX(calc(var(--ty) * -6deg)); transition: transform 0.4s ease-out; transform-style: preserve-3d; }
+.art-drift { animation: brush-reveal 0.7s cubic-bezier(0.6, 0, 0.2, 1) both, art-drift 18s ease-in-out 0.7s infinite; }
+.art-sheen { pointer-events: none; position: absolute; inset: 0; width: 40%; background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--background) 35%, transparent), transparent); transform: translateX(-120%) skewX(-18deg); }
+.art-living:hover .art-sheen { animation: art-sheen 1.2s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .brush-sweep, .brush-stroke { display: none; }
+  .brush-reveal, .art-drift, .art-living:hover .art-sheen { animation: none; }
+  .art-living > button { transform: none; }
+}

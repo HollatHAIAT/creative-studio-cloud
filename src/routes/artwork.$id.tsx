@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArtStage } from "@/components/ArtViewer";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SiteShell, FavButton, ArtCard } from "@/components/SiteShell";
@@ -73,14 +74,13 @@ function Detail() {
     <SiteShell>
       <div className="mx-auto grid max-w-7xl gap-12 px-6 pt-12 md:grid-cols-2">
         <div>
-          <div className="relative">
-            <img src={a.images[img] ?? a.image} alt={pick(a, "title")} className="aspect-[4/5] w-full rounded-sm object-cover" />
+          <ArtStage images={a.images.length ? a.images : [a.image]} index={img} onIndex={setImg} alt={pick(a, "title")}>
             <FavButton id={a.id} className="absolute end-4 top-4" />
-          </div>
+          </ArtStage>
           {a.images.length > 1 && (
             <div className="mt-3 flex gap-3">
               {a.images.map((src, i) => (
-                <button key={i} onClick={() => setImg(i)} className={`h-20 w-20 overflow-hidden rounded-sm border-2 ${i === img ? "border-primary" : "border-transparent"}`}>
+                <button key={i} type="button" onClick={() => setImg(i)} aria-label={`${i + 1}`} aria-current={i === img} className={`hover-scale h-20 w-20 overflow-hidden rounded-sm border-2 ${i === img ? "border-primary" : "border-transparent"}`}>
                   <img src={src} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
