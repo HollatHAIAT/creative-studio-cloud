@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { ShoppingBag, MapPin } from "lucide-react";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { supplies, supplyTypes, fmt } from "@/lib/data";
-import { useStore } from "@/lib/store";
+import { actions } from "@/lib/store";
 import { useLocale } from "@/lib/i18n";
 import hero from "@/assets/supplies.jpg";
 
@@ -23,7 +23,6 @@ export const Route = createFileRoute("/supplies")({
 
 function Supplies() {
   const { locale } = useLocale(); const ar = locale === "ar"; const L = (e: string, a: string) => (ar ? a : e);
-  const store = useStore();
   const [type, setType] = useState<string>("all");
   const [qty, setQty] = useState<Record<string, number>>({});
   const shown = type === "all" ? supplies : supplies.filter((s) => s.type === type);
@@ -53,7 +52,7 @@ function Supplies() {
                   <span className="font-display text-xl">{fmt(s.price)}</span>
                   <span className="flex items-center gap-2">
                     <input type="number" min={1} max={20} value={n} onChange={(e) => setQty({ ...qty, [s.id]: Math.max(1, Math.min(20, Number(e.target.value) || 1)) })} aria-label={L("Quantity", "الكمية")} className="w-16 rounded-md border border-border bg-background px-2 py-2 text-center" />
-                    <button onClick={() => { store.addToCart({ key: `supply:${s.id}`, kind: "supply", supplyId: s.id, qty: n }); toast.success(L("Added to basket", "أُضيف إلى السلة")); }} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground"><ShoppingBag className="h-4 w-4" />{L("Add", "أضف")}</button>
+                    <button onClick={() => { actions.addToCart({ key: `supply:${s.id}`, kind: "supply", supplyId: s.id, qty: n }); toast.success(L("Added to basket", "أُضيف إلى السلة")); }} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground"><ShoppingBag className="h-4 w-4" />{L("Add", "أضف")}</button>
                   </span>
                 </div>
               </li>);
