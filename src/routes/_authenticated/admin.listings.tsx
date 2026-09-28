@@ -19,14 +19,14 @@ export const Route = createFileRoute("/_authenticated/admin/listings")({
     { property: "og:description", content: "Approve or reject submitted listings and track their publishing status." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" },
   ] }),
-  // Moderators and admins only; everyone else is sent to their account page before the page renders.
+  // Moderators and admins only; everyone else is sent to the home page before the page renders.
   beforeLoad: async () => {
     const { data: u } = await supabase.auth.getUser();
     const { data: ok } = u.user ? await (supabase as any).rpc("can_view_private_comments", { _uid: u.user.id }) : { data: false };
     if (!ok) {
       const { toast } = await import("sonner");
       toast.error(document.documentElement.lang === "ar" ? "صفحة مراجعة الإعلانات للمشرفين والمديرين فقط." : "Listing review is only for moderators and admins.");
-      throw redirect({ to: "/accounts", replace: true });
+      throw redirect({ to: "/", replace: true });
     }
   },
   component: () => <StaffGate><ListingsReview /></StaffGate>,
