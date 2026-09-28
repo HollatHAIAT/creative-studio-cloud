@@ -74,6 +74,7 @@ export function AccountNav() {
                 <DropdownMenuItem asChild><Link to="/admin/emails">{locale === "ar" ? "حالة البريد" : "Email delivery"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/scan">{t("adm.scan")}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/reviews">{locale === "ar" ? "الإشراف على التقييمات" : "Review moderation"}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/admin/policy-review">{locale === "ar" ? "مراجعة سياسات الإعلانات" : "Listing policy review"}</Link></DropdownMenuItem>
               </>)}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={async () => { await supabase.auth.signOut(); qc.clear(); navigate({ to: "/" }); }}>{t("auth.signout")}</DropdownMenuItem>
