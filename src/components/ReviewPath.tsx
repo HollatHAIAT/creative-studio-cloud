@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { toast } from "sonner";
+import { ChecklistProgress } from "./ChecklistProgress";
 
 // Loose client: these tables were added recently.
 const sb = supabase as any;
