@@ -1,3 +1,4 @@
+import { TrustPanel } from "@/components/TrustPanel";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArtStage } from "@/components/ArtViewer";
 import { useState } from "react";
@@ -130,6 +131,7 @@ function Detail() {
             blockedReason={agentBlocked ? L("This work is sold by an agent whose owner authorization isn't currently valid, so it can't be bought right now.", "يبيع هذا العمل وكيلٌ تفويضه من المالك غير سارٍ حاليًا، لذا لا يمكن شراؤه الآن.") : undefined}
             onAdd={() => { if (!v) return false; addToCart(); return true; }} />
           <p className="mt-3 text-xs text-muted-foreground">{t("art.cert")}</p>
+          <TrustPanel listingId={a.id} />
 
           {auc && aucLive && (
             <div className="mt-8 flex items-center justify-between rounded-sm border border-primary p-5">

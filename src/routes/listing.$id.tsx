@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteShell } from "@/components/SiteShell";
 import { getSellerListing } from "@/lib/seller-listings.functions";
 import { useLocale } from "@/lib/i18n";
+import { TrustPanel } from "@/components/TrustPanel";
 
 export const Route = createFileRoute("/listing/$id")({
   loader: async ({ params }) => {
@@ -35,6 +36,7 @@ function ListingPage() {
           <p className="whitespace-pre-line leading-relaxed">{ar ? l.descriptionAr : l.description}</p>
           {l.tags.length > 0 && <ul className="flex flex-wrap gap-2">{l.tags.map((t) => <li key={t} className="rounded-full bg-muted px-3 py-1 text-xs">{t}</li>)}</ul>}
           <p className="text-sm text-muted-foreground">{ar ? "للشراء، استخدم «اسأل البائع» أو تواصل مع فريق أروقة." : "To buy, contact the Arwiqa team — seller checkout for new listings is coming soon."}</p>
+          <TrustPanel listingId={l.id} />
         </div>
       </article>
     </SiteShell>
