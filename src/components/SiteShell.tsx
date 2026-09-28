@@ -50,7 +50,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
         <div aria-hidden className="sadu-thin" />
         <div className={`mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 transition-all duration-300 ${scrolled ? "py-2.5" : "py-4"}`}>
           <Link to="/" className="flex shrink-0 items-center gap-2 font-display text-2xl tracking-tight" aria-label="Arwiqa أروقة">
-            <span className={`logo-paint relative inline-block transition-all duration-300 ${scrolled ? "h-7 w-7" : "h-9 w-9"}`}><img src={logoMark} alt="" width={36} height={36} className="logo-paint-img h-full w-full object-contain" /><span aria-hidden className="logo-paint-brush" /></span><span>{t("brand.name")}</span>
+            <span onPointerEnter={(e) => { const el = e.currentTarget; if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; el.classList.remove("is-replay"); void el.offsetWidth; el.classList.add("is-replay"); }} className={`logo-paint relative inline-block transition-all duration-300 ${scrolled ? "h-7 w-7" : "h-9 w-9"}`}><img src={logoMark} alt="" width={36} height={36} className="logo-paint-img h-full w-full object-contain" /><span aria-hidden className="logo-paint-brush" /></span><span>{t("brand.name")}</span>
           </Link>
           <nav className="hidden items-center gap-7 text-sm lg:flex" aria-label={L("Main", "الرئيسية")}>
             {nav.map((n) => (
