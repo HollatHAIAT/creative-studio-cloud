@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { useLocale } from "@/lib/i18n";
+import { HeritageAsk } from "@/components/HeritageAsk";
 
 export const Route = createFileRoute("/heritage")({
   head: () => ({ meta: [
@@ -75,6 +76,7 @@ function Heritage() {
           <p className="text-xs text-muted-foreground">{L("Heritage items on Arwiqa always pass staff review, with ownership history and a condition report.", "القطع التراثية في أروقة تمر دائماً بمراجعة الفريق مع سجل الملكية وتقرير الحالة.")}</p>
         </article>
       </div>
+      <HeritageAsk />
     </SiteShell>
   );
 }
