@@ -64,7 +64,7 @@ function PolicyReviewPage() {
                   {x.imageUrl ? <img src={x.imageUrl} alt="" className="h-12 w-12 rounded-sm object-cover" /> : <span className="h-12 w-12 rounded-sm bg-muted" />}
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">{(ar ? x.title_ar : x.title) || L("Untitled", "بدون عنوان")}</span>
-                    {results[x.id] && <span className={`mt-1 inline-block rounded-sm border px-1.5 text-xs ${tone[results[x.id].risk]}`}>{riskLabel(results[x.id].risk)}</span>}
+                    {results[x.id] && <span className={`mt-1 inline-block rounded-sm border px-1.5 text-xs ${tone[results[x.id]!.risk]}`}>{riskLabel(results[x.id]!.risk)}</span>}
                   </span>
                 </button>
               </li>
