@@ -66,6 +66,7 @@ export function AccountNav() {
               <DropdownMenuItem asChild><Link to="/revision-check">{locale === "ar" ? "فحص التعديلات المطلوبة" : "Revision check"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/owner-approvals">{locale === "ar" ? "موافقات المالك" : "Owner approvals"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/review-invites">{locale === "ar" ? "دعوات المراجعة" : "Review invitations"}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/seller-dashboard">{locale === "ar" ? "لوحة البائع" : "Seller dashboard"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/teams">{locale === "ar" ? "الفرق والمعارض" : "Teams & galleries"}</Link></DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild><Link to="/orders">{t("nav.orders")}</Link></DropdownMenuItem>
@@ -75,6 +76,7 @@ export function AccountNav() {
               <DropdownMenuItem asChild><Link to="/settings">{t("nav.settings")}</Link></DropdownMenuItem>
               {isStaff && (<>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild><Link to="/admin/dashboard">{locale === "ar" ? "لوحة الإدارة" : "Admin dashboard"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/orders">{t("adm.orders")}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/reports">{t("adm.reports")}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/emails">{locale === "ar" ? "حالة البريد" : "Email delivery"}</Link></DropdownMenuItem>

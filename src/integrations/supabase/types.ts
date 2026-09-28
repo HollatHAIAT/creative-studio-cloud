@@ -971,10 +971,12 @@ export type Database = {
           created_at: string
           creator_id: string
           id: string
+          low_stock_at: number
           owner_can_reply: boolean
           owner_user_id: string | null
           price: number
           status: string
+          stock: number | null
           title: string
           title_ar: string
         }
@@ -983,10 +985,12 @@ export type Database = {
           created_at?: string
           creator_id: string
           id: string
+          low_stock_at?: number
           owner_can_reply?: boolean
           owner_user_id?: string | null
           price?: number
           status?: string
+          stock?: number | null
           title: string
           title_ar?: string
         }
@@ -995,10 +999,12 @@ export type Database = {
           created_at?: string
           creator_id?: string
           id?: string
+          low_stock_at?: number
           owner_can_reply?: boolean
           owner_user_id?: string | null
           price?: number
           status?: string
+          stock?: number | null
           title?: string
           title_ar?: string
         }
@@ -2230,6 +2236,10 @@ export type Database = {
       }
       set_checklist_item_done: {
         Args: { _done: boolean; _item: string; _note?: string }
+        Returns: undefined
+      }
+      set_listing_stock: {
+        Args: { _listing: string; _low?: number; _stock: number }
         Returns: undefined
       }
       settle_auction_if_due: { Args: { _auction: string }; Returns: string }
