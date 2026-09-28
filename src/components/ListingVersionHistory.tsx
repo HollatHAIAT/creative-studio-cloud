@@ -4,7 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { ResubmissionCheck } from "./ResubmissionCheck";
 import { RecurringIssues } from "./RecurringIssues";
-import { FieldComments, useVersionComments } from "./FieldComments";
+import { FieldComments, useVersionComments, useCanViewPrivateComments } from "./FieldComments";
+
+const FILTER_FIELDS = [["title", "Title (EN)", "العنوان (EN)"], ["title_ar", "Title (AR)", "العنوان (AR)"], ["description", "Description (EN)", "الوصف (EN)"],
+  ["description_ar", "Description (AR)", "الوصف (AR)"], ["alt_text", "Alt text (EN)", "النص البديل (EN)"], ["alt_text_ar", "Alt text (AR)", "النص البديل (AR)"],
+  ["medium", "Medium", "الوسيط"], ["tags", "Tags", "الوسوم"], ["image", "Image", "الصورة"]] as const;
 
 type V = { id: string; version: number; title: string; title_ar: string; description: string; description_ar: string; alt_text: string; alt_text_ar: string; tags: string[]; medium: string; image_path: string | null; previous_review_note: string | null; created_at: string };
 
@@ -42,6 +46,17 @@ export function ListingVersionHistory({ draftId }: { draftId: string }) {
   const tagsRemoved = cur && prev ? prev.tags.filter((t) => !cur.tags.includes(t)) : [];
   const imageChanged = !!cur && !!prev && cur.image_path !== prev.image_path;
   const fmt = (t: string) => new Date(t).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" });
+  const { allowed: canComment } = useCanViewPrivateComments();
+  const [onlyComments, setOnlyComments] = useState(false);
+  const [fieldFilter, setFieldFilter] = useState<string[]>([]);
+  const index = useMemo(() => vs.map((v) => {
+    const p = vs.find((x) => x.version === v.version - 1);
+    const ch: string[] = p ? FIELDS.filter(([k]) => v[k] !== p[k]).map(([k]) => k as string) : [];
+    if (p && (v.tags.join("|") !== p.tags.join("|"))) ch.push("tags");
+    if (p && v.image_path !== p.image_path) ch.push("image");
+    return { v, changed: ch, comments: cs.filter((c) => c.version === v.version).length };
+  }), [vs, cs]);
+  const matches = index.filter((m) => (!onlyComments || m.comments > 0) && fieldFilter.every((f) => m.changed.includes(f)));
 
   if (q.isLoading) return <p className="text-sm text-muted-foreground">…</p>;
   if (q.error) return <p role="alert" className="text-sm text-destructive">{L("Couldn't load the revision history.", "تعذّر تحميل سجل التعديلات.")}</p>;
@@ -58,6 +73,32 @@ export function ListingVersionHistory({ draftId }: { draftId: string }) {
           {prev && <span className="ms-2 text-muted-foreground">{L(`with v${prev.version}`, `مع الإصدار ${prev.version}`)}</span>}
         </label>
       </div>
+
+      <fieldset className="space-y-2 rounded-xl bg-muted/30 p-3 text-sm">
+        <legend className="sr-only">{L("Filter history", "تصفية السجل")}</legend>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-muted-foreground">{L("Filter:", "تصفية:")}</span>
+          {canComment && (
+            <button type="button" aria-pressed={onlyComments} onClick={() => setOnlyComments(!onlyComments)}
+              className={`rounded-full border px-3 py-1 ${onlyComments ? "border-primary bg-primary/10" : "border-border"}`}>
+              {L("Has private comments", "فيه تعليقات خاصة")}
+            </button>)}
+          {FILTER_FIELDS.map(([k, en, arL]) => (
+            <button key={k} type="button" aria-pressed={fieldFilter.includes(k)} onClick={() => setFieldFilter(fieldFilter.includes(k) ? fieldFilter.filter((x) => x !== k) : [...fieldFilter, k])}
+              className={`rounded-full border px-3 py-1 ${fieldFilter.includes(k) ? "border-primary bg-primary/10" : "border-border"}`}>{L(en, arL)}</button>
+          ))}
+          {(onlyComments || fieldFilter.length > 0) && <button type="button" onClick={() => { setOnlyComments(false); setFieldFilter([]); }} className="underline">{L("Clear", "مسح")}</button>}
+        </div>
+        <p className="sr-only" aria-live="polite">{L(`${matches.length} matching versions`, `${matches.length} إصدارات مطابقة`)}</p>
+        {(onlyComments || fieldFilter.length > 0) && (matches.length === 0
+          ? <p className="text-muted-foreground">{L("No versions match these filters.", "لا إصدارات تطابق هذه التصفية.")}</p>
+          : <ul className="flex flex-wrap gap-2">{matches.map((m) => (
+              <li key={m.v.id}><button type="button" onClick={() => setPick(m.v.version)} aria-current={cur?.version === m.v.version}
+                className={`rounded-xl border px-3 py-1.5 text-start ${cur?.version === m.v.version ? "border-primary bg-primary/10" : "border-border bg-background"}`}>
+                <span className="font-medium">v{m.v.version}</span>
+                <span className="ms-2 text-xs text-muted-foreground">{m.changed.map((f) => { const x = FILTER_FIELDS.find(([k]) => k === f); return x ? L(x[1], x[2]) : f; }).join(" · ")}{m.comments ? ` · 💬 ${m.comments}` : ""}</span>
+              </button></li>))}</ul>)}
+      </fieldset>
 
       {!prev ? <p className="text-sm text-muted-foreground">{L("This is the first submission — there's no earlier version to compare.", "هذا أول إرسال — لا يوجد إصدار سابق للمقارنة.")}</p> : (<>
         {cur!.previous_review_note && (
