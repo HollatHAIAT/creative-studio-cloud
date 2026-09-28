@@ -45,6 +45,7 @@ import { Route as AssetsIdRouteImport } from './routes/assets.$id'
 import { Route as AuctionsIdRouteImport } from './routes/auctions.$id'
 import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.saudi-banks'
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
+import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as AuthenticatedAdminAuctionsRouteImport } from './routes/_authenticated/admin.auctions'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
 import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin.listings'
@@ -240,6 +241,11 @@ const ExhibitionsIdRoute = ExhibitionsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ExhibitionsRoute,
 } as any)
+const ListingIdRoute = ListingIdRouteImport.update({
+  id: '/listing/$id',
+  path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminAuctionsRoute =
   AuthenticatedAdminAuctionsRouteImport.update({
     id: '/admin/auctions',
@@ -334,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/listing/$id': typeof ListingIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
@@ -381,6 +388,7 @@ export interface FileRoutesByTo {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/listing/$id': typeof ListingIdRoute
   '/assets': typeof AssetsIndexRoute
   '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
@@ -430,6 +438,7 @@ export interface FileRoutesById {
   '/auctions/$id': typeof AuctionsIdRoute
   '/collections/saudi-banks': typeof CollectionsSaudiBanksRoute
   '/exhibitions/$id': typeof ExhibitionsIdRoute
+  '/listing/$id': typeof ListingIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/_authenticated/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
@@ -479,6 +488,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/listing/$id'
     | '/assets/'
     | '/admin/auctions'
     | '/admin/emails'
@@ -526,6 +536,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/listing/$id'
     | '/assets'
     | '/admin/auctions'
     | '/admin/emails'
@@ -574,6 +585,7 @@ export interface FileRouteTypes {
     | '/auctions/$id'
     | '/collections/saudi-banks'
     | '/exhibitions/$id'
+    | '/listing/$id'
     | '/assets/'
     | '/_authenticated/admin/auctions'
     | '/_authenticated/admin/emails'
@@ -609,6 +621,7 @@ export interface RootRouteChildren {
   ArtworkIdRoute: typeof ArtworkIdRoute
   AssetsIdRoute: typeof AssetsIdRoute
   CollectionsSaudiBanksRoute: typeof CollectionsSaudiBanksRoute
+  ListingIdRoute: typeof ListingIdRoute
   AssetsIndexRoute: typeof AssetsIndexRoute
 }
 
@@ -866,6 +879,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExhibitionsIdRouteImport
       parentRoute: typeof ExhibitionsRoute
     }
+    '/listing/$id': {
+      id: '/listing/$id'
+      path: '/listing/$id'
+      fullPath: '/listing/$id'
+      preLoaderRoute: typeof ListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/auctions': {
       id: '/_authenticated/admin/auctions'
       path: '/admin/auctions'
@@ -1047,6 +1067,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtworkIdRoute: ArtworkIdRoute,
   AssetsIdRoute: AssetsIdRoute,
   CollectionsSaudiBanksRoute: CollectionsSaudiBanksRoute,
+  ListingIdRoute: ListingIdRoute,
   AssetsIndexRoute: AssetsIndexRoute,
 }
 export const routeTree = rootRouteImport

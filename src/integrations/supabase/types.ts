@@ -575,12 +575,17 @@ export type Database = {
         Row: {
           alt_text: string
           alt_text_ar: string
+          category: string | null
           created_at: string
           description: string
           description_ar: string
           id: string
           image_path: string | null
           medium: string
+          price: number | null
+          published_at: string | null
+          published_by: string | null
+          published_listing_id: string | null
           review_note: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -595,12 +600,17 @@ export type Database = {
         Insert: {
           alt_text?: string
           alt_text_ar?: string
+          category?: string | null
           created_at?: string
           description?: string
           description_ar?: string
           id?: string
           image_path?: string | null
           medium?: string
+          price?: number | null
+          published_at?: string | null
+          published_by?: string | null
+          published_listing_id?: string | null
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -615,12 +625,17 @@ export type Database = {
         Update: {
           alt_text?: string
           alt_text_ar?: string
+          category?: string | null
           created_at?: string
           description?: string
           description_ar?: string
           id?: string
           image_path?: string | null
           medium?: string
+          price?: number | null
+          published_at?: string | null
+          published_by?: string | null
+          published_listing_id?: string | null
           review_note?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -1488,6 +1503,10 @@ export type Database = {
         Args: { _reason: string; _remove: boolean; _review: string }
         Returns: undefined
       }
+      admin_publish_listing: {
+        Args: { _category: string; _id: string; _price: number }
+        Returns: string
+      }
       admin_retry_email: { Args: { _id: string }; Returns: undefined }
       admin_review_listing: {
         Args: { _approve: boolean; _id: string; _note: string }
@@ -1503,6 +1522,10 @@ export type Database = {
       }
       admin_set_reply_permission: {
         Args: { _allowed: boolean; _listing: string }
+        Returns: undefined
+      }
+      admin_unpublish_listing: {
+        Args: { _id: string; _reason: string }
         Returns: undefined
       }
       agent_authorization_valid: {

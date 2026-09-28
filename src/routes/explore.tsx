@@ -5,6 +5,8 @@ import { SiteShell, ArtCard, PageTitle } from "@/components/SiteShell";
 import { categories, minPrice } from "@/lib/data";
 import { useListings } from "@/lib/store";
 import { useLocale, type Key } from "@/lib/i18n";
+import { useQuery } from "@tanstack/react-query";
+import { listSellerListings } from "@/lib/seller-listings.functions";
 
 export const Route = createFileRoute("/explore")({
   head: () => ({
@@ -39,6 +41,10 @@ function Explore() {
     .filter((a) => (search.min == null || minPrice(a) >= search.min) && (search.max == null || minPrice(a) < search.max))
     .filter((a) => (cat === "All" || a.category === cat) && [a.title, a.titleAr, a.artist, a.artistAr, a.medium, a.mediumAr, a.description].join(" ").toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => sort === "newest" ? b.createdAt - a.createdAt : sort === "price-asc" ? minPrice(a) - minPrice(b) : sort === "price-desc" ? minPrice(b) - minPrice(a) : pick(a, "title").localeCompare(pick(b, "title")));
+  const sellers = useQuery({ queryKey: ["seller-listings"], queryFn: () => listSellerListings() });
+  const sellerList = (sellers.data ?? []).filter((l) => (cat === "All" || l.category === cat)
+    && (search.min == null || l.price >= search.min) && (search.max == null || l.price < search.max)
+    && [l.title, l.titleAr, l.medium, l.description, ...l.tags].join(" ").toLowerCase().includes(q.toLowerCase()));
   return (
     <SiteShell>
       <PageTitle eyebrow={t("nav.explore")} title={t("explore.title")} sub={t("explore.sub")} />
@@ -61,7 +67,19 @@ function Explore() {
           </Link>
         </div>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">{list.map((a) => <ArtCard key={a.id} a={a} />)}</div>
-        {list.length === 0 && <p className="text-muted-foreground">{t("explore.none")}</p>}
+        {sellerList.length > 0 && (
+          <section aria-labelledby="new-sellers" className="mt-14">
+            <h2 id="new-sellers" className="mb-6 font-display text-2xl">{locale === "ar" ? "جديد من البائعين" : "New from sellers"}</h2>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {sellerList.map((l) => (
+                <Link key={l.id} to="/listing/$id" params={{ id: l.id }} className="group block">
+                  {l.imageUrl ? <img src={l.imageUrl} alt={locale === "ar" ? l.altTextAr : l.altText} loading="lazy" className="aspect-[4/5] w-full rounded-2xl object-cover" /> : <div className="aspect-[4/5] rounded-2xl bg-muted" />}
+                  <p className="mt-3 font-medium group-hover:underline">{locale === "ar" ? l.titleAr : l.title}</p>
+                  <p className="text-sm text-muted-foreground">{l.medium} · ${l.price.toLocaleString()}</p>
+                </Link>))}
+            </div>
+          </section>)}
+        {list.length === 0 && sellerList.length === 0 && <p className="text-muted-foreground">{t("explore.none")}</p>}
       </div>
     </SiteShell>
   );
