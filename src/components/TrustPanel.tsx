@@ -7,9 +7,9 @@ import { getListingTrust } from "@/lib/listing-trust.functions";
 
 const ROLE: Record<string, [string, string]> = {
   owner: ["Sold by the owner", "يبيعه المالك"], agent: ["Sold by an authorised agent", "يبيعه وكيل مفوّض"],
-  consignment: ["Sold on consignment", "يُباع بالأمانة"], heir: ["Sold by an heir", "يبيعه وريث"], co_owner: ["Sold by a joint owner", "يبيعه مالك مشارك"],
+  consignment: ["Sold on consignment", "يُباع بالأمانة"], heir: ["Sold by an heir", "يبيعه وريث"], joint_owner: ["Sold by a joint owner", "يبيعه مالك مشارك"], gallery: ["Sold by a gallery", "يبيعه معرض"],
 };
-const GRADE: Record<string, [string, string]> = { excellent: ["Excellent", "ممتازة"], very_good: ["Very good", "جيدة جدًا"], good: ["Good", "جيدة"], fair: ["Fair", "مقبولة"], poor: ["Poor", "ضعيفة"] };
+const GRADE: Record<string, [string, string]> = { excellent: ["Excellent", "ممتازة"], restored: ["Restored", "مرمّمة"], good: ["Good", "جيدة"], fair: ["Fair", "مقبولة"], poor: ["Poor", "ضعيفة"] };
 
 function Row({ icon, title, ok, children }: { icon: ReactNode; title: string; ok: boolean | null; children: ReactNode }) {
   return (
