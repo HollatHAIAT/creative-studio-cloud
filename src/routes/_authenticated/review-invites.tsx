@@ -109,7 +109,7 @@ function ReviewInvites() {
             const d = drafts[i.draft_id]; const s = statusOf(i);
             const notOpen = new Date(i.starts_at).getTime() > Date.now();
             return (
-              <article key={i.id} className="rounded-2xl border border-border bg-card p-5">
+              <article key={i.id} id={i.draft_id} className="scroll-mt-24 rounded-2xl border border-border bg-card p-5 target:ring-2 target:ring-primary">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h3 className="font-display text-lg">{title(i.draft_id)}</h3>
                   <StatusPill s={s} L={L} />

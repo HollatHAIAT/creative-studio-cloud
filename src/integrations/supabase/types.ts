@@ -1925,6 +1925,7 @@ export type Database = {
       revoke_auction_invite: { Args: { _invite: string }; Returns: undefined }
       saved_search_token: { Args: { _uid: string }; Returns: string }
       seller_publish_direct: { Args: { _id: string }; Returns: string }
+      send_reviewer_deadline_reminders: { Args: never; Returns: number }
       send_saved_search_digests: {
         Args: { _frequency: string }
         Returns: number
