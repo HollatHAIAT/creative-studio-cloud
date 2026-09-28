@@ -44,7 +44,8 @@ function ReviewPolicy() {
     if (error) toast.error(L("Couldn't save", "تعذّر الحفظ")); else toast.success(L("Policy saved", "حُفظت السياسة"));
   };
 
-  if (!staff.data) return <SiteShell><p className="container mx-auto p-8">{L("Staff only.", "للفريق فقط.")}</p></SiteShell>;
+  if (staff.loading) return <SiteShell><p className="container mx-auto p-8">…</p></SiteShell>;
+  if (!staff.isStaff) return <SiteShell><p className="container mx-auto p-8">{L("Staff only.", "للفريق فقط.")}</p></SiteShell>;
   return (
     <SiteShell>
       <PageTitle title={L("Review policy", "سياسة المراجعة")} subtitle={L("Creative review is the seller's choice. These rules decide when Arwiqa staff must review first.", "المراجعة الفنية اختيار البائع. هذه القواعد تحدد متى يجب أن يراجع فريق أروقة أولاً.")} />

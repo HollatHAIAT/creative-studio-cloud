@@ -145,3 +145,10 @@
 - [x] Saudi art supplies shop (/supplies), priced server-side
 - [x] Auction lifecycle: open/invite-only, invites, owner + staff management, auto winner, 48h payment, next bidder, sold, full log
 - [ ] Replace sample supply makers with real Saudi suppliers (needs user data)
+
+## Heritage marketplace brief (110 sections) — building in phases
+- [x] Phase 1 (§1–8): optional, policy-driven review — review modes, direct publish, platform checks, reviewer invites with dates/permissions/watermark, comment visibility, staff review policy
+- [ ] Phase 2 (§9–23): seller vs owner, agents, agreements, consignment, heirs, joint ownership, owner approval
+- [ ] Phase 3 (§24–55): heritage categories, cultural-property compliance, provenance, condition reports, experts
+- [ ] Phase 4 (§56–73): advanced listing creation, workflow engine, teams, agency dashboards
+- [ ] Phase 5 (§74–110): Explore Saudi/Gulf, heritage map, museum labels, AI heritage assistants, trust panel, restricted sales, taxonomy
