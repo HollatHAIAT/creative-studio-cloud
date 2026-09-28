@@ -35,6 +35,7 @@ import { Route as AuthenticatedMyAuctionsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authenticated/my-reviews'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOrderHelpRouteImport } from './routes/_authenticated/order-help'
+import { Route as AuthenticatedRevisionCheckRouteImport } from './routes/_authenticated/revision-check'
 import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
 import { Route as AuthenticatedSearchTermsRouteImport } from './routes/_authenticated/search-terms'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -189,6 +190,12 @@ const AuthenticatedOrderHelpRoute = AuthenticatedOrderHelpRouteImport.update({
   path: '/order-help',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRevisionCheckRoute =
+  AuthenticatedRevisionCheckRouteImport.update({
+    id: '/revision-check',
+    path: '/revision-check',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSavedSearchesRoute =
   AuthenticatedSavedSearchesRouteImport.update({
     id: '/saved-searches',
@@ -331,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
+  '/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/search-terms': typeof AuthenticatedSearchTermsRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -379,6 +387,7 @@ export interface FileRoutesByTo {
   '/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
+  '/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/search-terms': typeof AuthenticatedSearchTermsRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -429,6 +438,7 @@ export interface FileRoutesById {
   '/_authenticated/my-reviews': typeof AuthenticatedMyReviewsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/order-help': typeof AuthenticatedOrderHelpRoute
+  '/_authenticated/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
   '/_authenticated/search-terms': typeof AuthenticatedSearchTermsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -479,6 +489,7 @@ export interface FileRouteTypes {
     | '/my-reviews'
     | '/notifications'
     | '/order-help'
+    | '/revision-check'
     | '/saved-searches'
     | '/search-terms'
     | '/settings'
@@ -527,6 +538,7 @@ export interface FileRouteTypes {
     | '/my-reviews'
     | '/notifications'
     | '/order-help'
+    | '/revision-check'
     | '/saved-searches'
     | '/search-terms'
     | '/settings'
@@ -576,6 +588,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-reviews'
     | '/_authenticated/notifications'
     | '/_authenticated/order-help'
+    | '/_authenticated/revision-check'
     | '/_authenticated/saved-searches'
     | '/_authenticated/search-terms'
     | '/_authenticated/settings'
@@ -809,6 +822,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrderHelpRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/revision-check': {
+      id: '/_authenticated/revision-check'
+      path: '/revision-check'
+      fullPath: '/revision-check'
+      preLoaderRoute: typeof AuthenticatedRevisionCheckRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/saved-searches': {
       id: '/_authenticated/saved-searches'
       path: '/saved-searches'
@@ -968,6 +988,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyReviewsRoute: typeof AuthenticatedMyReviewsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOrderHelpRoute: typeof AuthenticatedOrderHelpRoute
+  AuthenticatedRevisionCheckRoute: typeof AuthenticatedRevisionCheckRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
   AuthenticatedSearchTermsRoute: typeof AuthenticatedSearchTermsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -992,6 +1013,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyReviewsRoute: AuthenticatedMyReviewsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOrderHelpRoute: AuthenticatedOrderHelpRoute,
+  AuthenticatedRevisionCheckRoute: AuthenticatedRevisionCheckRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
   AuthenticatedSearchTermsRoute: AuthenticatedSearchTermsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
