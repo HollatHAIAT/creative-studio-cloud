@@ -48,7 +48,7 @@ function ReviewPolicy() {
   if (!staff.isStaff) return <SiteShell><p className="container mx-auto p-8">{L("Staff only.", "للفريق فقط.")}</p></SiteShell>;
   return (
     <SiteShell>
-      <PageTitle title={L("Review policy", "سياسة المراجعة")} subtitle={L("Creative review is the seller's choice. These rules decide when Arwiqa staff must review first.", "المراجعة الفنية اختيار البائع. هذه القواعد تحدد متى يجب أن يراجع فريق أروقة أولاً.")} />
+      <PageTitle eyebrow={L("Arwiqa", "أروقة")} title={L("Review policy", "سياسة المراجعة")} sub={L("Creative review is the seller's choice. These rules decide when Arwiqa staff must review first.", "المراجعة الفنية اختيار البائع. هذه القواعد تحدد متى يجب أن يراجع فريق أروقة أولاً.")} />
       <div className="container mx-auto max-w-2xl space-y-6 px-4 pb-16 text-sm">
         <label className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
           <input type="checkbox" checked={allow} onChange={(e) => setAllow(e.target.checked)} />

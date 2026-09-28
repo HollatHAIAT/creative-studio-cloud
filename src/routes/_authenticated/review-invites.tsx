@@ -51,7 +51,7 @@ function ReviewInvites() {
 
   return (
     <SiteShell>
-      <PageTitle title={L("Review invitations", "دعوات المراجعة")} subtitle={L("Artworks artists asked you to review. You can't sell or change them.", "أعمال طلب منك أصحابها مراجعتها. لا يمكنك بيعها أو تعديلها.")} />
+      <PageTitle eyebrow={L("Arwiqa", "أروقة")} title={L("Review invitations", "دعوات المراجعة")} sub={L("Artworks artists asked you to review. You can't sell or change them.", "أعمال طلب منك أصحابها مراجعتها. لا يمكنك بيعها أو تعديلها.")} />
       <div className="container mx-auto max-w-4xl space-y-4 px-4 pb-16">
         {!invites.length && <p className="text-muted-foreground">{L("No invitations yet.", "لا دعوات بعد.")}</p>}
         {invites.map((i) => {
@@ -60,7 +60,7 @@ function ReviewInvites() {
             <article key={i.id} className="rounded-2xl border border-border bg-card p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="font-display text-lg">{d ? L(d.title || "Untitled", d.title_ar || "بلا عنوان") : L("Not available", "غير متاح")}</h2>
-                <span className="rounded-full bg-muted px-3 py-1 text-xs">{L(stateL[s][0], stateL[s][1])}{i.expires_at ? ` · ${L("until", "حتى")} ${new Date(i.expires_at).toLocaleDateString()}` : ""}</span>
+                <span className="rounded-full bg-muted px-3 py-1 text-xs">{L((stateL[s] ?? ["",""])[0], (stateL[s] ?? ["",""])[1])}{i.expires_at ? ` · ${L("until", "حتى")} ${new Date(i.expires_at).toLocaleDateString()}` : ""}</span>
               </div>
               {s === "active" && d && (open === i.id
                 ? <ReviewPanel draft={d} invite={i} />
@@ -90,7 +90,7 @@ function ReviewPanel({ draft, invite }: { draft: Draft; invite: Invite }) {
     if (!body.trim()) return;
     const { error } = await sb.from("listing_review_comments").insert({ draft_id: draft.id, body: body.trim(), visibility: vis,
       score: score ? Number(score) : null, recommendation: rec || null });
-    if (error) return toast.error(L("Couldn't send — your invitation may not allow this.", "تعذّر الإرسال — قد لا تسمح دعوتك بذلك."));
+    if (error) { toast.error(L("Couldn't send — your invitation may not allow this.", "تعذّر الإرسال — قد لا تسمح دعوتك بذلك.")); return; }
     setBody(""); setScore(""); setRec(""); void load(); toast.success(L("Sent", "أُرسل"));
   };
   return (

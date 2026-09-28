@@ -173,18 +173,18 @@ function Collaborators({ draftId, invite, mode }: { draftId: string; invite: boo
   useEffect(() => { void load(); }, [draftId]);
 
   const add = async () => {
-    if (!email.includes("@")) return toast.error(L("Enter an email", "أدخل بريداً"));
-    if (end && start && new Date(end) <= new Date(start)) return toast.error(L("End must be after start", "النهاية بعد البداية"));
+    if (!email.includes("@")) { toast.error(L("Enter an email", "أدخل بريداً")); return; }
+    if (end && start && new Date(end) <= new Date(start)) { toast.error(L("End must be after start", "النهاية بعد البداية")); return; }
     const { error } = await sb.from("listing_reviewers").insert({ draft_id: draftId, email: email.trim().toLowerCase(), role, permission: perm,
       starts_at: start ? new Date(start).toISOString() : new Date().toISOString(), expires_at: end ? new Date(end).toISOString() : null, allow_download: dl, watermark: wm });
-    if (error) return toast.error(L("Couldn't invite (already invited?)", "تعذّرت الدعوة (مدعو مسبقاً؟)"));
+    if (error) { toast.error(L("Couldn't invite (already invited?)", "تعذّرت الدعوة (مدعو مسبقاً؟)")); return; }
     setEmail(""); void load();
   };
   const remove = async (id: string) => { await sb.from("listing_reviewers").delete().eq("id", id); void load(); };
   const post = async () => {
     if (!body.trim()) return;
     const { error } = await sb.from("listing_review_comments").insert({ draft_id: draftId, body: body.trim(), visibility: vis });
-    if (error) return toast.error(L("Couldn't post", "تعذّر النشر"));
+    if (error) { toast.error(L("Couldn't post", "تعذّر النشر")); return; }
     setBody(""); void load();
   };
   const permL: Record<string, [string, string]> = { view: ["View only", "مشاهدة فقط"], comment: ["Comment", "تعليق"], score: ["Comment + score", "تعليق وتقييم"], recommend: ["Score + recommend", "تقييم وتوصية"] };
@@ -211,7 +211,7 @@ function Collaborators({ draftId, invite, mode }: { draftId: string; invite: boo
           <ul className="divide-y divide-border">
             {list.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                <span>{r.email} · {L(permL[r.permission][0], permL[r.permission][1])} · {new Date(r.starts_at).toLocaleDateString()}{r.expires_at ? ` → ${new Date(r.expires_at).toLocaleDateString()}` : ""}{r.watermark ? " · 💧" : ""}{r.allow_download ? " · ⬇" : ""}</span>
+                <span>{r.email} · {L((permL[r.permission] ?? ["",""])[0], (permL[r.permission] ?? ["",""])[1])} · {new Date(r.starts_at).toLocaleDateString()}{r.expires_at ? ` → ${new Date(r.expires_at).toLocaleDateString()}` : ""}{r.watermark ? " · 💧" : ""}{r.allow_download ? " · ⬇" : ""}</span>
                 <button type="button" onClick={() => remove(r.id)} className="text-xs text-destructive underline">{L("Remove", "إزالة")}</button>
               </li>
             ))}
@@ -225,7 +225,7 @@ function Collaborators({ draftId, invite, mode }: { draftId: string; invite: boo
         <ul className="space-y-2">
           {comments.map((c) => (
             <li key={c.id} className="rounded-xl bg-muted/50 p-3">
-              <span className="text-xs text-muted-foreground">{L(visL[c.visibility][0], visL[c.visibility][1])} · {new Date(c.created_at).toLocaleString()}{c.score ? ` · ★${c.score}` : ""}{c.recommendation ? ` · ${c.recommendation}` : ""}</span>
+              <span className="text-xs text-muted-foreground">{L((visL[c.visibility] ?? ["",""])[0], (visL[c.visibility] ?? ["",""])[1])} · {new Date(c.created_at).toLocaleString()}{c.score ? ` · ★${c.score}` : ""}{c.recommendation ? ` · ${c.recommendation}` : ""}</span>
               <p className="whitespace-pre-wrap">{c.body}</p>
             </li>
           ))}
@@ -233,7 +233,7 @@ function Collaborators({ draftId, invite, mode }: { draftId: string; invite: boo
         <div className="flex flex-wrap gap-2">
           <textarea aria-label={L("Comment", "تعليق")} value={body} onChange={(e) => setBody(e.target.value)} rows={2} className="min-w-0 flex-1 rounded-lg border border-input bg-background px-3 py-2" />
           <select aria-label={L("Who can see it", "من يراه")} value={vis} onChange={(e) => setVis(e.target.value)} className="rounded-lg border border-input bg-background px-2">
-            {["private", "team", "reviewers"].map((k) => <option key={k} value={k}>{L(visL[k][0], visL[k][1])}</option>)}
+            {["private", "team", "reviewers"].map((k) => <option key={k} value={k}>{L((visL[k] ?? ["",""])[0], (visL[k] ?? ["",""])[1])}</option>)}
           </select>
           <button type="button" onClick={post} className="rounded-full border border-border px-4">{L("Post", "أرسل")}</button>
         </div>
