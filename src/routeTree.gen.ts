@@ -28,6 +28,7 @@ import { Route as SellRouteImport } from './routes/sell'
 import { Route as SuppliesRouteImport } from './routes/supplies'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AuthenticatedAltCheckerRouteImport } from './routes/_authenticated/alt-checker'
+import { Route as AuthenticatedAltWriterRouteImport } from './routes/_authenticated/alt-writer'
 import { Route as AuthenticatedCropHelperRouteImport } from './routes/_authenticated/crop-helper'
 import { Route as AuthenticatedListingWriterRouteImport } from './routes/_authenticated/listing-writer'
 import { Route as AuthenticatedMatchExplainerRouteImport } from './routes/_authenticated/match-explainer'
@@ -152,6 +153,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const AuthenticatedAltCheckerRoute = AuthenticatedAltCheckerRouteImport.update({
   id: '/alt-checker',
   path: '/alt-checker',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAltWriterRoute = AuthenticatedAltWriterRouteImport.update({
+  id: '/alt-writer',
+  path: '/alt-writer',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCropHelperRoute = AuthenticatedCropHelperRouteImport.update({
@@ -345,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/supplies': typeof SuppliesRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/alt-checker': typeof AuthenticatedAltCheckerRoute
+  '/alt-writer': typeof AuthenticatedAltWriterRoute
   '/crop-helper': typeof AuthenticatedCropHelperRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
@@ -396,6 +403,7 @@ export interface FileRoutesByTo {
   '/supplies': typeof SuppliesRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/alt-checker': typeof AuthenticatedAltCheckerRoute
+  '/alt-writer': typeof AuthenticatedAltWriterRoute
   '/crop-helper': typeof AuthenticatedCropHelperRoute
   '/listing-writer': typeof AuthenticatedListingWriterRoute
   '/match-explainer': typeof AuthenticatedMatchExplainerRoute
@@ -449,6 +457,7 @@ export interface FileRoutesById {
   '/supplies': typeof SuppliesRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/alt-checker': typeof AuthenticatedAltCheckerRoute
+  '/_authenticated/alt-writer': typeof AuthenticatedAltWriterRoute
   '/_authenticated/crop-helper': typeof AuthenticatedCropHelperRoute
   '/_authenticated/listing-writer': typeof AuthenticatedListingWriterRoute
   '/_authenticated/match-explainer': typeof AuthenticatedMatchExplainerRoute
@@ -502,6 +511,7 @@ export interface FileRouteTypes {
     | '/supplies'
     | '/unsubscribe'
     | '/alt-checker'
+    | '/alt-writer'
     | '/crop-helper'
     | '/listing-writer'
     | '/match-explainer'
@@ -553,6 +563,7 @@ export interface FileRouteTypes {
     | '/supplies'
     | '/unsubscribe'
     | '/alt-checker'
+    | '/alt-writer'
     | '/crop-helper'
     | '/listing-writer'
     | '/match-explainer'
@@ -605,6 +616,7 @@ export interface FileRouteTypes {
     | '/supplies'
     | '/unsubscribe'
     | '/_authenticated/alt-checker'
+    | '/_authenticated/alt-writer'
     | '/_authenticated/crop-helper'
     | '/_authenticated/listing-writer'
     | '/_authenticated/match-explainer'
@@ -797,6 +809,13 @@ declare module '@tanstack/react-router' {
       path: '/alt-checker'
       fullPath: '/alt-checker'
       preLoaderRoute: typeof AuthenticatedAltCheckerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/alt-writer': {
+      id: '/_authenticated/alt-writer'
+      path: '/alt-writer'
+      fullPath: '/alt-writer'
+      preLoaderRoute: typeof AuthenticatedAltWriterRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/crop-helper': {
@@ -1021,6 +1040,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAltCheckerRoute: typeof AuthenticatedAltCheckerRoute
+  AuthenticatedAltWriterRoute: typeof AuthenticatedAltWriterRoute
   AuthenticatedCropHelperRoute: typeof AuthenticatedCropHelperRoute
   AuthenticatedListingWriterRoute: typeof AuthenticatedListingWriterRoute
   AuthenticatedMatchExplainerRoute: typeof AuthenticatedMatchExplainerRoute
@@ -1048,6 +1068,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAltCheckerRoute: AuthenticatedAltCheckerRoute,
+  AuthenticatedAltWriterRoute: AuthenticatedAltWriterRoute,
   AuthenticatedCropHelperRoute: AuthenticatedCropHelperRoute,
   AuthenticatedListingWriterRoute: AuthenticatedListingWriterRoute,
   AuthenticatedMatchExplainerRoute: AuthenticatedMatchExplainerRoute,
