@@ -1571,6 +1571,62 @@ export type Database = {
           },
         ]
       }
+      revision_checklist_items: {
+        Row: {
+          action: string
+          action_ar: string
+          author: string
+          created_at: string
+          done_at: string | null
+          done_by: string | null
+          draft_id: string
+          field: string
+          id: string
+          priority: string
+          seller_note: string | null
+          why: string
+          why_ar: string
+        }
+        Insert: {
+          action: string
+          action_ar?: string
+          author?: string
+          created_at?: string
+          done_at?: string | null
+          done_by?: string | null
+          draft_id: string
+          field?: string
+          id?: string
+          priority?: string
+          seller_note?: string | null
+          why?: string
+          why_ar?: string
+        }
+        Update: {
+          action?: string
+          action_ar?: string
+          author?: string
+          created_at?: string
+          done_at?: string | null
+          done_by?: string | null
+          draft_id?: string
+          field?: string
+          id?: string
+          priority?: string
+          seller_note?: string | null
+          why?: string
+          why_ar?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revision_checklist_items_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "listing_drafts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_search_matches: {
         Row: {
           created_at: string
@@ -1976,6 +2032,10 @@ export type Database = {
       send_saved_search_digests: {
         Args: { _frequency: string }
         Returns: number
+      }
+      set_checklist_item_done: {
+        Args: { _done: boolean; _item: string; _note?: string }
+        Returns: undefined
       }
       settle_auction_if_due: { Args: { _auction: string }; Returns: string }
       slot_bookings: {

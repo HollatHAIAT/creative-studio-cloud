@@ -1,4 +1,5 @@
 import { ReviewerChecklist } from "@/components/ReviewerChecklist";
+import { ChecklistProgress } from "@/components/ChecklistProgress";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -161,6 +162,7 @@ function ReviewPanel({ draft, invite }: { draft: Draft; invite: Invite }) {
       <div className="space-y-3 text-sm">
         <p className="whitespace-pre-wrap">{L(draft.description, draft.description_ar)}</p>
         <ul className="space-y-2">{comments.map((c) => <li key={c.id} className="rounded-xl bg-muted/50 p-3">{c.score ? `★${c.score} · ` : ""}{c.recommendation ? `${c.recommendation} · ` : ""}{c.body}</li>)}</ul>
+        <ChecklistProgress draftId={draft.id} canEdit={false} refreshKey={comments.length} />
         {canComment && <ReviewerChecklist draftId={draft.id} onSent={() => void load()} />}
         {canComment ? (
           <div className="space-y-2">

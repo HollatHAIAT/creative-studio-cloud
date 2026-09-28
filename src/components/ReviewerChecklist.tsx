@@ -39,9 +39,14 @@ export function ReviewerChecklist({ draftId, onSent }: { draftId: string; onSent
   };
   async function send() {
     if (sending) return; setSending(true);
-    const { error } = await (supabase as any).from("listing_review_comments").insert({ draft_id: draftId, body: text(), visibility: "artist" });
+    const sb = supabase as any;
+    const rows = res!.items.filter((_, i) => keep[i]).map((x) => ({ draft_id: draftId, priority: ["high", "medium", "low"].includes(x.priority) ? x.priority : "medium",
+      field: x.field, action: x.action.slice(0, 500), action_ar: x.actionAr.slice(0, 500), why: x.why.slice(0, 500), why_ar: x.whyAr.slice(0, 500) }));
+    const { error } = await sb.from("revision_checklist_items").insert(rows);
+    if (!error) await sb.from("listing_review_comments").insert({ draft_id: draftId, body: text(), visibility: "artist" });
     setSending(false);
     if (error) { toast.error(L("Couldn't send — your invitation may not allow comments.", "تعذّر الإرسال — قد لا تسمح دعوتك بالتعليق.")); return; }
+    setRes(null); setNotes("");
     toast.success(L("Checklist sent to the artist", "أُرسلت القائمة إلى الفنان")); onSent();
   }
 
