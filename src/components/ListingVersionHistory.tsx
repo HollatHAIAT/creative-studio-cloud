@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { ResubmissionCheck } from "./ResubmissionCheck";
+import { FieldComments, useVersionComments } from "./FieldComments";
 
 type V = { id: string; version: number; title: string; title_ar: string; description: string; description_ar: string; alt_text: string; alt_text_ar: string; tags: string[]; medium: string; image_path: string | null; previous_review_note: string | null; created_at: string };
 
@@ -31,6 +32,7 @@ export function ListingVersionHistory({ draftId }: { draftId: string }) {
     },
   });
   const vs = q.data ?? [];
+  const cq = useVersionComments(draftId); const cs = cq.data ?? [];
   const [pick, setPick] = useState<number | null>(null);
   const cur = vs.find((v) => v.version === pick) ?? vs[0];
   const prev = cur ? vs.find((v) => v.version === cur.version - 1) : undefined;
@@ -74,13 +76,14 @@ export function ListingVersionHistory({ draftId }: { draftId: string }) {
                   : p.k === "add" ? <ins key={i} className="bg-success/15 text-success underline decoration-success"><span className="sr-only">{L("added: ", "أُضيف: ")}</span>{p.t}</ins>
                   : <del key={i} className="bg-destructive/10 text-destructive"><span className="sr-only">{L("removed: ", "حُذف: ")}</span>{p.t}</del>) : (cur![k] || "—")}
               </dd>
+              {changed.includes(k) && <FieldComments draftId={draftId} version={cur!.version} field={k} comments={cs} />}
             </div>))}
           <div><dt className="font-medium">{L("Tags", "الوسوم")}</dt><dd className="flex flex-wrap gap-1.5">
             {tagsAdded.map((t) => <ins key={"a" + t} className="rounded-full bg-success/15 px-2 text-success no-underline">+ {t}</ins>)}
             {tagsRemoved.map((t) => <del key={"r" + t} className="rounded-full bg-destructive/10 px-2 text-destructive">− {t}</del>)}
             {!tagsAdded.length && !tagsRemoved.length && <span className="text-muted-foreground">{L("unchanged", "بلا تغيير")}</span>}
-          </dd></div>
-          <div><dt className="font-medium">{L("Image", "الصورة")}</dt><dd>{imageChanged ? L("A new image was uploaded.", "رُفعت صورة جديدة.") : L("unchanged", "بلا تغيير")}</dd></div>
+          </dd>{(tagsAdded.length > 0 || tagsRemoved.length > 0) && <FieldComments draftId={draftId} version={cur!.version} field="tags" comments={cs} />}</div>
+          <div><dt className="font-medium">{L("Image", "الصورة")}</dt><dd>{imageChanged ? L("A new image was uploaded.", "رُفعت صورة جديدة.") : L("unchanged", "بلا تغيير")}</dd>{imageChanged && <FieldComments draftId={draftId} version={cur!.version} field="image" comments={cs} />}</div>
         </dl>
         <ResubmissionCheck key={cur!.id} draftId={draftId} version={cur!.version} initialNotes={cur!.previous_review_note ?? ""} />
       </>)}
