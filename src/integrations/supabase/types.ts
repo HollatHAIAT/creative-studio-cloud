@@ -768,8 +768,10 @@ export type Database = {
           id: string
           invited_by: string
           permission: string
+          responded_at: string | null
           role: string
           starts_at: string
+          status: string
           watermark: boolean
         }
         Insert: {
@@ -781,8 +783,10 @@ export type Database = {
           id?: string
           invited_by?: string
           permission?: string
+          responded_at?: string | null
           role?: string
           starts_at?: string
+          status?: string
           watermark?: boolean
         }
         Update: {
@@ -794,8 +798,10 @@ export type Database = {
           id?: string
           invited_by?: string
           permission?: string
+          responded_at?: string | null
           role?: string
           starts_at?: string
+          status?: string
           watermark?: boolean
         }
         Relationships: [
@@ -1854,6 +1860,10 @@ export type Database = {
       respond_auction_invite: {
         Args: { _accept: boolean; _invite: string }
         Returns: undefined
+      }
+      respond_review_invite: {
+        Args: { _accept: boolean; _id: string }
+        Returns: string
       }
       retry_payment: { Args: { _order: string }; Returns: undefined }
       revoke_auction_invite: { Args: { _invite: string }; Returns: undefined }
