@@ -7,6 +7,7 @@ import { ActionButton, useAction } from "@/components/ActionButton";
 import { RevisionGuidance } from "@/components/RevisionGuidance";
 import { ListingVersionHistory } from "@/components/ListingVersionHistory";
 import { EvidenceCheck } from "@/components/EvidenceCheck";
+import { ReviewerConsensus } from "@/components/ReviewerConsensus";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { categories } from "@/lib/data";
@@ -179,6 +180,7 @@ function ListingsReview() {
                   </div>
                 ) : <p className="text-sm text-muted-foreground">{L("This listing has already been reviewed. If the seller edits it, it returns to draft and can be submitted again.", "تمت مراجعة هذا الإعلان. إذا عدّله البائع يعود مسودة ويمكن إرساله مجدداً.")}</p>}
               </div>
+              <ReviewerConsensus key={`rcn-${d.id}`} draftId={d.id} />
               <EvidenceCheck key={`ev-${d.id}`} draftId={d.id} description={`${d.description ?? ""}${d.description_ar ? `\n\n${d.description_ar}` : ""}`} />
               <ListingVersionHistory key={d.id} draftId={d.id} />
             </article>
