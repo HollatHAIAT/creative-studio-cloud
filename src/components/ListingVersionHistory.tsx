@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
+import { ResubmissionCheck } from "./ResubmissionCheck";
 
 type V = { id: string; version: number; title: string; title_ar: string; description: string; description_ar: string; alt_text: string; alt_text_ar: string; tags: string[]; medium: string; image_path: string | null; previous_review_note: string | null; created_at: string };
 
@@ -81,6 +82,7 @@ export function ListingVersionHistory({ draftId }: { draftId: string }) {
           </dd></div>
           <div><dt className="font-medium">{L("Image", "الصورة")}</dt><dd>{imageChanged ? L("A new image was uploaded.", "رُفعت صورة جديدة.") : L("unchanged", "بلا تغيير")}</dd></div>
         </dl>
+        <ResubmissionCheck key={cur!.id} draftId={draftId} version={cur!.version} initialNotes={cur!.previous_review_note ?? ""} />
       </>)}
     </section>
   );
