@@ -164,3 +164,62 @@ export const sendRevisionGuidance = createServerFn({ method: "POST" })
     await supabaseAdmin.rpc("push_notification", { _uid: d.user_id, _kind: "order", _t: "How to fix your listing", _tar: "كيف تعدّل إعلانك", _b: `${d.title}: ${data.message}`.slice(0, 500), _bar: `${d.title_ar}: ${data.messageAr}`.slice(0, 500), _link: "/listing-writer" });
     return { ok: true };
   });
+
+const RevisionCheck = z.object({
+  verdict: z.enum(["addressed", "partly", "not_addressed"]),
+  summary: z.string(), summaryAr: z.string(),
+  requests: z.array(z.object({
+    request: z.string(), requestAr: z.string(),
+    status: z.enum(["done", "partly", "missing"]),
+    note: z.string(), noteAr: z.string(),
+  })).max(12),
+  remaining: z.array(z.object({
+    area: z.enum(["image", "title", "description", "altText", "tags", "other"]),
+    edit: z.string(), editAr: z.string(),
+  })).max(10),
+});
+export type RevisionCheckResult = z.infer<typeof RevisionCheck>;
+
+/** Seller: AI checks whether a revised listing addresses the moderator's notes. Advisory only. */
+export const checkRevisionAgainstNotes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({
+    notes: z.string().trim().min(5).max(6000),
+    title: z.string().max(200), titleAr: z.string().max(200),
+    description: z.string().max(4000), descriptionAr: z.string().max(4000),
+    altText: z.string().max(300), altTextAr: z.string().max(300),
+    tags: z.array(z.string().max(60)).max(20),
+  }).parse(d))
+  .handler(async ({ data }): Promise<{ result?: RevisionCheckResult; error?: string }> => {
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const { notes, ...copy } = data;
+    const prompt = `You help sellers on Arwiqa, a Saudi-based global art marketplace, fix a listing a moderator rejected.
+Split the moderator's notes into the individual changes requested. For each, judge from the revised listing whether it is done, partly done or missing, with a short note (English + Arabic). Then list any remaining concrete edits, tied to an area. Only use the requests in the notes — do not invent new policy requirements. If you can't judge something from text alone (e.g. the image), say so and mark it partly.
+verdict: "addressed" if all done, "partly" if some are, "not_addressed" if none.
+Moderator notes: ${JSON.stringify(notes)}
+Revised listing: ${JSON.stringify(copy)}
+Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","requests":[{"request":"","requestAr":"","status":"","note":"","noteAr":""}],"remaining":[{"area":"","edit":"","editAr":""}]}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "medium", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [{ type: "input_text", text: prompt }] }],
+      }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Revision check AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no assessment." };
+    try { return { result: RevisionCheck.parse(JSON.parse(json)) }; } catch { return { error: "The AI returned an unreadable answer." }; }
+  });
