@@ -85,7 +85,7 @@ export function ArtLightbox({ images, index, onIndex, alt, onClose }: {
   const btn = "rounded-full bg-background/15 p-3 text-background backdrop-blur hover:bg-background/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-background";
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={L("Artwork viewer", "عارض العمل الفني")} className="fixed inset-0 z-[90] flex flex-col bg-foreground/95 animate-fade-in">
+    <div role="dialog" aria-modal="true" aria-label={L("Artwork viewer", "عارض العمل الفني")} className="fixed inset-0 z-[90] flex flex-col bg-foreground animate-fade-in">
       <div className="flex items-center justify-between gap-2 p-3 text-background">
         <span className="text-sm opacity-80" aria-live="polite">{n > 1 ? `${index + 1} / ${n}` : ""} · {Math.round(z * 100)}%</span>
         <div className="flex gap-2">
