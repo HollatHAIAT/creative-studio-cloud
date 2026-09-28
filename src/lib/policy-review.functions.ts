@@ -251,11 +251,12 @@ export const compareResubmission = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin.from("listing_draft_versions" as never).select("*")
       .eq("draft_id", data.draftId).in("version", [data.version - 1, data.version]);
-    const list = (rows ?? []) as Array<Record<string, unknown>>;
+    type Row = { version: number; title: string; title_ar: string; description: string; description_ar: string; alt_text: string; alt_text_ar: string; tags: string[]; medium: string; image_path: string | null };
+    const list = (rows ?? []) as unknown as Row[];
     const pick = (n: number) => list.find((r) => r.version === n);
     const prev = pick(data.version - 1), cur = pick(data.version);
     if (!prev || !cur) return { error: "Both versions are needed to compare." };
-    const shape = (r: Record<string, unknown>) => ({ title: r.title, titleAr: r.title_ar, description: r.description, descriptionAr: r.description_ar, altText: r.alt_text, altTextAr: r.alt_text_ar, tags: r.tags, medium: r.medium });
+    const shape = (r: Row) => ({ title: r.title, titleAr: r.title_ar, description: r.description, descriptionAr: r.description_ar, altText: r.alt_text, altTextAr: r.alt_text_ar, tags: r.tags, medium: r.medium });
     const imageChanged = prev.image_path !== cur.image_path;
     const prompt = `You assist moderators at Arwiqa, a Saudi-based global art marketplace, reviewing a seller's resubmission of a rejected listing.
 Split the moderator's decision notes into the individual changes requested. For each, compare the PREVIOUS and RESUBMITTED versions and judge: addressed, partly, not_addressed, or unclear (e.g. image content can't be judged from text; only whether the image file changed is known). Give short evidence quoting what changed (English + Arabic).

@@ -25,7 +25,7 @@ export function ResubmissionCheck({ draftId, version, initialNotes }: { draftId:
       if (r.error) setErr(r.error); else setRes(r.result ?? null);
     } catch (e) { setErr(e instanceof Error ? e.message : "Error"); } finally { setBusy(false); }
   }
-  const pill = (s: string) => { const x = STATUS[s] ?? STATUS.unclear!; return <span className={`rounded-full px-2 py-0.5 text-xs ${x[2]}`}>{L(x[0], x[1])}</span>; };
+  const pill = (s: string) => { const x = STATUS[s] ?? STATUS["unclear"]!; return <span className={`rounded-full px-2 py-0.5 text-xs ${x[2]}`}>{L(x[0], x[1])}</span>; };
 
   return (
     <div className="space-y-3 rounded-xl border border-border p-3">
