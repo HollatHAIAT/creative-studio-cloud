@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.admin_review_listing(uuid, boolean, text) FROM PUBLIC, anon;
