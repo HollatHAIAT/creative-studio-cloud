@@ -36,6 +36,7 @@ function ListingWriter() {
   const [medium, setMedium] = useState("");
   const [notes, setNotes] = useState("");
   const [copy, setCopy] = useState<ListingCopy | null>(null);
+  const [mode, setMode] = useState<"ai" | "manual">("ai");
   const [err, setErr] = useState("");
   const revise = useServerFn(reviseListingCopy);
   const [instr, setInstr] = useState("");
@@ -152,6 +153,10 @@ function ListingWriter() {
     if (r.error || !r.copy) { setErr(r.error ?? ""); throw new Error(r.error); }
     setCopy(r.copy);
   });
+  const startManual = () => {
+    setMode("manual");
+    setCopy((c) => c ?? { title: "", titleAr: "", description: "", descriptionAr: "", altText: "", altTextAr: "", tags: [] });
+  };
 
   const removeImage = async () => {
     if (path) await supabase.storage.from("artwork-images").remove([path]);
@@ -188,12 +193,27 @@ function ListingWriter() {
           <label className="block text-sm">{L("Notes for the writer (optional)", "ملاحظات للكاتب (اختياري)")}
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={600} rows={3} placeholder={L("Inspiration, place, series…", "الإلهام، المكان، السلسلة…")} className="mt-1 w-full rounded-sm border border-border bg-background px-3 py-2" />
           </label>
-          <ActionButton state={write.state} disabled={!path} onClick={() => write.run()} onRetry={write.retry}
-            loadingLabel={L("Writing copy…", "جارٍ الكتابة…")} successLabel={L("Copy ready", "النص جاهز")}
-            errorLabel={err || L("Couldn't write copy.", "تعذّرت الكتابة.")} retryLabel={L("Try again", "حاول مجدداً")}
-            className="w-full rounded-sm bg-primary px-5 py-3 text-primary-foreground">
-            {copy ? L("Rewrite copy", "أعد الكتابة") : L("Write listing copy", "اكتب نص الإعلان")}
-          </ActionButton>
+          <div role="radiogroup" aria-label={L("How to write the listing", "طريقة كتابة الإعلان")} className="grid grid-cols-2 gap-2 rounded-full bg-muted p-1 text-sm">
+            {([["ai", L("Write with AI", "اكتب بالذكاء الاصطناعي")], ["manual", L("Write it myself", "أكتبه بنفسي")]] as const).map(([m, label]) => (
+              <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)}
+                className={`rounded-full px-3 py-2 ${mode === m ? "bg-background font-medium shadow-sm" : "text-muted-foreground"}`}>{label}</button>
+            ))}
+          </div>
+          {mode === "ai" ? (<>
+            <ActionButton state={write.state} disabled={!path} onClick={() => write.run()} onRetry={write.retry}
+              loadingLabel={L("Writing copy…", "جارٍ الكتابة…")} successLabel={L("Copy ready", "النص جاهز")}
+              errorLabel={err || L("Couldn't write copy.", "تعذّرت الكتابة.")} retryLabel={L("Try again", "حاول مجدداً")}
+              className="w-full rounded-full bg-primary px-5 py-3 text-primary-foreground">
+              {copy ? L("Rewrite copy", "أعد الكتابة") : L("Write listing copy", "اكتب نص الإعلان")}
+            </ActionButton>
+            {write.state === "error" && (
+              <p className="text-sm">{L("The AI isn't available right now.", "الذكاء الاصطناعي غير متاح الآن.")}{" "}
+                <button type="button" onClick={startManual} className="font-medium text-primary underline">{L("Write it myself instead", "سأكتبه بنفسي بدلاً من ذلك")}</button></p>)}
+          </>) : (
+            <button type="button" onClick={startManual} disabled={!!copy} className="w-full rounded-full bg-primary px-5 py-3 text-primary-foreground disabled:opacity-60">
+              {copy ? L("Editing below — fill in the fields", "حرّر الحقول أدناه") : L("Start writing", "ابدأ الكتابة")}
+            </button>
+          )}
         </section>
 
         <section aria-live="polite" className="space-y-5">
@@ -255,9 +275,19 @@ function ListingWriter() {
                   {prev && <button type="button" onClick={() => { setCopy(prev); setPrev(null); }} className="text-sm underline">{L("Undo revision", "تراجع عن التعديل")}</button>}
                 </div>
               </form>
-              {copy.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">{copy.tags.map((t) => <span key={t} className="rounded-full border border-border px-3 py-1 text-sm">#{t}</span>)}</div>
-              )}
+              <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">{copy.tags.map((t) => (
+                  <span key={t} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-sm">#{t}
+                    <button type="button" aria-label={L(`Remove tag ${t}`, `إزالة الوسم ${t}`)} onClick={() => setCopy({ ...copy, tags: copy.tags.filter((x) => x !== t) })} className="text-muted-foreground hover:text-destructive">×</button>
+                  </span>))}</div>
+                <input aria-label={L("Add a tag", "أضف وسماً")} placeholder={L("Add a tag and press Enter", "أضف وسماً واضغط Enter")} maxLength={40}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return; e.preventDefault();
+                    const v = e.currentTarget.value.trim().replace(/^#/, "");
+                    if (v && !copy.tags.includes(v) && copy.tags.length < 20) setCopy({ ...copy, tags: [...copy.tags, v] });
+                    e.currentTarget.value = "";
+                  }} className="w-full rounded-full border border-border bg-background px-4 py-2 text-sm" />
+              </div>
               <div className="space-y-3 rounded-sm border border-border p-4">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                   <div className="min-w-0">
