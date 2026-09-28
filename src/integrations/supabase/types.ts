@@ -1891,6 +1891,7 @@ export type Database = {
         Returns: string
       }
       admin_retry_email: { Args: { _id: string }; Returns: undefined }
+      admin_retry_reminder_email: { Args: { _id: string }; Returns: undefined }
       admin_review_listing: {
         Args: { _approve: boolean; _id: string; _note: string }
         Returns: undefined
