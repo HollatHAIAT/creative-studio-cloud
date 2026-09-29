@@ -197,6 +197,48 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_filter_presets: {
+        Row: {
+          actor: string
+          created_at: string
+          field: string
+          from_date: string
+          id: string
+          name: string
+          owner_email: string | null
+          owner_id: string
+          shared: boolean
+          to_date: string
+          updated_at: string
+        }
+        Insert: {
+          actor?: string
+          created_at?: string
+          field?: string
+          from_date?: string
+          id?: string
+          name: string
+          owner_email?: string | null
+          owner_id?: string
+          shared?: boolean
+          to_date?: string
+          updated_at?: string
+        }
+        Update: {
+          actor?: string
+          created_at?: string
+          field?: string
+          from_date?: string
+          id?: string
+          name?: string
+          owner_email?: string | null
+          owner_id?: string
+          shared?: boolean
+          to_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bids: {
         Row: {
           amount: number
