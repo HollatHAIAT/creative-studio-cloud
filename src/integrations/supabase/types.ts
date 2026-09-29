@@ -2311,6 +2311,15 @@ export type Database = {
         Args: { _allowed: boolean; _listing: string }
         Returns: undefined
       }
+      admin_set_role: {
+        Args: {
+          _grant: boolean
+          _reason?: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _uid: string
+        }
+        Returns: undefined
+      }
       admin_settings_audit: {
         Args: { _limit?: number }
         Returns: {
