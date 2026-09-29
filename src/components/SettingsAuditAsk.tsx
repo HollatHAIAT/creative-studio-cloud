@@ -29,7 +29,7 @@ export function SettingsAuditAsk() {
 
   async function submit(question: string) {
     if (question.trim().length < 3 || busy) return;
-    setBusy(true); setErr(null); setRes(null);
+    setBusy(true); setErr(null); setRes(null); setNote(null);
     try { const r = await ask({ data: { question: question.trim() } }); if (r.error) setErr(r.error); else setRes(r.result ?? null); }
     catch { setErr(L("Couldn't reach the assistant. Please try again.", "تعذّر الوصول إلى المساعد. حاول مجددًا.")); }
     finally { setBusy(false); }
