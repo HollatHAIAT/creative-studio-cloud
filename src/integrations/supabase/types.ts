@@ -2239,6 +2239,186 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_accounts: {
+        Row: {
+          about: string
+          about_ar: string
+          city: string
+          city_ar: string
+          created_at: string
+          email: string
+          name: string
+          name_ar: string
+          phone: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          about?: string
+          about_ar?: string
+          city?: string
+          city_ar?: string
+          created_at?: string
+          email?: string
+          name: string
+          name_ar?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          about?: string
+          about_ar?: string
+          city?: string
+          city_ar?: string
+          created_at?: string
+          email?: string
+          name?: string
+          name_ar?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      supplier_order_lines: {
+        Row: {
+          amount: number
+          buyer_name: string
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string | null
+          qty: number
+          ship_to: Json | null
+          status: string
+          supplier_id: string
+          title: string
+          title_ar: string
+          tracking: string
+          unit: number
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          buyer_name?: string
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id?: string | null
+          qty: number
+          ship_to?: Json | null
+          status?: string
+          supplier_id: string
+          title: string
+          title_ar: string
+          tracking?: string
+          unit: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          buyer_name?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string | null
+          qty?: number
+          ship_to?: Json | null
+          status?: string
+          supplier_id?: string
+          title?: string
+          title_ar?: string
+          tracking?: string
+          unit?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_order_lines_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_order_lines_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_order_lines_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      supplier_products: {
+        Row: {
+          created_at: string
+          description: string
+          description_ar: string
+          id: string
+          low_stock_at: number
+          name: string
+          name_ar: string
+          price: number
+          status: string
+          stock: number
+          supplier_id: string
+          swatch: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          description_ar?: string
+          id?: string
+          low_stock_at?: number
+          name: string
+          name_ar: string
+          price: number
+          status?: string
+          stock?: number
+          supplier_id?: string
+          swatch?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          description_ar?: string
+          id?: string
+          low_stock_at?: number
+          name?: string
+          name_ar?: string
+          price?: number
+          status?: string
+          stock?: number
+          supplier_id?: string
+          swatch?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           contact_email: string | null
@@ -2732,6 +2912,10 @@ export type Database = {
           _topic: string
         }
         Returns: string
+      }
+      supplier_update_line: {
+        Args: { _line: string; _status: string; _tracking: string }
+        Returns: undefined
       }
       track_support_request: {
         Args: { _email: string; _reference: string }

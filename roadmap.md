@@ -173,7 +173,7 @@
 - [ ] CMS: About, Licensing, FAQ, footer page texts
 - [x] Buyer profile: details, addresses, password, delete account
 - [x] Seller bio, photo, bank payout account
-- [ ] Supplies vendor accounts, products, stock, orders
+- [x] Supplies vendor accounts, products, stock, orders (supplier portal)
 - [x] Seller: artwork view counting + conversion
 - [x] Checkout applies accepted offer price (once)
 - [x] Checkout blocks sold-out / insufficient stock

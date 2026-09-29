@@ -48,6 +48,7 @@ import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authen
 import { Route as AuthenticatedSearchTermsRouteImport } from './routes/_authenticated/search-terms'
 import { Route as AuthenticatedSellerDashboardRouteImport } from './routes/_authenticated/seller-dashboard'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSupplierRouteImport } from './routes/_authenticated/supplier'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
 import { Route as ArtistsIdRouteImport } from './routes/artists.$id'
 import { Route as ArtworkIdRouteImport } from './routes/artwork.$id'
@@ -276,6 +277,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSupplierRoute = AuthenticatedSupplierRouteImport.update({
+  id: '/supplier',
+  path: '/supplier',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
@@ -448,6 +454,7 @@ export interface FileRoutesByFullPath {
   '/search-terms': typeof AuthenticatedSearchTermsRoute
   '/seller-dashboard': typeof AuthenticatedSellerDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/supplier': typeof AuthenticatedSupplierRoute
   '/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -512,6 +519,7 @@ export interface FileRoutesByTo {
   '/search-terms': typeof AuthenticatedSearchTermsRoute
   '/seller-dashboard': typeof AuthenticatedSellerDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/supplier': typeof AuthenticatedSupplierRoute
   '/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -578,6 +586,7 @@ export interface FileRoutesById {
   '/_authenticated/search-terms': typeof AuthenticatedSearchTermsRoute
   '/_authenticated/seller-dashboard': typeof AuthenticatedSellerDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/supplier': typeof AuthenticatedSupplierRoute
   '/_authenticated/teams': typeof AuthenticatedTeamsRoute
   '/artists/$id': typeof ArtistsIdRoute
   '/artwork/$id': typeof ArtworkIdRoute
@@ -644,6 +653,7 @@ export interface FileRouteTypes {
     | '/search-terms'
     | '/seller-dashboard'
     | '/settings'
+    | '/supplier'
     | '/teams'
     | '/artists/$id'
     | '/artwork/$id'
@@ -708,6 +718,7 @@ export interface FileRouteTypes {
     | '/search-terms'
     | '/seller-dashboard'
     | '/settings'
+    | '/supplier'
     | '/teams'
     | '/artists/$id'
     | '/artwork/$id'
@@ -773,6 +784,7 @@ export interface FileRouteTypes {
     | '/_authenticated/search-terms'
     | '/_authenticated/seller-dashboard'
     | '/_authenticated/settings'
+    | '/_authenticated/supplier'
     | '/_authenticated/teams'
     | '/artists/$id'
     | '/artwork/$id'
@@ -1104,6 +1116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/supplier': {
+      id: '/_authenticated/supplier'
+      path: '/supplier'
+      fullPath: '/supplier'
+      preLoaderRoute: typeof AuthenticatedSupplierRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/teams': {
       id: '/_authenticated/teams'
       path: '/teams'
@@ -1293,6 +1312,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSearchTermsRoute: typeof AuthenticatedSearchTermsRoute
   AuthenticatedSellerDashboardRoute: typeof AuthenticatedSellerDashboardRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSupplierRoute: typeof AuthenticatedSupplierRoute
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
   AuthenticatedAdminAuctionsRoute: typeof AuthenticatedAdminAuctionsRoute
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
@@ -1329,6 +1349,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSearchTermsRoute: AuthenticatedSearchTermsRoute,
   AuthenticatedSellerDashboardRoute: AuthenticatedSellerDashboardRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSupplierRoute: AuthenticatedSupplierRoute,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
   AuthenticatedAdminAuctionsRoute: AuthenticatedAdminAuctionsRoute,
   AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
