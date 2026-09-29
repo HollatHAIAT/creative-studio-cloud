@@ -74,6 +74,7 @@ export function AccountNav() {
               <DropdownMenuItem asChild><Link to="/my-reviews">{locale === "ar" ? "تقييماتي" : "My reviews"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/notifications">{t("nav.notifications")}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/profile">{locale === "ar" ? "ملفي الشخصي" : "My profile"}</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link to="/supplier">{locale === "ar" ? "بوابة الموردين" : "Supplier portal"}</Link></DropdownMenuItem>
               <DropdownMenuItem asChild><Link to="/settings">{t("nav.settings")}</Link></DropdownMenuItem>
               {isStaff && (<>
                 <DropdownMenuSeparator />
