@@ -358,6 +358,39 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_entries: {
+        Row: {
+          created_at: string
+          data: Json
+          key: string
+          kind: string
+          published: boolean
+          sort: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          key: string
+          kind: string
+          published?: boolean
+          sort?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          key?: string
+          kind?: string
+          published?: boolean
+          sort?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       digital_assets: {
         Row: {
           category: string

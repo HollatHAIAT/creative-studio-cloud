@@ -57,6 +57,7 @@ import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as AuthenticatedAdminAuctionsRouteImport } from './routes/_authenticated/admin.auctions'
+import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin.content'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
 import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin.listings'
@@ -320,6 +321,12 @@ const AuthenticatedAdminAuctionsRoute =
     path: '/admin/auctions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminContentRoute =
+  AuthenticatedAdminContentRouteImport.update({
+    id: '/admin/content',
+    path: '/admin/content',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminDashboardRoute =
   AuthenticatedAdminDashboardRouteImport.update({
     id: '/admin/dashboard',
@@ -444,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
@@ -506,6 +514,7 @@ export interface FileRoutesByTo {
   '/listing/$id': typeof ListingIdRoute
   '/assets': typeof AssetsIndexRoute
   '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
@@ -570,6 +579,7 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/_authenticated/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/listings': typeof AuthenticatedAdminListingsRoute
@@ -634,6 +644,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets/'
     | '/admin/auctions'
+    | '/admin/content'
     | '/admin/dashboard'
     | '/admin/emails'
     | '/admin/listings'
@@ -696,6 +707,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets'
     | '/admin/auctions'
+    | '/admin/content'
     | '/admin/dashboard'
     | '/admin/emails'
     | '/admin/listings'
@@ -759,6 +771,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets/'
     | '/_authenticated/admin/auctions'
+    | '/_authenticated/admin/content'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/emails'
     | '/_authenticated/admin/listings'
@@ -1142,6 +1155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuctionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/content': {
+      id: '/_authenticated/admin/content'
+      path: '/admin/content'
+      fullPath: '/admin/content'
+      preLoaderRoute: typeof AuthenticatedAdminContentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/dashboard': {
       id: '/_authenticated/admin/dashboard'
       path: '/admin/dashboard'
@@ -1255,6 +1275,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
   AuthenticatedAdminAuctionsRoute: typeof AuthenticatedAdminAuctionsRoute
+  AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
@@ -1289,6 +1310,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
   AuthenticatedAdminAuctionsRoute: AuthenticatedAdminAuctionsRoute,
+  AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,

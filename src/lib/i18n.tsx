@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { actions, useStore } from "./store";
 import { en2, ar2 } from "./i18n-extra";
+import { textOverrides, useCmsVersion } from "./cms";
 
 export type Locale = "en" | "ar";
 
@@ -116,7 +117,9 @@ const dicts = { en, ar };
 export function useLocale() {
   const { locale } = useStore();
   const l: Locale = locale === "ar" ? "ar" : "en";
-  const t = (k: Key) => dicts[l][k] ?? en[k];
+  // Overrides apply only after hydration (version > 0) so server and first client render match.
+  const cmsV = useCmsVersion();
+  const t = (k: Key) => (cmsV > 0 ? textOverrides[l][k] : undefined) ?? dicts[l][k] ?? en[k];
   /** Pick the Arabic field when available (e.g. titleAr). */
   const pick = <T extends Record<string, unknown>>(o: T, field: string) => (l === "ar" && typeof o[`${field}Ar`] === "string" ? (o[`${field}Ar`] as string) : (o[field] as string));
   const num = (n: number) => n.toLocaleString(l === "ar" ? "ar-SA" : "en-US");
@@ -135,3 +138,5 @@ export function useDocumentDirection() {
 
 /** Inline translated text, for places that just need a label. */
 export function T({ k }: { k: Key }) { return useLocale().t(k); }
+
+export const dictionaries = { en: en as Record<string, string>, ar: ar as Record<string, string> };
