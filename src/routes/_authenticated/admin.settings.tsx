@@ -86,20 +86,44 @@ function AdminSettings() {
 type AuditRow = { id: string; actor_email: string | null; field: string; old_value: string | null; new_value: string | null; created_at: string };
 function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string; ar: boolean; labels: Record<string, string> }) {
   const q = useQuery({ queryKey: ["settings-audit"], queryFn: async () => {
-    const { data, error } = await (supabase as any).rpc("admin_settings_audit", { _limit: 200 });
+    const { data, error } = await (supabase as any).rpc("admin_settings_audit", { _limit: 1000 });
     if (error) throw error; return (data ?? []) as AuditRow[];
   } });
+  const [from, setFrom] = useState(""); const [to, setTo] = useState("");
+  const [who, setWho] = useState(""); const [field, setField] = useState("");
+  const admins = Array.from(new Set((q.data ?? []).map((r) => r.actor_email ?? ""))).sort();
+  const rows = (q.data ?? []).filter((r) => {
+    const d = r.created_at.slice(0, 10);
+    if (from && d < from) return false;
+    if (to && d > to) return false;
+    if (who && (r.actor_email ?? "") !== (who === "__system" ? "" : who)) return false;
+    if (field && r.field !== field) return false;
+    return true;
+  });
+  const active = !!(from || to || who || field);
+  const ctl = "rounded-sm border border-border bg-background px-3 py-2 text-sm";
   return (
     <section aria-labelledby="audit-h" className="mx-auto mt-12 max-w-4xl px-6">
       <h2 id="audit-h" className="font-display text-2xl">{L("Change history", "سجل التغييرات")}</h2>
       <p className="mt-1 text-sm text-muted-foreground">{L("Every settings change, who made it and when. Entries can't be edited or deleted.", "كل تغيير في الإعدادات ومن أجراه ومتى. لا يمكن تعديل السجل أو حذفه.")}</p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="grid gap-1 text-xs"><span>{L("From date", "من تاريخ")}</span><input type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} className={ctl} /></label>
+        <label className="grid gap-1 text-xs"><span>{L("To date", "إلى تاريخ")}</span><input type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} className={ctl} /></label>
+        <label className="grid gap-1 text-xs"><span>{L("Administrator", "المدير")}</span><select value={who} onChange={(e) => setWho(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{admins.map((a) => <option key={a || "s"} value={a || "__system"}>{a || L("System", "النظام")}</option>)}</select></label>
+        <label className="grid gap-1 text-xs"><span>{L("Setting", "الإعداد")}</span><select value={field} onChange={(e) => setField(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{Object.entries(labels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+      </div>
+      {q.data && q.data.length > 0 && <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
+        <span>{L(`Showing ${rows.length} of ${q.data.length}`, `عرض ${rows.length} من ${q.data.length}`)}</span>
+        {active && <button type="button" onClick={() => { setFrom(""); setTo(""); setWho(""); setField(""); }} className="underline hover:text-foreground">{L("Clear filters", "مسح الفلاتر")}</button>}
+      </div>}
       {q.isError ? <p className="mt-4 text-sm text-destructive">{L("Couldn't load the history.", "تعذّر تحميل السجل.")}</p>
         : !q.data ? <p className="mt-4 text-sm">…</p>
-        : q.data.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes yet.", "لا تغييرات بعد.")}</p> : (
+        : q.data.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes yet.", "لا تغييرات بعد.")}</p>
+        : rows.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes match these filters.", "لا تغييرات تطابق هذه الفلاتر.")}</p> : (
         <div className="mt-4 overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-muted"><tr>{[L("When", "متى"), L("Administrator", "المدير"), L("Setting", "الإعداد"), L("From", "من"), L("To", "إلى")].map((h) => <th key={h} className="p-3 text-start">{h}</th>)}</tr></thead>
-            <tbody>{q.data.map((r) => (
+            <tbody>{rows.map((r) => (
               <tr key={r.id} className="border-t border-border">
                 <td className="p-3 whitespace-nowrap">{new Date(r.created_at).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" })}</td>
                 <td className="p-3">{r.actor_email ?? L("System", "النظام")}</td>
