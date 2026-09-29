@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { ShoppingBag, MapPin } from "lucide-react";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { supplies, supplyTypes, fmt } from "@/lib/data";
+import { useSupplierProducts } from "@/lib/supplier";
+import { Link as SupLink } from "@tanstack/react-router";
 import { actions } from "@/lib/store";
 import { useLocale } from "@/lib/i18n";
 import hero from "@/assets/supplies.jpg";
@@ -25,10 +27,13 @@ function Supplies() {
   const { locale } = useLocale(); const ar = locale === "ar"; const L = (e: string, a: string) => (ar ? a : e);
   const [type, setType] = useState<string>("all");
   const [qty, setQty] = useState<Record<string, number>>({});
-  const shown = type === "all" ? supplies : supplies.filter((s) => s.type === type);
+  const sp = useSupplierProducts();
+  const all = [...(sp.data ?? []), ...supplies];
+  const shown = type === "all" ? all : all.filter((s) => s.type === type);
   return (
     <SiteShell>
       <PageTitle eyebrow={L("Made in Saudi Arabia", "صُنع في السعودية")} title={L("Art supplies", "مستلزمات الفن")} sub={L("Paints, brushes, qalam, clay and Sadu yarn from makers in Riyadh, Abha, Al-Ahsa, Madinah and beyond.", "ألوان وفرش وأقلام قصب وطين وصوف السدو من صنّاع في الرياض وأبها والأحساء والمدينة وغيرها.")} />
+      <p className="mx-auto -mt-4 mb-6 max-w-6xl px-6 text-sm text-muted-foreground">{L("Do you make or sell art supplies?", "هل تصنع أو تبيع مستلزمات الفن؟")} <SupLink to="/supplier" className="text-primary underline">{L("Open the supplier portal", "افتح بوابة الموردين")}</SupLink></p>
       <div className="mx-auto max-w-7xl space-y-8 px-6 pb-16">
         <img src={hero} alt={L("Paint tubes, brushes, reed pens and small canvases on linen", "أنابيب ألوان وفرش وأقلام قصب ولوحات صغيرة على قماش كتان")} width={1536} height={864} className="aspect-[21/8] w-full rounded-3xl object-cover" />
         <div role="group" aria-label={L("Filter by type", "التصفية حسب النوع")} className="flex flex-wrap gap-2">

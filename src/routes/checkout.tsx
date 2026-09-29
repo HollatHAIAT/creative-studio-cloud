@@ -8,6 +8,7 @@ import { CreditCard, Landmark, Smartphone, Apple, Check } from "lucide-react";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { actions, useStore } from "@/lib/store";
 import { priceCart } from "@/lib/pricing";
+import { useSupplierProducts } from "@/lib/supplier";
 import { placeOrder } from "@/lib/orders.functions";
 const SELL_ERR: Record<string, [string, string]> = {
   LISTING_UNAVAILABLE: ["This artwork is no longer available.", "هذا العمل لم يعد متاحًا."],
@@ -39,6 +40,7 @@ type Method = (typeof METHODS)[number]["id"];
 function Checkout() {
   const { t, locale } = useLocale();
   const { cart } = useStore();
+  useSupplierProducts();
   const { user } = useSession();
   const items = cart ?? [];
   const priced = priceCart(items);
