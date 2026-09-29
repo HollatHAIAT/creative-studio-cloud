@@ -220,7 +220,7 @@ function Orders({ L, ar }: { L: (e: string, a: string) => string; ar: boolean })
             {!["delivered", "cancelled"].includes(l.status) && (
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <input aria-label={L("Tracking number", "رقم التتبع")} placeholder={L("Tracking number", "رقم التتبع")} dir="ltr" maxLength={120} value={track[l.id] ?? ""} onChange={(e) => setTrack({ ...track, [l.id]: e.target.value })} className="rounded-md border border-border bg-background p-1.5 text-sm" />
-                <button onClick={() => update(l, next[l.status] ?? "delivered")} className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground">{L(`Mark ${STATUS[next[l.status]][0].toLowerCase()}`, `تحويل إلى: ${STATUS[next[l.status]][1]}`)}</button>
+                <button onClick={() => update(l, next[l.status] ?? "delivered")} className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground">{L(`Mark ${st(next[l.status])[0].toLowerCase()}`, `تحويل إلى: ${st(next[l.status])[1]}`)}</button>
                 {track[l.id] !== l.tracking && <button onClick={() => update(l, l.status)} className="text-sm underline">{L("Save tracking", "حفظ رقم التتبع")}</button>}
                 <button onClick={() => update(l, "cancelled")} className="text-sm text-destructive">{L("Cancel", "إلغاء")}</button>
               </div>
