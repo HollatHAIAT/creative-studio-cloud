@@ -117,7 +117,7 @@ export function InventoryHistory({ listings }: { listings: { id: string; title: 
   return (
     <section aria-labelledby="sd-inv" className="rounded-2xl border border-border p-4">
       <h2 id="sd-inv" className="font-display text-xl">{L("Stock history", "سجل المخزون")}</h2>
-      <p className="text-sm text-muted-foreground">{L("Stock goes down automatically when an order is paid. Sold-out works show as unavailable in the shop.", "ينقص المخزون تلقائيًا عند دفع الطلب، وتظهر الأعمال النافدة غير متاحة في المتجر.")}</p>
+      <p className="text-sm text-muted-foreground">{L("Stock goes down automatically when an order is paid, and you are notified at low stock or sold out.", "ينقص المخزون تلقائيًا عند دفع الطلب، وتصلك إشعارات عند انخفاضه أو نفاده.")}</p>
       <ul className="mt-3 divide-y divide-border text-sm">
         {(q.data ?? []).map((r) => (
           <li key={r.id} className="flex flex-wrap justify-between gap-2 py-2">
