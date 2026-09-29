@@ -86,23 +86,43 @@ function AdminSettings() {
 
 type AuditRow = { id: string; actor_email: string | null; field: string; old_value: string | null; new_value: string | null; created_at: string };
 function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string; ar: boolean; labels: Record<string, string> }) {
-  const q = useQuery({ queryKey: ["settings-audit"], queryFn: async () => {
-    const { data, error } = await (supabase as any).rpc("admin_settings_audit", { _limit: 1000 });
-    if (error) throw error; return (data ?? []) as AuditRow[];
-  } });
   const [from, setFrom] = useState(""); const [to, setTo] = useState("");
   const [who, setWho] = useState(""); const [field, setField] = useState("");
-  const admins = Array.from(new Set((q.data ?? []).map((r) => r.actor_email ?? ""))).sort();
-  const rows = (q.data ?? []).filter((r) => {
-    const d = r.created_at.slice(0, 10);
-    if (from && d < from) return false;
-    if (to && d > to) return false;
-    if (who && (r.actor_email ?? "") !== (who === "__system" ? "" : who)) return false;
-    if (field && r.field !== field) return false;
-    return true;
-  });
+  const [exporting, setExporting] = useState(false);
+  const PAGE = 500;
+  const args = (limit: number, offset: number) => ({ _from: from || null, _to: to || null, _actor: who || null, _field: field || null, _limit: limit, _offset: offset });
+  const q = useQuery({ queryKey: ["settings-audit", from, to, who, field], placeholderData: (p) => p, queryFn: async () => {
+    const { data, error } = await (supabase as any).rpc("admin_settings_audit_search", args(PAGE, 0));
+    if (error) throw error; const list = (data ?? []) as (AuditRow & { total: number })[];
+    return { rows: list as AuditRow[], total: Number(list[0]?.total ?? 0) };
+  } });
+  const actorsQ = useQuery({ queryKey: ["settings-audit", "actors"], queryFn: async () => {
+    const { data, error } = await (supabase as any).rpc("admin_settings_audit_actors");
+    if (error) throw error; return ((data ?? []) as { actor_email: string }[]).map((r) => r.actor_email);
+  } });
+  const admins = actorsQ.data ?? [];
+  const rows = q.data?.rows ?? []; const total = q.data?.total ?? 0;
   const active = !!(from || to || who || field);
   const ctl = "rounded-sm border border-border bg-background px-3 py-2 text-sm";
+  async function exportAll() {
+    setExporting(true);
+    try {
+      const all: AuditRow[] = [];
+      for (let off = 0; ; off += 5000) {
+        const { data, error } = await (supabase as any).rpc("admin_settings_audit_search", args(5000, off));
+        if (error) throw error; const list = (data ?? []) as AuditRow[]; all.push(...list);
+        if (list.length < 5000) break;
+      }
+      const esc = (v: unknown) => { const s = String(v ?? ""); return /[",\n\r]/.test(s) || /^[=+\-@]/.test(s) ? `"${(/^[=+\-@]/.test(s) ? "'" : "") + s.replace(/"/g, '""')}"` : s; };
+      const head = ["Timestamp (UTC)", "Administrator", "Setting key", "Setting", "Old value", "New value", "Entry ID"];
+      const lines = all.map((r) => [r.created_at, r.actor_email ?? "System", r.field, labels[r.field] ?? r.field, r.old_value, r.new_value, r.id].map(esc).join(","));
+      const blob = new Blob(["\uFEFF" + [head.join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = `arwiqa-settings-audit-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+      toast.success(L(`Exported ${all.length} entries`, `صُدِّر ${all.length} سجلًا`));
+    } catch { toast.error(L("Export failed. Please try again.", "تعذّر التصدير. حاول مجددًا.")); }
+    finally { setExporting(false); }
+  }
   return (
     <section aria-labelledby="audit-h" className="mx-auto mt-12 max-w-4xl px-6">
       <h2 id="audit-h" className="font-display text-2xl">{L("Change history", "سجل التغييرات")}</h2>
@@ -113,22 +133,15 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
         <label className="grid gap-1 text-xs"><span>{L("Administrator", "المدير")}</span><select value={who} onChange={(e) => setWho(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{admins.map((a) => <option key={a || "s"} value={a || "__system"}>{a || L("System", "النظام")}</option>)}</select></label>
         <label className="grid gap-1 text-xs"><span>{L("Setting", "الإعداد")}</span><select value={field} onChange={(e) => setField(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{Object.entries(labels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
       </div>
-      {q.data && q.data.length > 0 && <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
-        <span>{L(`Showing ${rows.length} of ${q.data.length}`, `عرض ${rows.length} من ${q.data.length}`)}</span>
+      {q.data && (total > 0 || active) && <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
+        <span>{total > rows.length ? L(`${total} matching · showing latest ${rows.length}`, `${total} مطابقًا · يُعرض أحدث ${rows.length}`) : L(`${total} matching`, `${total} مطابقًا`)}</span>
         {active && <button type="button" onClick={() => { setFrom(""); setTo(""); setWho(""); setField(""); }} className="underline hover:text-foreground">{L("Clear filters", "مسح الفلاتر")}</button>}
-        <button type="button" disabled={rows.length === 0} onClick={() => {
-          const esc = (v: unknown) => { const s = String(v ?? ""); return /[",\n\r]/.test(s) || /^[=+\-@]/.test(s) ? `"${(/^[=+\-@]/.test(s) ? "'" : "") + s.replace(/"/g, '""')}"` : s; };
-          const head = ["Timestamp (UTC)", "Administrator", "Setting key", "Setting", "Old value", "New value", "Entry ID"];
-          const lines = rows.map((r) => [r.created_at, r.actor_email ?? "System", r.field, labels[r.field] ?? r.field, r.old_value, r.new_value, r.id].map(esc).join(","));
-          const blob = new Blob(["\uFEFF" + [head.join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
-          const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-          a.download = `arwiqa-settings-audit-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
-        }} className="ms-auto rounded-full border border-border px-4 py-1.5 text-sm text-foreground hover:border-primary disabled:opacity-50">{L(`Export CSV (${rows.length})`, `تصدير CSV (${rows.length})`)}</button>
+        <button type="button" disabled={total === 0 || exporting} onClick={() => void exportAll()} className="ms-auto rounded-full border border-border px-4 py-1.5 text-sm text-foreground hover:border-primary disabled:opacity-50">{exporting ? L("Exporting…", "جارٍ التصدير…") : L(`Export CSV (${total})`, `تصدير CSV (${total})`)}</button>
       </div>}
-      {q.data && q.data.length > 0 && <ComplianceReview rows={rows} L={L} ar={ar} labels={labels} scope={[from && `from ${from}`, to && `to ${to}`, who && `admin ${who === "__system" ? "system" : who}`, field && `setting ${field}`].filter(Boolean).join(", ") || "all entries"} />}
+      {rows.length > 0 && <ComplianceReview rows={rows} L={L} ar={ar} labels={labels} scope={[from && `from ${from}`, to && `to ${to}`, who && `admin ${who === "__system" ? "system" : who}`, field && `setting ${field}`].filter(Boolean).join(", ") || "all entries"} />}
       {q.isError ? <p className="mt-4 text-sm text-destructive">{L("Couldn't load the history.", "تعذّر تحميل السجل.")}</p>
         : !q.data ? <p className="mt-4 text-sm">…</p>
-        : q.data.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes yet.", "لا تغييرات بعد.")}</p>
+        : rows.length === 0 && !active ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes yet.", "لا تغييرات بعد.")}</p>
         : rows.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes match these filters.", "لا تغييرات تطابق هذه الفلاتر.")}</p> : (
         <div className="mt-4 overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">

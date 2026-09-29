@@ -2277,6 +2277,31 @@ export type Database = {
           old_value: string
         }[]
       }
+      admin_settings_audit_actors: {
+        Args: never
+        Returns: {
+          actor_email: string
+        }[]
+      }
+      admin_settings_audit_search: {
+        Args: {
+          _actor: string
+          _field: string
+          _from: string
+          _limit: number
+          _offset: number
+          _to: string
+        }
+        Returns: {
+          actor_email: string
+          created_at: string
+          field: string
+          id: string
+          new_value: string
+          old_value: string
+          total: number
+        }[]
+      }
       admin_unpublish_listing: {
         Args: { _id: string; _reason: string }
         Returns: undefined
