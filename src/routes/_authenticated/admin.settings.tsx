@@ -12,6 +12,7 @@ import { ComplianceReview } from "@/components/ComplianceReview";
 import { AuditPresets } from "@/components/AuditPresets";
 import { ControlCheck } from "@/components/ControlCheck";
 import { AuditNlSearch } from "@/components/AuditNlSearch";
+import { SelectedAuditSummary } from "@/components/SelectedAuditSummary";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({
@@ -92,6 +93,8 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
   const [from, setFrom] = useState(""); const [to, setTo] = useState("");
   const [who, setWho] = useState(""); const [field, setField] = useState("");
   const [exporting, setExporting] = useState(false);
+  const [sel, setSel] = useState<string[]>([]);
+  const toggle = (id: string) => setSel((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id]);
   const PAGE = 100;
   const [page, setPage] = useState(0);
   useEffect(() => { setPage(0); }, [from, to, who, field]);
@@ -148,15 +151,17 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
       </div>}
       {rows.length > 0 && <ComplianceReview filters={{ from: from || null, to: to || null, actor: who || null, field: field || null }} total={q.data?.total ?? rows.length} L={L} ar={ar} labels={labels} scope={[from && `from ${from}`, to && `to ${to}`, who && `admin ${who === "__system" ? "system" : who}`, field && `setting ${field}`].filter(Boolean).join(", ") || "all entries"} />}
       {rows.length > 0 && <ControlCheck filters={{ from: from || null, to: to || null, actor: who || null, field: field || null }} total={q.data?.total ?? rows.length} L={L} ar={ar} labels={labels} scope={[from && `from ${from}`, to && `to ${to}`, who && `admin ${who === "__system" ? "system" : who}`, field && `setting ${field}`].filter(Boolean).join(", ") || "all entries"} />}
+      {rows.length > 0 && <SelectedAuditSummary ids={sel} clear={() => setSel([])} L={L} ar={ar} />}
       {q.isError ? <p className="mt-4 text-sm text-destructive">{L("Couldn't load the history.", "تعذّر تحميل السجل.")}</p>
         : !q.data ? <p className="mt-4 text-sm">…</p>
         : rows.length === 0 && !active ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes yet.", "لا تغييرات بعد.")}</p>
         : rows.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes match these filters.", "لا تغييرات تطابق هذه الفلاتر.")}</p> : (
         <div className="mt-4 overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
-            <thead className="bg-muted"><tr>{["#", L("When", "متى"), L("Administrator", "المدير"), L("Setting", "الإعداد"), L("From", "من"), L("To", "إلى")].map((h) => <th key={h} className="p-3 text-start">{h}</th>)}</tr></thead>
+            <thead className="bg-muted"><tr><th className="p-3"><input type="checkbox" aria-label={L("Select all on this page", "تحديد الكل في هذه الصفحة")} checked={rows.length > 0 && rows.every((r) => sel.includes(r.id))} onChange={(e) => setSel((s) => e.target.checked ? [...new Set([...s, ...rows.map((r) => r.id)])] : s.filter((x) => !rows.some((r) => r.id === x)))} /></th>{["#", L("When", "متى"), L("Administrator", "المدير"), L("Setting", "الإعداد"), L("From", "من"), L("To", "إلى")].map((h) => <th key={h} className="p-3 text-start">{h}</th>)}</tr></thead>
             <tbody>{rows.map((r, i) => (
               <tr key={r.id} id={`audit-${r.id}`} className="border-t border-border transition-colors">
+                <td className="p-3"><input type="checkbox" aria-label={L(`Select entry ${(q.data?.offset ?? 0) + i + 1}`, `تحديد السجل ${(q.data?.offset ?? 0) + i + 1}`)} checked={sel.includes(r.id)} onChange={() => toggle(r.id)} /></td>
                 <td className="p-3 text-muted-foreground">{(q.data?.offset ?? 0) + i + 1}</td>
                 <td className="p-3 whitespace-nowrap">{new Date(r.created_at).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" })}</td>
                 <td className="p-3">{r.actor_email ?? L("System", "النظام")}</td>
