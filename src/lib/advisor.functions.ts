@@ -69,7 +69,7 @@ export const recommendArtworks = createServerFn({ method: "POST" })
       if (!inRange(price) || (data.categories.length && !data.categories.includes(d.category ?? "")) || (data.mediums.length && !data.mediums.includes(mediumGroup(d.medium)))) continue;
       const id = d.published_listing_id!;
       sellers.set(id, { id, title: d.title, titleAr: d.title_ar, price, medium: d.medium, imageUrl: null, path: d.image_path });
-      catalog.push({ id, title: d.title, artist: "Independent seller", category: d.category ?? "", medium: d.medium, year: undefined as any,
+      catalog.push({ id, title: d.title, artist: "Independent seller", category: (d.category ?? "") as any, medium: d.medium, year: undefined as any,
         description: `${d.description} Tags: ${(d.tags ?? []).join(", ")}`.slice(0, 600), fromPrice: price, options: ["original"], inAuction: false });
     }
     if (!catalog.length) return { picks: [], noneLive: true };
