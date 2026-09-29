@@ -17,6 +17,9 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { safeNext } from "@/lib/auth";
+import { usePlatformSettings } from "@/lib/platform-settings";
+
+function SettingsSync() { usePlatformSettings(); return null; }
 
 function NotFoundComponent() {
   return (
@@ -142,6 +145,7 @@ function RootComponent() {
       <BrushTransition />
       <BidsLiveProvider />
       <AccountSync />
+      <SettingsSync />
       <Toaster position="bottom-right" />
     </QueryClientProvider>
   );
