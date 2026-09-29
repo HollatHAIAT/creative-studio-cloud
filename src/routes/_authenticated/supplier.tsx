@@ -29,6 +29,8 @@ const TYPE_AR: Record<string, string> = { paint: "ألوان", brush: "فرش", 
 const STATUS: Record<string, [string, string]> = { new: ["New", "جديد"], preparing: ["Preparing", "قيد التجهيز"], shipped: ["Shipped", "تم الشحن"], delivered: ["Delivered", "تم التسليم"], cancelled: ["Cancelled", "ملغى"],
   draft: ["Draft", "مسودة"], published: ["Published", "منشور"], archived: ["Archived", "مؤرشف"] };
 
+const st = (k?: string): [string, string] => STATUS[k ?? ""] ?? [k ?? "", k ?? ""];
+
 function SupplierPortal() {
   const { locale } = useLocale(); const ar = locale === "ar";
   const L = (e: string, a: string) => (ar ? a : e);
@@ -129,7 +131,7 @@ function Products({ L, ar }: { L: (e: string, a: string) => string; ar: boolean 
         <label className="text-sm">{L("In stock", "الكمية المتوفرة")}<input type="number" min={0} step={1} value={edit.stock} onChange={n("stock")} className={input} /></label>
         <label className="text-sm">{L("Alert me when stock reaches", "نبّهني عندما يصل المخزون إلى")}<input type="number" min={0} step={1} value={edit.low_stock_at} onChange={n("low_stock_at")} className={input} /></label>
         <label className="flex items-center gap-3 text-sm">{L("Colour swatch", "لون العيّنة")}<input type="color" value={edit.swatch.startsWith("#") ? edit.swatch : "#b0643a"} onChange={t("swatch")} className="h-9 w-14 rounded border border-border" /></label>
-        <label className="text-sm">{L("Status", "الحالة")}<select value={edit.status} onChange={t("status")} className={input}>{["draft", "published", "archived"].map((x) => <option key={x} value={x}>{L(STATUS[x][0], STATUS[x][1])}</option>)}</select></label>
+        <label className="text-sm">{L("Status", "الحالة")}<select value={edit.status} onChange={t("status")} className={input}>{["draft", "published", "archived"].map((x) => <option key={x} value={x}>{L(st(x)[0], st(x)[1])}</option>)}</select></label>
       </div>
       <div className="mt-5 flex gap-3"><button className="rounded-md bg-primary px-5 py-2 text-primary-foreground">{L("Save product", "حفظ المنتج")}</button><button type="button" onClick={() => setEdit(null)} className="rounded-md border border-border px-4 py-2">{L("Cancel", "إلغاء")}</button></div>
     </form>
@@ -159,7 +161,7 @@ function Products({ L, ar }: { L: (e: string, a: string) => string; ar: boolean 
                     </div>
                     {p.stock === 0 ? <span className="text-xs text-destructive">{L("Sold out", "نفدت")}</span> : p.stock <= p.low_stock_at && <span className="text-xs text-destructive">{L("Low", "منخفض")}</span>}
                   </td>
-                  <td className="p-3">{L(STATUS[p.status][0], STATUS[p.status][1])}</td>
+                  <td className="p-3">{L(st(p.status)[0], st(p.status)[1])}</td>
                   <td className="p-3"><div className="flex flex-wrap gap-3">
                     <button onClick={() => setEdit(p)} className="text-primary underline">{L("Edit", "تعديل")}</button>
                     {p.status !== "published" ? <button onClick={() => patch(p.id!, { status: "published" }, L("Published", "تم النشر"))}>{L("Publish", "نشر")}</button> : <button onClick={() => patch(p.id!, { status: "archived" }, L("Hidden from shop", "أُخفي من المتجر"))}>{L("Hide", "إخفاء")}</button>}
@@ -204,7 +206,7 @@ function Orders({ L, ar }: { L: (e: string, a: string) => string; ar: boolean })
       <label className="flex items-center gap-2 text-sm">{L("Show", "عرض")}
         <select value={filter} onChange={(e) => setFilter(e.target.value)} className="rounded-md border border-border bg-background p-1.5">
           <option value="open">{L("Open", "المفتوحة")}</option><option value="all">{L("All", "الكل")}</option>
-          {Object.keys(next).concat("delivered", "cancelled").map((s) => <option key={s} value={s}>{L(STATUS[s][0], STATUS[s][1])}</option>)}
+          {Object.keys(next).concat("delivered", "cancelled").map((s) => <option key={s} value={s}>{L(st(s)[0], st(s)[1])}</option>)}
         </select></label>
       {q.isLoading ? <p className="text-muted-foreground">…</p> : !lines.length ? <p className={`${card} text-muted-foreground`}>{L("No orders here yet.", "لا طلبات هنا بعد.")}</p> : (
         <ul className="space-y-3">{lines.map((l) => (
@@ -212,13 +214,13 @@ function Orders({ L, ar }: { L: (e: string, a: string) => string; ar: boolean })
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div><p className="font-medium">{l.qty} × {ar ? l.title_ar : l.title}</p>
                 <p className="text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString(ar ? "ar-SA" : "en-GB")} · {fmt(Number(l.amount))}</p></div>
-              <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs">{L(STATUS[l.status][0], STATUS[l.status][1])}</span>
+              <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs">{L(st(l.status)[0], st(l.status)[1])}</span>
             </div>
             <p className="mt-2 text-sm">{L("Ship to", "الشحن إلى")}: {l.buyer_name}{l.ship_to && ` — ${[l.ship_to.line, l.ship_to.city, l.ship_to.postal, l.ship_to.country].filter(Boolean).join("، ")}`}</p>
             {!["delivered", "cancelled"].includes(l.status) && (
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <input aria-label={L("Tracking number", "رقم التتبع")} placeholder={L("Tracking number", "رقم التتبع")} dir="ltr" maxLength={120} value={track[l.id] ?? ""} onChange={(e) => setTrack({ ...track, [l.id]: e.target.value })} className="rounded-md border border-border bg-background p-1.5 text-sm" />
-                <button onClick={() => update(l, next[l.status])} className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground">{L(`Mark ${STATUS[next[l.status]][0].toLowerCase()}`, `تحويل إلى: ${STATUS[next[l.status]][1]}`)}</button>
+                <button onClick={() => update(l, next[l.status] ?? "delivered")} className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground">{L(`Mark ${STATUS[next[l.status]][0].toLowerCase()}`, `تحويل إلى: ${STATUS[next[l.status]][1]}`)}</button>
                 {track[l.id] !== l.tracking && <button onClick={() => update(l, l.status)} className="text-sm underline">{L("Save tracking", "حفظ رقم التتبع")}</button>}
                 <button onClick={() => update(l, "cancelled")} className="text-sm text-destructive">{L("Cancel", "إلغاء")}</button>
               </div>
