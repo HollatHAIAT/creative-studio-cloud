@@ -8,6 +8,7 @@ import { useLocale } from "@/lib/i18n";
 import { useStaff } from "@/lib/auth";
 import { DEFAULT_SETTINGS, applySettings, usePlatformSettings, type PlatformSettings } from "@/lib/platform-settings";
 import { SettingsAuditAsk } from "@/components/SettingsAuditAsk";
+import { ComplianceReview } from "@/components/ComplianceReview";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({
@@ -124,15 +125,17 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
           a.download = `arwiqa-settings-audit-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
         }} className="ms-auto rounded-full border border-border px-4 py-1.5 text-sm text-foreground hover:border-primary disabled:opacity-50">{L(`Export CSV (${rows.length})`, `تصدير CSV (${rows.length})`)}</button>
       </div>}
+      {q.data && q.data.length > 0 && <ComplianceReview rows={rows} L={L} ar={ar} labels={labels} scope={[from && `from ${from}`, to && `to ${to}`, who && `admin ${who === "__system" ? "system" : who}`, field && `setting ${field}`].filter(Boolean).join(", ") || "all entries"} />}
       {q.isError ? <p className="mt-4 text-sm text-destructive">{L("Couldn't load the history.", "تعذّر تحميل السجل.")}</p>
         : !q.data ? <p className="mt-4 text-sm">…</p>
         : q.data.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes yet.", "لا تغييرات بعد.")}</p>
         : rows.length === 0 ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes match these filters.", "لا تغييرات تطابق هذه الفلاتر.")}</p> : (
         <div className="mt-4 overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
-            <thead className="bg-muted"><tr>{[L("When", "متى"), L("Administrator", "المدير"), L("Setting", "الإعداد"), L("From", "من"), L("To", "إلى")].map((h) => <th key={h} className="p-3 text-start">{h}</th>)}</tr></thead>
-            <tbody>{rows.map((r) => (
-              <tr key={r.id} className="border-t border-border">
+            <thead className="bg-muted"><tr>{["#", L("When", "متى"), L("Administrator", "المدير"), L("Setting", "الإعداد"), L("From", "من"), L("To", "إلى")].map((h) => <th key={h} className="p-3 text-start">{h}</th>)}</tr></thead>
+            <tbody>{rows.map((r, i) => (
+              <tr key={r.id} id={`audit-${r.id}`} className="border-t border-border transition-colors">
+                <td className="p-3 text-muted-foreground">{i + 1}</td>
                 <td className="p-3 whitespace-nowrap">{new Date(r.created_at).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" })}</td>
                 <td className="p-3">{r.actor_email ?? L("System", "النظام")}</td>
                 <td className="p-3">{labels[r.field] ?? r.field}</td>
