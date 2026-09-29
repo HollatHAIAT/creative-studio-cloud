@@ -3,14 +3,20 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { readText } from "./advisor.functions";
 
-const Answer = z.object({
+const AnswerRaw = z.object({
   summary: z.string().default(""), summaryAr: z.string().default(""),
-  entries: z.array(z.object({ when: z.string().default(""), who: z.string().default(""), field: z.string().default(""), change: z.string().default(""), changeAr: z.string().default("") })).max(20).default([]),
-  patterns: z.array(z.object({ pattern: z.string(), patternAr: z.string().default(""), evidence: z.string().default(""), evidenceAr: z.string().default("") })).max(8).default([]),
+  summaryIds: z.array(z.string()).default([]),
+  entries: z.array(z.object({ ref: z.string().default(""), why: z.string().default(""), whyAr: z.string().default("") })).max(20).default([]),
+  patterns: z.array(z.object({ pattern: z.string(), patternAr: z.string().default(""), evidence: z.string().default(""), evidenceAr: z.string().default(""), refs: z.array(z.string()).default([]) })).max(8).default([]),
 });
-export type AuditAnswer = z.infer<typeof Answer>;
+export type AuditAnswer = {
+  summary: string; summaryAr: string; summaryIds: string[];
+  entries: { id: string; why: string; whyAr: string }[];
+  patterns: { pattern: string; patternAr: string; evidence: string; evidenceAr: string; entryIds: string[] }[];
+  evidence: Record<string, EvidenceEntry>; searched: number; total: number;
+};
 
-/** Admin only: answers a question about platform-setting changes from the audit log. */
+/** Admin only: answers a question by searching ALL audit entries (up to 3,000 newest); answers cite entries. */
 export const askSettingsAudit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ question: z.string().trim().min(3).max(800) }).parse(d))
@@ -18,23 +24,36 @@ export const askSettingsAudit = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     const { data: admin } = await sb.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (!admin) return { error: "Only admins can use this." };
-    const { data: rows, error } = await sb.rpc("admin_settings_audit", { _limit: 300 });
-    if (error) return { error: "Couldn't load the change history." };
-    if (!rows?.length) return { result: { summary: "There are no recorded setting changes yet.", summaryAr: "لا توجد تغييرات مسجّلة في الإعدادات بعد.", entries: [], patterns: [] } };
+    const all: any[] = []; let total = 0;
+    while (all.length < MAX_REVIEW) {
+      const { data: page, error } = await sb.rpc("admin_settings_audit_search", { _from: null, _to: null, _actor: null, _field: null, _limit: Math.min(1000, MAX_REVIEW - all.length), _offset: all.length });
+      if (error) return { error: "Couldn't load the change history." };
+      if (!page?.length) break;
+      total = Number(page[0].total ?? 0); all.push(...page);
+      if (all.length >= total) break;
+    }
+    if (!all.length) return { result: { summary: "There are no recorded setting changes yet.", summaryAr: "لا توجد تغييرات مسجّلة في الإعدادات بعد.", summaryIds: [], entries: [], patterns: [], evidence: {}, searched: 0, total: 0 } };
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { error: "AI is not configured." };
-    const log = rows.map((r: any) => ({ when: r.created_at, who: r.actor_email ?? "system", field: r.field, from: r.old_value, to: r.new_value }));
+    const byRef = new Map<string, EvidenceEntry>();
+    const log = all.map((r, i) => {
+      const ref = `e${i + 1}`;
+      byRef.set(ref, { id: r.id, n: i + 1, created_at: r.created_at, field: r.field, who: r.actor_email ?? "system", from: r.old_value, to: r.new_value });
+      return [ref, r.created_at, r.actor_email ?? "system", r.field, r.old_value, r.new_value];
+    });
     const prompt = `You help an admin of Arwiqa (an art marketplace) understand changes to platform settings.
 Settings: return_days (refund window), print_ship_min_days/print_ship_max_days, commercial_print_limit, commercial_multiplier and extended_multiplier (license price × personal).
+Today is ${new Date().toISOString().slice(0, 10)}.
 Rules:
 - Use ONLY the audit log below. Never invent changes, people or dates. If the log can't answer, say so.
-- summary: direct answer to the question.
-- entries: the log rows relevant to the question (most recent first, max 20); change like "14 → 21".
-- patterns: notable patterns (frequent flip-flops, one admin making most changes, changes reverted soon after, bursts of changes, unusually large jumps). Each with evidence from the log. Empty if none.
+- summary: direct answer to the question; summaryIds: refs it relies on.
+- entries: the log rows relevant to the question (most recent first, max 20) by ref, each with a short reason why it's relevant.
+- patterns: notable patterns (flip-flops, one admin making most changes, reverts, bursts, large jumps) with evidence text and the refs supporting them. Empty if none.
+- Only use ref values that appear in the log (like "e3").
 - English + natural Arabic for text fields.
 QUESTION: ${JSON.stringify(data.question)}
-AUDIT LOG (newest first): ${JSON.stringify(log)}
-Reply with ONLY JSON: {"summary":"","summaryAr":"","entries":[{"when":"","who":"","field":"","change":"","changeAr":""}],"patterns":[{"pattern":"","patternAr":"","evidence":"","evidenceAr":""}]}`;
+AUDIT LOG (newest first; ${all.length}${total > all.length ? ` of ${total}` : ""} entries) as [ref, time, admin, setting, old, new]: ${JSON.stringify(log)}
+Reply with ONLY JSON: {"summary":"","summaryAr":"","summaryIds":["e1"],"entries":[{"ref":"e1","why":"","whyAr":""}],"patterns":[{"pattern":"","patternAr":"","evidence":"","evidenceAr":"","refs":["e1"]}]}`;
     const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
@@ -54,7 +73,17 @@ Reply with ONLY JSON: {"summary":"","summaryAr":"","entries":[{"when":"","who":"
     try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
     const json = text.match(/\{[\s\S]*\}/)?.[0];
     if (!json) return { error: "The AI returned no answer." };
-    try { return { result: Answer.parse(JSON.parse(json)) }; } catch { return { error: "The AI returned an unreadable answer." }; }
+    try {
+      const r = AnswerRaw.parse(JSON.parse(json));
+      const evidence: Record<string, EvidenceEntry> = {};
+      const resolve = (refs: string[]) => [...new Set(refs)].map((x) => byRef.get(x)).filter((e): e is EvidenceEntry => !!e).slice(0, 15).map((e) => { evidence[e.id] = e; return e.id; });
+      return { result: {
+        summary: r.summary, summaryAr: r.summaryAr, summaryIds: resolve(r.summaryIds),
+        entries: r.entries.flatMap((e) => { const [id] = resolve([e.ref]); return id ? [{ id, why: e.why, whyAr: e.whyAr }] : []; }),
+        patterns: r.patterns.map((p) => ({ pattern: p.pattern, patternAr: p.patternAr, evidence: p.evidence, evidenceAr: p.evidenceAr, entryIds: resolve(p.refs) })),
+        evidence, searched: all.length, total: Math.max(total, all.length),
+      } };
+    } catch { return { error: "The AI returned an unreadable answer." }; }
   });
 
 const Review = z.object({
