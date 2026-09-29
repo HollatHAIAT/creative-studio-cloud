@@ -1,3 +1,4 @@
+import { licenseRates } from "./license-rates";
 import art1 from "@/assets/art1.jpg";
 import art2 from "@/assets/art2.jpg";
 import art3 from "@/assets/art3.jpg";
@@ -104,8 +105,12 @@ export const supplies: Supply[] = [
 
 /** Legacy listings (made before variants) get options derived from their price. */
 export function variantsOf(l: Listing): Variant[] {
-  if (l.variants?.length) return l.variants;
-  return [{ id: "orig", kind: "original", price: l.price, edition: 1, sold: 0 }];
+  if (!l.variants?.length) return [{ id: "orig", kind: "original", price: l.price, edition: 1, sold: 0 }];
+  const personal = l.variants.find((v) => v.kind === "license" && v.license === "personal");
+  if (!personal) return l.variants;
+  // Commercial/extended license prices follow the admin-configured multipliers.
+  return l.variants.map((v) => v.kind === "license" && (v.license === "commercial" || v.license === "extended")
+    ? { ...v, price: Math.round(personal.price * licenseRates[v.license]) } : v);
 }
 export const minPrice = (l: Listing) => Math.min(...variantsOf(l).map((v) => v.price));
 
