@@ -446,7 +446,7 @@ function ListingWriter() {
                   );
                 })()}
               </div>
-              <GalleryEditor draftId={draftId} onSave={saveNow} onMakeMain={(p) => { const old = path; setPath(p); setPreview(null); if (old) void supabase.storage.from("artwork-images").remove([old]); }} />
+              <GalleryEditor draftId={draftId} onSave={saveNow} onMakeMain={(p) => { const old = path; setPath(p); setPreview(null); return old; }} />
               <OwnershipHeritage draftId={draftId} onSave={saveNow} />
               <ReviewPath draftId={draftId} onSave={saveNow} submitted={submitted} onPublished={() => void loadDrafts()} />
               <PublishGate issues={publishIssues(copy, !!path, { ratio: imgRatio, width: imgW }, L)} submitted={submitted}

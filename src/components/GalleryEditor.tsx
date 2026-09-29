@@ -9,10 +9,10 @@ const BUCKET = "artwork-images";
 const MAX_IMAGES = 12;
 const MAX_BYTES = 10 * 1024 * 1024;
 export type GalleryItem = { path: string; alt: string; altAr: string };
-type Row = GalleryItem & { url?: string };
+type Row = GalleryItem & { url?: string | undefined };
 
 /** Extra artwork photos for a draft: upload, caption, reorder, remove, or promote one to the main image. */
-export function GalleryEditor({ draftId, onSave, onMakeMain }: { draftId: string | null; onSave: () => Promise<string | null>; onMakeMain?: (path: string) => void }) {
+export function GalleryEditor({ draftId, onSave, onMakeMain }: { draftId: string | null; onSave: () => Promise<string | null>; onMakeMain?: (path: string) => string | null }) {
   const { locale } = useLocale(); const ar = locale === "ar"; const L = (e: string, a: string) => (ar ? a : e);
   const [items, setItems] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
@@ -54,7 +54,7 @@ export function GalleryEditor({ draftId, onSave, onMakeMain }: { draftId: string
   }
 
   const move = (i: number, d: number) => { const n = [...items]; const j = i + d; if (j < 0 || j >= n.length) return; [n[i], n[j]] = [n[j], n[i]]; void persist(n); };
-  const remove = async (i: number) => { const r = items[i]; await persist(items.filter((_, k) => k !== i)); await supabase.storage.from(BUCKET).remove([r.path]); };
+  const remove = async (i: number) => { const r = items[i]; if (!r) return; await persist(items.filter((_, k) => k !== i)); await supabase.storage.from(BUCKET).remove([r.path]); };
   const setAlt = (i: number, k: "alt" | "altAr", v: string) => setItems((s) => s.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
 
   return (
@@ -82,7 +82,7 @@ export function GalleryEditor({ draftId, onSave, onMakeMain }: { draftId: string
               <div className="flex flex-col gap-1">
                 <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label={L("Move up", "انقل للأعلى")} className="rounded-md p-1 hover:bg-muted disabled:opacity-30"><ArrowUp className="h-4 w-4" /></button>
                 <button type="button" onClick={() => move(i, 1)} disabled={i === items.length - 1} aria-label={L("Move down", "انقل للأسفل")} className="rounded-md p-1 hover:bg-muted disabled:opacity-30"><ArrowDown className="h-4 w-4" /></button>
-                {onMakeMain && <button type="button" onClick={() => { onMakeMain(it.path); void persist(items.filter((_, k) => k !== i)); }} aria-label={L("Make main image", "اجعلها الصورة الرئيسية")} title={L("Make main image", "اجعلها الصورة الرئيسية")} className="rounded-md p-1 hover:bg-muted"><Star className="h-4 w-4" /></button>}
+                {onMakeMain && <button type="button" onClick={() => { const old = onMakeMain(it.path); const n = [...items]; n.splice(i, 1, ...(old ? [{ path: old, alt: "", altAr: "" }] : [])); void persist(n); }} aria-label={L("Make main image", "اجعلها الصورة الرئيسية")} title={L("Make main image", "اجعلها الصورة الرئيسية")} className="rounded-md p-1 hover:bg-muted"><Star className="h-4 w-4" /></button>}
                 <button type="button" onClick={() => void remove(i)} aria-label={L("Remove", "احذف")} className="rounded-md p-1 text-destructive hover:bg-muted"><X className="h-4 w-4" /></button>
               </div>
             </li>
