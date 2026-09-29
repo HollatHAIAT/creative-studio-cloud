@@ -1,7 +1,8 @@
 import { TrustPanel } from "@/components/TrustPanel";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArtStage } from "@/components/ArtViewer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { trackView, useRecentlyViewed } from "@/lib/recently-viewed";
 import { toast } from "sonner";
 import { SiteShell, FavButton, ArtCard } from "@/components/SiteShell";
 import { artworks, creatorOf, fmt, MATERIAL_AR, type Variant, type VariantKind } from "@/lib/data";
@@ -46,6 +47,8 @@ function Detail() {
   const [showLic, setShowLic] = useState(false);
   const L = (en: string, ar: string) => (locale === "ar" ? ar : en);
   const { data: agent } = useListingAgent(id);
+  useEffect(() => { trackView(id); }, [id]);
+  const recentIds = useRecentlyViewed(id);
   if (!a) return <SiteShell><div className="p-16 text-center"><p>{t("art.unavailable")}</p><Link to="/explore" className="underline">{t("art.back")}</Link></div></SiteShell>;
   const moreByArtist = all.filter((x) => x.creatorId === a.creatorId && x.id !== a.id).slice(0, 4);
   const similar = all.filter((x) => x.category === a.category && x.creatorId !== a.creatorId).slice(0, 4);
@@ -177,7 +180,7 @@ function Detail() {
         </div>
       </div>
       <Reviews listingId={a.id} />
-      {[{ title: L("More from this artist", "المزيد من الفنان"), list: moreByArtist }, { title: L("You may also like", "قد يعجبك أيضًا"), list: similar }].filter((g) => g.list.length).map((g) => (
+      {[{ title: L("More from this artist", "المزيد من الفنان"), list: moreByArtist }, { title: L("You may also like", "قد يعجبك أيضًا"), list: similar }, { title: L("Recently viewed", "شاهدتها مؤخرًا"), list: recentIds.map((r) => all.find((x) => x.id === r)).filter((x): x is NonNullable<typeof x> => !!x).slice(0, 4) }].filter((g) => g.list.length).map((g) => (
         <section key={g.title} className="mx-auto max-w-7xl px-6 pt-16">
           <h2 className="font-display text-3xl">{g.title}</h2>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 md:grid-cols-4">{g.list.map((x) => <ArtCard key={x.id} a={x} />)}</div>

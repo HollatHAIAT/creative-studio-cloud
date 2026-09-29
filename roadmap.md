@@ -108,24 +108,24 @@
 - [ ] E2E tests: direct purchase, auction routing, owner vs agent listings
 - [ ] Reviews & ratings: owner/agent replies per admin permission, abuse reports, admin removal, timed/permanent user blocks with notices, review analytics
 - [ ] Home page animations + easier, competitive marketplace UX
-- [ ] Verified-purchase badges, buyer-only reviews, duplicate/spam safeguards
-- [ ] Helpful votes + sort/filter reviews by rating, date, verified
+- [x] Verified-purchase badges, buyer-only reviews, duplicate/spam safeguards
+- [x] Helpful votes + sort/filter reviews by rating, date, verified
 - [ ] Admin audit trail: review removals, abuse decisions, suspensions (actor, reason, time)
-- [ ] Rating distribution + review summary on product pages, linking to filtered reviews
-- [ ] Reviewers edit (48h) / delete (7 days) own reviews; revision history kept for moderators
-- [ ] Removal/moderation notices with reason + appeal flow
-- [ ] "My reviews" page with remaining edit/delete time
+- [x] Rating distribution + review summary on product pages, linking to filtered reviews
+- [x] Reviewers edit (48h) / delete (7 days) own reviews; revision history kept for moderators
+- [x] Removal/moderation notices with reason + appeal flow
+- [x] "My reviews" page with remaining edit/delete time
 - [ ] Keyboard + screen-reader accessible rating, filters, review history
 - [ ] E2E tests: cart+checkout, verified-purchase reviews, moderation appeal
 - [ ] Order/payment hardening: duplicate submits, failed payments, safe recovery
 - [x] Moderator queue: filters for pending reports, appeals, recent decisions
 - [x] Buyer order details: fulfillment status, shipment tracking links, delivery updates
-- [ ] Seller dashboard: sales, conversion, product performance over time (database-backed)
-- [ ] Seller inventory: stock levels, low-stock alerts, automatic availability
-- [ ] PRIORITY: artwork page buttons full journey (buy now, basket, favorite, share, ask seller, make offer)
-- [ ] Seller dashboard: date-range + product filters, period comparison
-- [ ] Seller CSV exports: sales, conversion, product performance
-- [ ] Inventory adjustment history (change, time, reason)
+- [x] Seller dashboard: sales, conversion, product performance over time (database-backed)
+- [x] Seller inventory: stock levels, low-stock alerts, automatic availability
+- [x] PRIORITY: artwork page buttons full journey (buy now, basket, favorite, share, ask seller, make offer)
+- [x] Seller dashboard: date-range + product filters, period comparison
+- [x] Seller CSV exports: sales, conversion, product performance
+- [x] Inventory adjustment history (change, time, reason)
 - [x] Button loading/success/error states + clear confirmations (buy, basket, favorite, question, offer)
 - [ ] Test buy/basket/favorite/share/contact journeys on mobile + desktop, sign-in, failed orders, duplicate-submit prevention
 - [x] Automated tests: button loading/success/error + duplicate-submit prevention
@@ -134,8 +134,8 @@
 
 ## Editorial UI/UX upgrade (from redesign brief)
 - [x] Phase 1: design tokens, smart sticky header + "More" menu, discovery search, new homepage (hero overlays, curated masonry, live auctions, artists, spotlight, exhibitions, mood, spaces, collections, digital assets, sell, trust), gallery-label tiles, quick-view drawer, price chips
-- [ ] Phase 2: artwork detail page (type selector, story, image viewer), artist page
-- [ ] Phase 3: explore page + mobile filter sheet, mega menu, recently viewed, personalized home
+- [x] Phase 2: artwork detail page (type selector, image viewer, recently viewed), artist page (cover, stats, filters)
+- [~] Phase 3: explore mobile filter sheet + recently viewed + empty state DONE; mega menu, personalized home open
 - [ ] Phase 4: Saudi-bank catalog mode (hover checkboxes, sticky ZIP toolbar), cart/favorites/auth polish, loading/empty/error states
 - [x] Phase 5: seller dashboard + admin dashboard (listings, stock, approvals, review activity) — sales charts still open (lines 123, 126)
 
@@ -160,3 +160,7 @@
 - [ ] Heritage phase 5 rest: heritage AI assistants, trust panel on artwork pages, full taxonomy
 - [ ] Design phases 2–5 (see above)
 - [ ] Other open items above (seller dashboard in database, inventory, E2E tests, etc.)
+
+- [ ] Seller dashboard: page-view tracking for conversion (views not recorded in database yet)
+- [ ] Buy at accepted-offer price in checkout
+- [ ] Seller listing pages: block purchase when stock reaches 0

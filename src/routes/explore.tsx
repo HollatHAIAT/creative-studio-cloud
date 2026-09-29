@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bell } from "lucide-react";
+import { Bell, SlidersHorizontal } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useRecentlyViewed } from "@/lib/recently-viewed";
 import { useState } from "react";
 import { SiteShell, ArtCard, PageTitle } from "@/components/SiteShell";
 import { categories, minPrice } from "@/lib/data";
@@ -37,6 +39,9 @@ function Explore() {
   const [q, setQ] = useState(search.q ?? "");
   const [cat, setCat] = useState<string>(search.cat && (categories as readonly string[]).includes(search.cat) ? search.cat : "All");
   const [sort, setSort] = useState<keyof typeof sorts>("newest");
+  const [sheet, setSheet] = useState(false);
+  const recent = useRecentlyViewed().map((r) => all.find((x) => x.id === r)).filter((x): x is NonNullable<typeof x> => !!x).slice(0, 4);
+  const ar = locale === "ar";
   const list = all
     .filter((a) => (search.min == null || minPrice(a) >= search.min) && (search.max == null || minPrice(a) < search.max))
     .filter((a) => (cat === "All" || a.category === cat) && [a.title, a.titleAr, a.artist, a.artistAr, a.medium, a.mediumAr, a.description].join(" ").toLowerCase().includes(q.toLowerCase()))
@@ -50,15 +55,37 @@ function Explore() {
       <PageTitle eyebrow={t("nav.explore")} title={t("explore.title")} sub={t("explore.sub")} />
       <div className="mx-auto max-w-7xl px-6">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("explore.search")} className="w-full border-b border-border bg-transparent py-3 text-lg outline-none focus:border-primary" />
-        <div className="my-8 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap gap-2">
-            {["All", ...categories].map((c) => (
-              <button key={c} onClick={() => setCat(c)} className={`rounded-full border px-4 py-1.5 text-sm ${cat === c ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{c === "All" ? t("explore.all") : t(`cat.${c}` as Key)}</button>
-            ))}
-          </div>
-          <select value={sort} onChange={(e) => setSort(e.target.value as keyof typeof sorts)} className="rounded-full border border-border bg-background px-4 py-2 text-sm">
+        <div className="my-8 hidden flex-wrap items-center justify-between gap-4 md:flex">
+          <div className="flex flex-wrap gap-2">{["All", ...categories].map((c) => (
+              <button key={c} type="button" aria-pressed={cat === c} onClick={() => setCat(c)} className={`rounded-full border px-4 py-1.5 text-sm ${cat === c ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{c === "All" ? t("explore.all") : t(`cat.${c}` as Key)}</button>
+            ))}</div>
+          <select value={sort} onChange={(e) => setSort(e.target.value as keyof typeof sorts)} aria-label={ar ? "الترتيب" : "Sort"} className="rounded-full border border-border bg-background px-4 py-2 text-sm">
             {Object.entries(sorts).map(([k, v]) => <option key={k} value={k}>{t(v)}</option>)}
           </select>
+        </div>
+        <div className="my-6 flex items-center justify-between gap-3 md:hidden">
+          <Sheet open={sheet} onOpenChange={setSheet}>
+            <SheetTrigger asChild>
+              <button type="button" className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm">
+                <SlidersHorizontal aria-hidden className="h-4 w-4" />{ar ? "التصفية والترتيب" : "Filter & sort"}{cat !== "All" && <span className="rounded-full bg-primary px-2 text-xs text-primary-foreground">1</span>}
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-3xl">
+              <SheetHeader><SheetTitle>{ar ? "التصفية والترتيب" : "Filter & sort"}</SheetTitle></SheetHeader>
+              <p className="mt-4 text-sm text-muted-foreground">{ar ? "الفئة" : "Category"}</p>
+              <div className="mt-2 flex flex-wrap gap-2">{["All", ...categories].map((c) => (
+              <button key={c} type="button" aria-pressed={cat === c} onClick={() => setCat(c)} className={`rounded-full border px-4 py-1.5 text-sm ${cat === c ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{c === "All" ? t("explore.all") : t(`cat.${c}` as Key)}</button>
+            ))}</div>
+              <p className="mt-5 text-sm text-muted-foreground">{ar ? "الترتيب" : "Sort"}</p>
+              <div className="mt-2"><select value={sort} onChange={(e) => setSort(e.target.value as keyof typeof sorts)} aria-label={ar ? "الترتيب" : "Sort"} className="rounded-full border border-border bg-background px-4 py-2 text-sm">
+            {Object.entries(sorts).map(([k, v]) => <option key={k} value={k}>{t(v)}</option>)}
+          </select></div>
+              <div className="mt-6 flex gap-2">
+                <button type="button" onClick={() => { setCat("All"); setSort("newest"); }} className="flex-1 rounded-full border border-border py-3 text-sm">{ar ? "إعادة الضبط" : "Reset"}</button>
+                <button type="button" onClick={() => setSheet(false)} className="flex-1 rounded-full bg-primary py-3 text-sm text-primary-foreground">{ar ? `اعرض ${num(list.length)} نتيجة` : `Show ${list.length} results`}</button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">{num(list.length)} {t("explore.results")}</p>
@@ -79,7 +106,16 @@ function Explore() {
                 </Link>))}
             </div>
           </section>)}
-        {list.length === 0 && sellerList.length === 0 && <p className="text-muted-foreground">{t("explore.none")}</p>}
+        {list.length === 0 && sellerList.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-border p-10 text-center">
+            <p className="text-muted-foreground">{t("explore.none")}</p>
+            <button type="button" onClick={() => { setQ(""); setCat("All"); }} className="mt-3 rounded-full border border-primary px-4 py-1.5 text-sm text-primary">{ar ? "امسح البحث والتصفية" : "Clear search & filters"}</button>
+          </div>)}
+        {recent.length > 0 && (
+          <section aria-labelledby="recent-h" className="mt-14">
+            <h2 id="recent-h" className="mb-6 font-display text-2xl">{ar ? "شاهدتها مؤخرًا" : "Recently viewed"}</h2>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">{recent.map((a) => <ArtCard key={a.id} a={a} />)}</div>
+          </section>)}
       </div>
     </SiteShell>
   );

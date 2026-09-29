@@ -518,6 +518,50 @@ export type Database = {
           },
         ]
       }
+      inventory_adjustments: {
+        Row: {
+          actor: string | null
+          created_at: string
+          from_stock: number | null
+          id: string
+          listing_id: string
+          order_id: string | null
+          reason: string
+          source: string
+          to_stock: number | null
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          from_stock?: number | null
+          id?: string
+          listing_id: string
+          order_id?: string | null
+          reason?: string
+          source: string
+          to_stock?: number | null
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          from_stock?: number | null
+          id?: string
+          listing_id?: string
+          order_id?: string | null
+          reason?: string
+          source?: string
+          to_stock?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_adjustments_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_agents: {
         Row: {
           agency: string
@@ -2229,6 +2273,15 @@ export type Database = {
       revoke_auction_invite: { Args: { _invite: string }; Returns: undefined }
       saved_search_token: { Args: { _uid: string }; Returns: string }
       seller_publish_direct: { Args: { _id: string }; Returns: string }
+      seller_sales: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          day: string
+          listing_id: string
+          revenue: number
+          units: number
+        }[]
+      }
       send_reviewer_deadline_reminders: { Args: never; Returns: number }
       send_saved_search_digests: {
         Args: { _frequency: string }
@@ -2239,7 +2292,12 @@ export type Database = {
         Returns: undefined
       }
       set_listing_stock: {
-        Args: { _listing: string; _low?: number; _stock: number }
+        Args: {
+          _listing: string
+          _low?: number
+          _reason?: string
+          _stock: number
+        }
         Returns: undefined
       }
       settle_auction_if_due: { Args: { _auction: string }; Returns: string }

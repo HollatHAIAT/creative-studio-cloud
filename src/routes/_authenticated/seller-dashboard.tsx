@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MessageSquare, Package, Star, Tag } from "lucide-react";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { StockEditor } from "@/components/StockEditor";
+import { InventoryHistory, OffersInbox, SellerSales } from "@/components/SellerInsights";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 
@@ -73,6 +74,9 @@ function SellerDashboard() {
               <div key={i} className={card}><p className="flex items-center gap-2 text-sm text-muted-foreground"><span aria-hidden className="text-primary">{icon}</span>{label}</p><p className="mt-1 font-display text-3xl">{n}</p></div>))}
           </section>
 
+          <SellerSales listings={d.listings.map((l: any) => ({ id: l.id, title: title(l) }))} views={{}} />
+          <OffersInbox listings={d.listings.map((l: any) => ({ id: l.id, title: title(l) }))} onChanged={() => void q.refetch()} />
+
           <section aria-labelledby="sd-drafts" className={card}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 id="sd-drafts" className="font-display text-xl">{L("Listings & approvals", "الإعلانات والموافقات")}</h2>
@@ -112,6 +116,8 @@ function SellerDashboard() {
               {d.listings.length === 0 && <li className="py-3 text-sm text-muted-foreground">{L("Nothing live in the shop yet.", "لا شيء منشور في المتجر بعد.")}</li>}
             </ul>
           </section>
+
+          <InventoryHistory listings={d.listings.map((l: any) => ({ id: l.id, title: title(l) }))} />
 
           <div className="grid gap-6 lg:grid-cols-2">
             <section aria-labelledby="sd-rev" className={card}>
