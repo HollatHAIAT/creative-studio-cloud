@@ -738,6 +738,7 @@ export type Database = {
           description_ar: string
           era: string
           export_permit_ref: string
+          gallery: Json
           heritage_type: string | null
           id: string
           image_path: string | null
@@ -782,6 +783,7 @@ export type Database = {
           description_ar?: string
           era?: string
           export_permit_ref?: string
+          gallery?: Json
           heritage_type?: string | null
           id?: string
           image_path?: string | null
@@ -826,6 +828,7 @@ export type Database = {
           description_ar?: string
           era?: string
           export_permit_ref?: string
+          gallery?: Json
           heritage_type?: string | null
           id?: string
           image_path?: string | null
