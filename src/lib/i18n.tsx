@@ -117,8 +117,9 @@ const dicts = { en, ar };
 export function useLocale() {
   const { locale } = useStore();
   const l: Locale = locale === "ar" ? "ar" : "en";
-  useCmsVersion();
-  const t = (k: Key) => textOverrides[l][k] ?? dicts[l][k] ?? en[k];
+  // Overrides apply only after hydration (version > 0) so server and first client render match.
+  const cmsV = useCmsVersion();
+  const t = (k: Key) => (cmsV > 0 ? textOverrides[l][k] : undefined) ?? dicts[l][k] ?? en[k];
   /** Pick the Arabic field when available (e.g. titleAr). */
   const pick = <T extends Record<string, unknown>>(o: T, field: string) => (l === "ar" && typeof o[`${field}Ar`] === "string" ? (o[`${field}Ar`] as string) : (o[field] as string));
   const num = (n: number) => n.toLocaleString(l === "ar" ? "ar-SA" : "en-US");

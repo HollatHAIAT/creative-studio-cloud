@@ -70,7 +70,7 @@ function TextLink({ to, children }: { to: string; children: React.ReactNode }) {
 /* 1–2. Asymmetric editorial hero with layered marketplace overlays + discovery search */
 function Hero({ lead }: { lead?: Artwork | undefined }) {
   const L = useL();
-  const { pick } = useLocale();
+  const { pick, t } = useLocale();
   const live = useLiveAuction(lead?.id ?? "");
   return (
     <section className="relative mx-auto max-w-7xl px-6 pb-16 pt-10 md:pt-14">
@@ -96,9 +96,9 @@ function Hero({ lead }: { lead?: Artwork | undefined }) {
           </div>
         </div>
         <div className="lg:col-span-5">
-          <p className="text-xs uppercase tracking-[0.3em] text-primary">{L("Global art marketplace", "سوق فني عالمي")}</p>
-          <h1 className="mt-5 font-display text-5xl leading-[1.05] md:text-7xl">{L("Art that deserves to be discovered.", "الفن الذي يستحق أن يُكتشف.")}</h1>
-          <p className="mt-6 max-w-md text-lg text-muted-foreground">{L("Discover originals, limited editions, exhibitions and auctions from selected artists and galleries.", "اكتشف أعمالًا أصلية، إصدارات محدودة، معارض ومزادات من فنانين وصالات مختارة.")}</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-primary">{t("hero.eyebrow")}</p>
+          <h1 className="mt-5 font-display text-5xl leading-[1.05] md:text-7xl">{t("hero.title")}</h1>
+          <p className="mt-6 max-w-md text-lg text-muted-foreground">{t("hero.sub")}</p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link to="/explore" className="rounded-full bg-primary px-7 py-3.5 text-primary-foreground transition hover:bg-primary-hover">{L("Explore artworks", "استكشف الأعمال")}</Link>
             <Link to="/auctions" className="rounded-full border border-foreground px-6 py-3.5 transition hover:bg-foreground hover:text-background">{L("Live auctions", "المزادات الحية")}</Link>

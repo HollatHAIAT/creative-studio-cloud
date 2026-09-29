@@ -3,10 +3,10 @@ import { useLocale } from "@/lib/i18n";
 
 /** Admin-managed promotional banners (Content → Banners). Renders nothing when none are published. */
 export function HomeBanners() {
-  useCmsVersion();
+  const v = useCmsVersion();
   const { locale } = useLocale();
   const ar = locale === "ar";
-  if (!banners.length) return null;
+  if (v === 0 || !banners.length) return null;
   return (
     <section aria-label={ar ? "إعلانات" : "Announcements"} className="mx-auto grid max-w-7xl gap-4 px-6 pb-8 md:grid-cols-2">
       {banners.map((b) => {

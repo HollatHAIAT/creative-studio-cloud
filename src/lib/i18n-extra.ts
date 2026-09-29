@@ -1,4 +1,5 @@
 export const en2 = {
+  "hero.eyebrow": "Global art marketplace", "hero.title": "Art that deserves to be discovered.", "hero.sub": "Discover originals, limited editions, exhibitions and auctions from selected artists and galleries.",
   "auth.title": "Sign in", "auth.signup": "Create account", "auth.email": "Email", "auth.password": "Password", "auth.name": "Display name",
   "auth.google": "Continue with Google", "auth.or": "or", "auth.haveAccount": "Already have an account? Sign in", "auth.noAccount": "New here? Create an account",
   "auth.checkEmail": "Check your email to confirm your account, then sign in.", "auth.signout": "Sign out", "auth.required": "Sign in to continue",
@@ -35,6 +36,7 @@ export const en2 = {
 };
 
 export const ar2: Record<keyof typeof en2, string> = {
+  "hero.eyebrow": "سوق فني عالمي", "hero.title": "الفن الذي يستحق أن يُكتشف.", "hero.sub": "اكتشف أعمالًا أصلية، إصدارات محدودة، معارض ومزادات من فنانين وصالات مختارة.",
   "auth.title": "تسجيل الدخول", "auth.signup": "إنشاء حساب", "auth.email": "البريد الإلكتروني", "auth.password": "كلمة المرور", "auth.name": "الاسم الظاهر",
   "auth.google": "المتابعة عبر Google", "auth.or": "أو", "auth.haveAccount": "لديك حساب؟ سجّل الدخول", "auth.noAccount": "جديد هنا؟ أنشئ حسابًا",
   "auth.checkEmail": "تحقق من بريدك لتأكيد حسابك ثم سجّل الدخول.", "auth.signout": "تسجيل الخروج", "auth.required": "سجّل الدخول للمتابعة",
