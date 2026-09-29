@@ -1,3 +1,4 @@
+import { HomeBanners } from "@/components/HomeBanners";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, BadgeCheck, Frame, Gavel, Printer, ShieldCheck, Store, Truck } from "lucide-react";
@@ -40,6 +41,7 @@ function Index() {
   return (
     <SiteShell>
       <Hero lead={all[0]} />
+      <HomeBanners />
       <Curated works={all} onQuick={setQuick} />
       <LiveAuctions works={all} />
       <Artists works={all} />
