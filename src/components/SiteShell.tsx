@@ -1,3 +1,4 @@
+import { AdminShell } from "@/components/AdminShell";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Brush, ChevronDown, Heart, Languages, Search } from "lucide-react";
@@ -33,6 +34,12 @@ const more = [
 
 export function SiteShell({ children }: { children: ReactNode }) {
   useDocumentDirection();
+  const path = useRouterState({ select: (r) => r.location.pathname });
+  if (path.startsWith("/admin")) return <AdminShell>{children}</AdminShell>;
+  return <PublicShell>{children}</PublicShell>;
+}
+
+function PublicShell({ children }: { children: ReactNode }) {
   const { favorites } = useStore();
   const { t, toggle, locale } = useLocale();
   const L = (en: string, ar: string) => (locale === "ar" ? ar : en);
