@@ -78,7 +78,7 @@ function Support() {
         <section aria-labelledby="contact-h">
           <h2 id="contact-h" className="font-display text-2xl">{L("Contact us", "راسلنا")}</h2>
           {uid === null ? (
-            <p className="mt-4 text-sm">{L("Sign in to send a message and follow our reply.", "سجّل الدخول لإرسال رسالة ومتابعة الرد.")} <Link to="/auth" className="text-primary underline">{L("Sign in", "تسجيل الدخول")}</Link></p>
+            <p className="mt-4 text-sm">{L("Sign in to send a message and follow our reply.", "سجّل الدخول لإرسال رسالة ومتابعة الرد.")} <Link to="/auth" search={{ next: "/support" }} className="text-primary underline">{L("Sign in", "تسجيل الدخول")}</Link></p>
           ) : (
             <form onSubmit={submit} className="mt-4 space-y-3">
               <label className="block text-sm">{L("Topic", "الموضوع")}
