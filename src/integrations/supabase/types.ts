@@ -2570,6 +2570,10 @@ export type Database = {
       claim_pending_role: { Args: never; Returns: boolean }
       close_auction: { Args: { _auction: string }; Returns: undefined }
       close_expired_blocks: { Args: never; Returns: undefined }
+      consume_accepted_offer: {
+        Args: { _offer: string; _order: string }
+        Returns: undefined
+      }
       create_auction: {
         Args: {
           _ends: string
