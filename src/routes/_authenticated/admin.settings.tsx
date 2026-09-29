@@ -9,6 +9,7 @@ import { useStaff } from "@/lib/auth";
 import { DEFAULT_SETTINGS, applySettings, usePlatformSettings, type PlatformSettings } from "@/lib/platform-settings";
 import { SettingsAuditAsk } from "@/components/SettingsAuditAsk";
 import { ComplianceReview } from "@/components/ComplianceReview";
+import { AuditPresets } from "@/components/AuditPresets";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({
