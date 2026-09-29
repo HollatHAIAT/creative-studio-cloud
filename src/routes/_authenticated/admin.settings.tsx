@@ -89,12 +89,14 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
   const [from, setFrom] = useState(""); const [to, setTo] = useState("");
   const [who, setWho] = useState(""); const [field, setField] = useState("");
   const [exporting, setExporting] = useState(false);
-  const PAGE = 500;
+  const PAGE = 100;
+  const [page, setPage] = useState(0);
+  useEffect(() => { setPage(0); }, [from, to, who, field]);
   const args = (limit: number, offset: number) => ({ _from: from || null, _to: to || null, _actor: who || null, _field: field || null, _limit: limit, _offset: offset });
-  const q = useQuery({ queryKey: ["settings-audit", from, to, who, field], placeholderData: (p) => p, queryFn: async () => {
-    const { data, error } = await (supabase as any).rpc("admin_settings_audit_search", args(PAGE, 0));
+  const q = useQuery({ queryKey: ["settings-audit", from, to, who, field, page], placeholderData: (p) => p, queryFn: async () => {
+    const { data, error } = await (supabase as any).rpc("admin_settings_audit_search", args(PAGE, page * PAGE));
     if (error) throw error; const list = (data ?? []) as (AuditRow & { total: number })[];
-    return { rows: list as AuditRow[], total: Number(list[0]?.total ?? 0) };
+    return { rows: list as AuditRow[], total: Number(list[0]?.total ?? 0), offset: page * PAGE };
   } });
   const actorsQ = useQuery({ queryKey: ["settings-audit", "actors"], queryFn: async () => {
     const { data, error } = await (supabase as any).rpc("admin_settings_audit_actors");
@@ -134,7 +136,7 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
         <label className="grid gap-1 text-xs"><span>{L("Setting", "الإعداد")}</span><select value={field} onChange={(e) => setField(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{Object.entries(labels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
       </div>
       {q.data && (total > 0 || active) && <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
-        <span>{total > rows.length ? L(`${total} matching · showing latest ${rows.length}`, `${total} مطابقًا · يُعرض أحدث ${rows.length}`) : L(`${total} matching`, `${total} مطابقًا`)}</span>
+        <span>{total > rows.length ? L(`${total} matching · showing ${(q.data.offset ?? 0) + 1}–${(q.data.offset ?? 0) + rows.length}`, `${total} مطابقًا · يُعرض ${(q.data.offset ?? 0) + 1}–${(q.data.offset ?? 0) + rows.length}`) : L(`${total} matching`, `${total} مطابقًا`)}</span>
         {active && <button type="button" onClick={() => { setFrom(""); setTo(""); setWho(""); setField(""); }} className="underline hover:text-foreground">{L("Clear filters", "مسح الفلاتر")}</button>}
         <button type="button" disabled={total === 0 || exporting} onClick={() => void exportAll()} className="ms-auto rounded-full border border-border px-4 py-1.5 text-sm text-foreground hover:border-primary disabled:opacity-50">{exporting ? L("Exporting…", "جارٍ التصدير…") : L(`Export CSV (${total})`, `تصدير CSV (${total})`)}</button>
       </div>}
@@ -148,7 +150,7 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
             <thead className="bg-muted"><tr>{["#", L("When", "متى"), L("Administrator", "المدير"), L("Setting", "الإعداد"), L("From", "من"), L("To", "إلى")].map((h) => <th key={h} className="p-3 text-start">{h}</th>)}</tr></thead>
             <tbody>{rows.map((r, i) => (
               <tr key={r.id} id={`audit-${r.id}`} className="border-t border-border transition-colors">
-                <td className="p-3 text-muted-foreground">{i + 1}</td>
+                <td className="p-3 text-muted-foreground">{(q.data?.offset ?? 0) + i + 1}</td>
                 <td className="p-3 whitespace-nowrap">{new Date(r.created_at).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" })}</td>
                 <td className="p-3">{r.actor_email ?? L("System", "النظام")}</td>
                 <td className="p-3">{labels[r.field] ?? r.field}</td>
@@ -159,6 +161,14 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
           </table>
         </div>
       )}
+      {total > PAGE && (() => { const pages = Math.ceil(total / PAGE); return (
+        <nav aria-label={L("Change history pages", "صفحات سجل التغييرات")} className="mt-3 flex flex-wrap items-center justify-center gap-2 text-sm">
+          <button type="button" disabled={page === 0 || q.isFetching} onClick={() => setPage(0)} className="rounded-full border border-border px-3 py-1 disabled:opacity-50">{L("First", "الأولى")}</button>
+          <button type="button" disabled={page === 0 || q.isFetching} onClick={() => setPage((p) => p - 1)} className="rounded-full border border-border px-3 py-1 disabled:opacity-50">{L("Newer", "الأحدث")}</button>
+          <span aria-live="polite">{L(`Page ${page + 1} of ${pages}`, `صفحة ${page + 1} من ${pages}`)}</span>
+          <button type="button" disabled={page >= pages - 1 || q.isFetching} onClick={() => setPage((p) => p + 1)} className="rounded-full border border-border px-3 py-1 disabled:opacity-50">{L("Older", "الأقدم")}</button>
+          <button type="button" disabled={page >= pages - 1 || q.isFetching} onClick={() => setPage(pages - 1)} className="rounded-full border border-border px-3 py-1 disabled:opacity-50">{L("Last", "الأخيرة")}</button>
+        </nav>); })()}
     </section>
   );
 }
