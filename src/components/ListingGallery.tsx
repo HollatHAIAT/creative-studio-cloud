@@ -9,7 +9,7 @@ export function ListingGallery({ images }: { images: GalleryImage[] }) {
   const { locale } = useLocale(); const ar = locale === "ar"; const L = (e: string, a: string) => (ar ? a : e);
   const [i, setI] = useState(0);
   if (!images.length) return <div className="aspect-[4/5] rounded-2xl bg-muted" />;
-  const cur = images[Math.min(i, images.length - 1)];
+  const cur = images[Math.min(i, images.length - 1)]!;
   const go = (d: number) => setI((x) => (x + d + images.length) % images.length);
   return (
     <div>
