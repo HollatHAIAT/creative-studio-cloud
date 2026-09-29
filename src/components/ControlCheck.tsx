@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ClipboardCheck } from "lucide-react";
+import { exportCompliancePdf, reportText } from "@/lib/compliance-pdf";
 import { assessControl, type ControlAssessment } from "@/lib/settings-audit-qa.functions";
 
 type Filters = { from: string | null; to: string | null; actor: string | null; field: string | null };
 /** Admin writes a control/policy; AI assesses every matching audit entry, flags evidence gaps, links evidence. */
-export function ControlCheck({ filters, total, L, ar }: { filters: Filters; total: number; L: (e: string, a: string) => string; ar: boolean }) {
+export function ControlCheck({ filters, total, L, ar, scope = "", labels = {} }: { filters: Filters; total: number; L: (e: string, a: string) => string; ar: boolean; scope?: string; labels?: Record<string, string> }) {
   const run = useServerFn(assessControl);
   const [control, setControl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -49,7 +50,9 @@ export function ControlCheck({ filters, total, L, ar }: { filters: Filters; tota
       <div aria-live="polite" className="mt-3 text-sm">
         {err && <p role="alert" className="text-destructive">{err}</p>}
         {res && (<>
-          <p className="flex flex-wrap items-center gap-2"><span className={`rounded-full px-2 py-0.5 text-xs ${cls[res.verdict]}`}>{verdict[res.verdict]}</span><span className="text-xs text-muted-foreground">{L(`Assessed ${n(res.reviewed)} of ${n(res.total)} matching changes`, `قُيِّم ${n(res.reviewed)} من ${n(res.total)} تغييرًا مطابقًا`)}</span></p>
+          <p className="flex flex-wrap items-center gap-2"><span className={`rounded-full px-2 py-0.5 text-xs ${cls[res.verdict]}`}>{verdict[res.verdict]}</span><span className="text-xs text-muted-foreground">{L(`Assessed ${n(res.reviewed)} of ${n(res.total)} matching changes`, `قُيِّم ${n(res.reviewed)} من ${n(res.total)} تغييرًا مطابقًا`)}</span><button type="button" onClick={() => { if (!exportCompliancePdf({ title: L("Control assessment", "تقييم الضابط الرقابي"), subtitle: `${L("Control", "الضابط")}: ${control.trim()} — ${verdict[res.verdict]}`, scope: scope || L("all entries", "كل السجلات"), summary: ar ? res.summaryAr || res.summary : res.summary, evidence: res.evidence, ar, labels, t: reportText(L),
+            sections: [...res.assessments.map((a) => ({ badge: status[a.status], heading: ar ? a.requirementAr || a.requirement : a.requirement, body: ar ? a.detailAr || a.detail : a.detail, entryIds: a.entryIds })),
+              ...res.gaps.map((g) => ({ badge: L("Evidence gap", "فجوة أدلة"), heading: ar ? g.gapAr || g.gap : g.gap, note: g.needed ? L("Needed: ", "المطلوب: ") + (ar ? g.neededAr || g.needed : g.needed) : undefined, entryIds: g.entryIds }))] })) setErr(L("Allow pop-ups for this site to export the PDF.", "اسمح بالنوافذ المنبثقة لهذا الموقع لتصدير الملف.")); }} className="ms-auto rounded-full border border-border px-3 py-1 text-xs hover:border-primary">{L("Export PDF", "تصدير PDF")}</button></p>
           <p className="mt-2 leading-relaxed">{ar ? res.summaryAr || res.summary : res.summary}</p>
           {res.assessments.length > 0 && <div className="mt-3"><p className="font-medium">{L("Requirements", "المتطلبات")}</p><ul className="mt-1 space-y-2">{res.assessments.map((a, i) => <li key={i} className="rounded-lg bg-muted p-3"><p className="flex gap-2"><span className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${cls[a.status]}`}>{status[a.status]}</span>{ar ? a.requirementAr || a.requirement : a.requirement}</p><p className="mt-1 text-xs text-muted-foreground">{ar ? a.detailAr || a.detail : a.detail}</p><Chips ids={a.entryIds} /></li>)}</ul></div>}
           {res.gaps.length > 0 && <div className="mt-3"><p className="font-medium">{L("Evidence gaps", "فجوات الأدلة")}</p><ul className="mt-1 space-y-2">{res.gaps.map((g, i) => <li key={i} className="rounded-lg border border-dashed border-border p-3"><p>{ar ? g.gapAr || g.gap : g.gap}</p>{g.needed && <p className="mt-1 text-xs text-muted-foreground">{L("Needed: ", "المطلوب: ")}{ar ? g.neededAr || g.needed : g.needed}</p>}<Chips ids={g.entryIds} /></li>)}</ul></div>}
