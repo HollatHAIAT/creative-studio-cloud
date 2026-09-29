@@ -1,4 +1,5 @@
 import { FocusOrderPreview } from "@/components/FocusOrderPreview";
+import { GalleryEditor } from "@/components/GalleryEditor";
 import { OwnershipHeritage } from "@/components/OwnershipHeritage";
 import { ScreenReaderPreview } from "@/components/ScreenReaderPreview";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -445,6 +446,7 @@ function ListingWriter() {
                   );
                 })()}
               </div>
+              <GalleryEditor draftId={draftId} onSave={saveNow} onMakeMain={(p) => { const old = path; setPath(p); setPreview(null); return old; }} />
               <OwnershipHeritage draftId={draftId} onSave={saveNow} />
               <ReviewPath draftId={draftId} onSave={saveNow} submitted={submitted} onPublished={() => void loadDrafts()} />
               <PublishGate issues={publishIssues(copy, !!path, { ratio: imgRatio, width: imgW }, L)} submitted={submitted}

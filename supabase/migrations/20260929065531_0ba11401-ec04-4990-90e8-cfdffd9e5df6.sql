@@ -1,0 +1,2 @@
+ALTER TABLE public.listing_drafts ADD COLUMN IF NOT EXISTS gallery jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.listing_drafts ADD CONSTRAINT listing_drafts_gallery_max CHECK (jsonb_typeof(gallery) = 'array' AND jsonb_array_length(gallery) <= 12);
