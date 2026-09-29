@@ -6,8 +6,18 @@ import gallery from "@/assets/gallery.jpg";
 import artSadu from "@/assets/art-sadu.jpg";
 import artQatt from "@/assets/art-qatt.jpg";
 import artPottery from "@/assets/art-pottery.jpg";
+import eg_papyrus from "@/assets/eg-papyrus.jpg";
+import eg_nefertiti from "@/assets/eg-nefertiti.jpg";
+import eg_giza from "@/assets/eg-giza.jpg";
+import eg_alabaster from "@/assets/eg-alabaster.jpg";
+import eg_khayamiya from "@/assets/eg-khayamiya.jpg";
+import gulf_najdi_door from "@/assets/gulf-najdi-door.jpg";
+import gulf_dallah from "@/assets/gulf-dallah.jpg";
+import gulf_dhow from "@/assets/gulf-dhow.jpg";
+import gulf_khanjar from "@/assets/gulf-khanjar.jpg";
+import gulf_hegra from "@/assets/gulf-hegra.jpg";
 
-export const categories = ["Painting", "Photography", "Calligraphy", "Sadu", "Qatt", "Pottery", "Illustration", "Digital", "Print"] as const;
+export const categories = ["Painting", "Photography", "Calligraphy", "Sadu", "Qatt", "Pottery", "Illustration", "Digital", "Print", "Heritage"] as const;
 export type Category = (typeof categories)[number];
 
 export type VariantKind = "original" | "print" | "license";
@@ -43,6 +53,12 @@ export const artists: Creator[] = [
   { id: "noor-al-sayed", name: "Noor Al-Sayed", nameAr: "نور السيد", city: "Cairo", cityAr: "القاهرة", discipline: "Calligrapher", disciplineAr: "خطّاطة", image: art3, followers: 8900,
     bio: "Noor reimagines classical Arabic scripts as contemporary compositions in gold leaf and ink.",
     bioAr: "تعيد نور تخيّل الخطوط العربية الكلاسيكية في تكوينات معاصرة بورق الذهب والحبر." },
+  { id: "karim-mansour", name: "Karim Mansour", nameAr: "كريم منصور", city: "Luxor", cityAr: "الأقصر", discipline: "Heritage artisan", disciplineAr: "حِرفي تراث", image: eg_papyrus, followers: 6400,
+    bio: "Karim's Luxor workshop makes hand-painted papyrus, alabaster carvings and museum-grade replicas of ancient Egyptian pieces.",
+    bioAr: "يصنع مشغل كريم في الأقصر ورق البردي المرسوم يدويًا ومنحوتات المرمر ونسخًا متحفية من القطع المصرية القديمة." },
+  { id: "hessa-alqahtani", name: "Hessa Al-Qahtani", nameAr: "حصة القحطاني", city: "AlUla", cityAr: "العُلا", discipline: "Heritage photographer & painter", disciplineAr: "مصوّرة ورسامة تراث", image: gulf_hegra, followers: 15200,
+    bio: "Hessa documents Gulf heritage — Hegra, Najdi architecture, pearling dhows and the objects of Arabian hospitality.",
+    bioAr: "توثّق حصة تراث الخليج: الحِجر، والعمارة النجدية، وسفن الغوص على اللؤلؤ، وأدوات الضيافة العربية." },
 ];
 
 const prints = (base: number, edition = 50): Variant[] => PRINT_SIZES.slice(0, 3).flatMap((size, i) =>
@@ -85,6 +101,36 @@ export const seedListings: Listing[] = [
   { id: "najd-vessel", title: "Najd Vessel", titleAr: "جرّة نجدية", creatorId: "omar-rahman", category: "Pottery", images: [artPottery], medium: "Hand-built incised clay", mediumAr: "طين مشكّل يدويًا بنقوش محفورة", year: 2025, price: 950, createdAt: d(21), formats: ["Original"],
     description: "A hand-built clay vessel with incised Najdi triangles, fired in a traditional kiln.", descriptionAr: "جرّة طينية مشكّلة يدويًا بمثلثات نجدية محفورة، مشويّة في فرن تقليدي.",
     variants: [{ id: "orig", kind: "original", price: 950, edition: 1, sold: 0 }] },
+  { id: "pharaoh-procession", title: "Procession of the Pharaoh", titleAr: "موكب الفرعون", creatorId: "karim-mansour", category: "Heritage", images: [eg_papyrus], medium: "Hand-painted natural papyrus, 90×40 cm", mediumAr: "رسم يدوي على بردي طبيعي، ٩٠×٤٠ سم", year: 2026, price: 480, createdAt: d(25), formats: ["Original", "Print"],
+    description: "A royal chariot procession with hieroglyph columns, painted by hand on papyrus pressed in Luxor using the ancient method. A contemporary work in the ancient style, not an antiquity.", descriptionAr: "موكب عربة ملكية مع أعمدة من الكتابة الهيروغليفية، مرسوم يدويًا على بردي مكبوس في الأقصر بالطريقة القديمة. عمل معاصر على الطراز القديم وليس قطعة أثرية.",
+    variants: [{ id: "orig", kind: "original", price: 480, edition: 1, sold: 0 }, ...prints(45, 50)] },
+  { id: "nefertiti-replica", title: "Nefertiti Bust (Museum Replica)", titleAr: "تمثال نفرتيتي (نسخة متحفية)", creatorId: "karim-mansour", category: "Heritage", images: [eg_nefertiti], medium: "Hand-painted cast stone, 48 cm", mediumAr: "حجر مصبوب ملوّن يدويًا، ٤٨ سم", year: 2026, price: 1250, createdAt: d(24), formats: ["Original"],
+    description: "A faithful full-size replica of the famous bust of Queen Nefertiti, cast and painted by hand. Sold as a replica with a maker's certificate.", descriptionAr: "نسخة أمينة بالحجم الكامل من تمثال الملكة نفرتيتي الشهير، مصبوبة وملوّنة يدويًا. تُباع كنسخة مع شهادة من الصانع.",
+    variants: [{ id: "orig", kind: "original", price: 1250, edition: 1, sold: 0 }] },
+  { id: "giza-dawn", title: "Giza at Dawn", titleAr: "الجيزة عند الفجر", creatorId: "karim-mansour", category: "Painting", images: [eg_giza], medium: "Oil on canvas, 80×80 cm", mediumAr: "زيت على قماش، ٨٠×٨٠ سم", year: 2025, price: 2100, createdAt: d(19), formats: ["Original", "Limited print", "Digital license"],
+    description: "A felucca crosses the Nile as the first light turns the pyramids rose and gold.", descriptionAr: "فلوكة تعبر النيل بينما يحوّل الضوء الأول الأهرامات إلى الوردي والذهبي.",
+    variants: [{ id: "orig", kind: "original", price: 2100, edition: 1, sold: 0 }, ...prints(85, 40), ...licenses(45)] },
+  { id: "anubis-jar", title: "Anubis Canopic Jar", titleAr: "جرّة أنوبيس الكانوبية", creatorId: "karim-mansour", category: "Heritage", images: [eg_alabaster], medium: "Hand-carved Egyptian alabaster, 30 cm", mediumAr: "مرمر مصري منحوت يدويًا، ٣٠ سم", year: 2026, price: 390, createdAt: d(17), formats: ["Original"],
+    description: "Carved from a single block of alabaster in the style of New Kingdom canopic jars, with a jackal-head lid of Anubis.", descriptionAr: "منحوتة من كتلة مرمر واحدة على طراز الجرار الكانوبية في الدولة الحديثة، بغطاء على هيئة رأس أنوبيس.",
+    variants: [{ id: "orig", kind: "original", price: 390, edition: 1, sold: 0 }] },
+  { id: "khayamiya-star", title: "Khayamiya Star", titleAr: "نجمة الخيامية", creatorId: "karim-mansour", category: "Heritage", images: [eg_khayamiya], medium: "Hand-stitched cotton appliqué, 100×100 cm", mediumAr: "قطن مخيّط يدويًا بالتطريز التطبيقي، ١٠٠×١٠٠ سم", year: 2026, price: 720, createdAt: d(16), formats: ["Original"],
+    description: "Tentmakers' appliqué from Cairo's Street of the Tentmakers, with an Islamic star and lotus corners.", descriptionAr: "فن الخيامية من شارع الخيامية بالقاهرة، بنجمة إسلامية وزهور لوتس في الأركان.",
+    variants: [{ id: "orig", kind: "original", price: 720, edition: 1, sold: 0 }] },
+  { id: "najdi-door", title: "Najdi Door, Diriyah", titleAr: "باب نجدي، الدرعية", creatorId: "hessa-alqahtani", category: "Photography", images: [gulf_najdi_door], medium: "Archival pigment print", mediumAr: "طباعة صبغية أرشيفية", year: 2026, price: 380, createdAt: d(25), formats: ["Fine art print", "Digital license"],
+    description: "A painted wooden Najdi door in a mud-brick wall at At-Turaif, Diriyah.", descriptionAr: "باب نجدي خشبي ملوّن في جدار طيني بحي الطريف في الدرعية.",
+    variants: [...prints(75, 30), ...licenses(35)] },
+  { id: "dallah-majlis", title: "Dallah of the Majlis", titleAr: "دلّة المجلس", creatorId: "hessa-alqahtani", category: "Heritage", images: [gulf_dallah], medium: "Hand-engraved brass dallah, 32 cm", mediumAr: "دلّة نحاسية منقوشة يدويًا، ٣٢ سم", year: 2025, price: 560, createdAt: d(22), formats: ["Original"],
+    description: "A traditional brass Arabic coffee pot engraved by hand, the centrepiece of Gulf hospitality.", descriptionAr: "دلّة قهوة عربية نحاسية منقوشة يدويًا، رمز الضيافة الخليجية.",
+    variants: [{ id: "orig", kind: "original", price: 560, edition: 1, sold: 0 }] },
+  { id: "pearling-dhow", title: "The Pearling Dhow", titleAr: "سفينة الغوص", creatorId: "hessa-alqahtani", category: "Painting", images: [gulf_dhow], medium: "Watercolour on cotton paper, 50×50 cm", mediumAr: "ألوان مائية على ورق قطني، ٥٠×٥٠ سم", year: 2026, price: 950, createdAt: d(21), formats: ["Original", "Print"],
+    description: "A wooden dhow sails past wind towers and forts, remembering the Gulf's pearling age.", descriptionAr: "سفينة خشبية تبحر أمام البراجيل والقلاع، تستحضر عصر الغوص على اللؤلؤ في الخليج.",
+    variants: [{ id: "orig", kind: "original", price: 950, edition: 1, sold: 0 }, ...prints(60, 40)] },
+  { id: "omani-khanjar", title: "Silver Khanjar & Pearls", titleAr: "خنجر فضي ولؤلؤ", creatorId: "hessa-alqahtani", category: "Heritage", images: [gulf_khanjar], medium: "Filigree silver, cultured Gulf pearls", mediumAr: "فضة مخرّمة ولؤلؤ خليجي مستزرع", year: 2025, price: 1650, createdAt: d(20), formats: ["Original"],
+    description: "A ceremonial khanjar in hand-worked silver filigree, paired with a strand of Gulf pearls. Decorative piece; blade is blunt.", descriptionAr: "خنجر احتفالي بفضة مخرّمة مشغولة يدويًا، مع عقد من اللؤلؤ الخليجي. قطعة زينة والنصل غير حاد.",
+    variants: [{ id: "orig", kind: "original", price: 1650, edition: 1, sold: 0 }] },
+  { id: "hegra-golden-hour", title: "Hegra, Golden Hour", titleAr: "الحِجر في الساعة الذهبية", creatorId: "hessa-alqahtani", category: "Photography", images: [gulf_hegra], medium: "Archival pigment print", mediumAr: "طباعة صبغية أرشيفية", year: 2026, price: 520, createdAt: d(26), formats: ["Fine art print", "Canvas", "Digital license"],
+    description: "Qasr al-Farid, the lone Nabataean tomb at Hegra — Saudi Arabia's first UNESCO World Heritage site.", descriptionAr: "قصر الفريد، المقبرة النبطية المنفردة في الحِجر، أول موقع سعودي في قائمة التراث العالمي لليونسكو.",
+    variants: [...prints(110, 25), ...licenses(50)] },
 ];
 
 // ---------- Saudi art supplies (sample catalogue — replace with real products/brands) ----------
