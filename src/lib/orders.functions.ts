@@ -84,7 +84,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         return { ok: false as const, error: msg, orderId: order.id };
       }
     }
-    if (usedOffers.length) await (supabase as any).from("offers").update({ used_order_id: order.id }).in("id", usedOffers).eq("user_id", userId);
+    for (const id of usedOffers) await (supabase as any).rpc("consume_accepted_offer", { _offer: id, _order: order.id });
     await supabase.from("cart_items").delete().eq("user_id", userId);
     return { ok: true as const, orderId: order.id, reference: order.reference };
   });
