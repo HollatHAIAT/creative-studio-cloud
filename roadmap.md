@@ -166,3 +166,19 @@
 - [ ] Seller listing pages: block purchase when stock reaches 0
 
 - [x] Buyer auction flow: tabs, lot details, bid outcomes
+
+## Platform gaps (Sep 29)
+- [x] Separate admin portal + user/role/suspension management
+- [x] CMS: home texts, artists, categories, exhibitions, banners
+- [ ] CMS: About, Licensing, FAQ, footer page texts
+- [x] Buyer profile: details, addresses, password, delete account
+- [x] Seller bio, photo, bank payout account
+- [ ] Supplies vendor accounts, products, stock, orders
+- [x] Seller: artwork view counting + conversion
+- [x] Checkout applies accepted offer price (once)
+- [x] Checkout blocks sold-out / insufficient stock
+- [ ] Listing writer without a photo
+- [ ] Card payments — blocked: needs a payment provider chosen by user
+- [ ] Real email sending — blocked: needs a sender email domain from user
+- [ ] End-to-end journey tests
+- [ ] Real artist names/works/prices and support response time — blocked: user data

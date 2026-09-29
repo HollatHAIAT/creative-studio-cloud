@@ -31,12 +31,33 @@ export const placeOrder = createServerFn({ method: "POST" })
     const priced = priceCart(data.items);
     if (priced.errors.length) return { ok: false as const, error: priced.errors.join("; ") };
     // Seller authorization: listing must be live; agent-sold listings need a valid, owner-approved license covering this format.
+    const usedOffers: string[] = [];
+    const wanted = new Map<string, number>();
     for (const l of priced.lines.filter((x) => x.kind !== "ticket" && x.kind !== "supply")) {
       const listingId = String(l.ref["listingId"]);
-      const { data: row } = await supabase.from("listings").select("id, status").eq("id", listingId).maybeSingle();
+      const { data: row } = await supabase.from("listings").select("id, status, stock").eq("id", listingId).maybeSingle();
       if (!row || row.status !== "published") return { ok: false as const, error: "LISTING_UNAVAILABLE" };
+      // Stock: physical items (originals, prints) can't exceed what the seller has left.
+      if (l.kind !== "license" && row.stock != null) {
+        const need = (wanted.get(listingId) ?? 0) + l.qty; wanted.set(listingId, need);
+        if (row.stock <= 0) return { ok: false as const, error: "OUT_OF_STOCK" };
+        if (need > row.stock) return { ok: false as const, error: "NOT_ENOUGH_STOCK" };
+      }
       const { data: auth, error: ae } = await supabase.rpc("agent_authorization_valid", { _listing: listingId, _kind: l.kind });
       if (ae || (auth !== "OWNER" && auth !== "AGENT_OK")) return { ok: false as const, error: String(auth ?? "SELLER_NOT_AUTHORIZED") };
+      // Accepted offer: the buyer pays the agreed price for the original, once.
+      if (l.kind === "original") {
+        const { data: off } = await (supabase as any).from("offers").select("id, amount").eq("listing_id", listingId).eq("user_id", userId).eq("status", "accepted").is("used_order_id", null).order("updated_at", { ascending: false }).limit(1).maybeSingle();
+        if (off && Number(off.amount) > 0 && Number(off.amount) < l.unit) {
+          l.unit = Number(off.amount); l.amount = l.unit * l.qty; l.detail = `${l.detail} · Accepted offer`; usedOffers.push(off.id);
+        }
+      }
+    }
+    if (usedOffers.length) {
+      const { VAT_RATE } = await import("./pricing");
+      priced.subtotal = priced.lines.reduce((s, x) => s + x.amount, 0);
+      priced.vat = Math.round((priced.subtotal + priced.shipping) * VAT_RATE * 100) / 100;
+      priced.total = Math.round((priced.subtotal + priced.shipping + priced.vat) * 100) / 100;
     }
     if (priced.needsShipping && (!data.address || !data.address.line || !data.address.city || !data.address.country)) return { ok: false as const, error: "Shipping address is required" };
 
@@ -63,6 +84,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         return { ok: false as const, error: msg, orderId: order.id };
       }
     }
+    for (const id of usedOffers) await (supabase as any).rpc("consume_accepted_offer", { _offer: id, _order: order.id });
     await supabase.from("cart_items").delete().eq("user_id", userId);
     return { ok: true as const, orderId: order.id, reference: order.reference };
   });

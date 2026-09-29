@@ -10,6 +10,8 @@ import { priceCart } from "@/lib/pricing";
 import { placeOrder } from "@/lib/orders.functions";
 const SELL_ERR: Record<string, [string, string]> = {
   LISTING_UNAVAILABLE: ["This artwork is no longer available.", "هذا العمل لم يعد متاحًا."],
+  OUT_OF_STOCK: ["Sorry, this item just sold out.", "عذرًا، نفدت الكمية المتاحة من هذا العمل."],
+  NOT_ENOUGH_STOCK: ["There aren't enough pieces left — reduce the quantity.", "الكمية المتبقية لا تكفي، قلّل العدد."],
   AGENT_NOT_APPROVED: ["The seller's agent isn't approved by the owner yet.", "وكيل البائع غير معتمد من المالك بعد."],
   AGENT_LICENSE_EXPIRED: ["The seller's agent authorization has expired.", "انتهت صلاحية تفويض وكيل البائع."],
   AGENT_SCOPE: ["The agent isn't authorized to sell this format.", "الوكيل غير مخوّل ببيع هذا الشكل."],
