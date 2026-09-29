@@ -1565,6 +1565,33 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings_audit: {
+        Row: {
+          actor: string | null
+          created_at: string
+          field: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          field: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          field?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+        }
+        Relationships: []
+      }
       refund_requests: {
         Row: {
           created_at: string
@@ -2238,6 +2265,17 @@ export type Database = {
       admin_set_reply_permission: {
         Args: { _allowed: boolean; _listing: string }
         Returns: undefined
+      }
+      admin_settings_audit: {
+        Args: { _limit?: number }
+        Returns: {
+          actor_email: string
+          created_at: string
+          field: string
+          id: string
+          new_value: string
+          old_value: string
+        }[]
       }
       admin_unpublish_listing: {
         Args: { _id: string; _reason: string }
