@@ -1,6 +1,6 @@
 import type { EvidenceEntry } from "@/lib/settings-audit-qa.functions";
 
-export type ReportSection = { heading: string; badge?: string; body?: string; note?: string; entryIds?: string[] };
+export type ReportSection = { heading: string; badge?: string | undefined; body?: string | undefined; note?: string | undefined; entryIds?: string[] | undefined };
 export type ReportInput = {
   title: string; subtitle: string; scope: string; summary: string; sections: ReportSection[];
   list?: { heading: string; items: string[] }; evidence: Record<string, EvidenceEntry>; ar: boolean;
@@ -14,7 +14,7 @@ export function exportCompliancePdf(r: ReportInput): boolean {
   const loc = r.ar ? "ar-SA" : "en-GB";
   const when = (d: string) => new Date(d).toLocaleString(loc, { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }) + " UTC";
   const used = new Set(r.sections.flatMap((s) => s.entryIds ?? []));
-  const rows = [...used].map((id) => r.evidence[id]).filter(Boolean).sort((a, b) => a.n - b.n);
+  const rows = [...used].map((id) => r.evidence[id]).filter((e): e is EvidenceEntry => !!e).sort((a, b) => a.n - b.n);
   const chip = (id: string) => { const e = r.evidence[id]; return e ? `<a href="#ev-${esc(id)}" class="chip">#${e.n}</a>` : ""; };
   const html = `<!doctype html><html lang="${r.ar ? "ar" : "en"}" dir="${r.ar ? "rtl" : "ltr"}"><head><meta charset="utf-8"><title>${esc(r.title)}</title>
 <style>
