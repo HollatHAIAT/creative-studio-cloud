@@ -135,6 +135,8 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
         <label className="grid gap-1 text-xs"><span>{L("Administrator", "المدير")}</span><select value={who} onChange={(e) => setWho(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{admins.map((a) => <option key={a || "s"} value={a || "__system"}>{a || L("System", "النظام")}</option>)}</select></label>
         <label className="grid gap-1 text-xs"><span>{L("Setting", "الإعداد")}</span><select value={field} onChange={(e) => setField(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{Object.entries(labels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
       </div>
+      <AuditPresets current={{ from, to, who, field }} apply={(p) => { setFrom(p.from); setTo(p.to); setWho(p.who); setField(p.field); }} L={L} />
+
       {q.data && (total > 0 || active) && <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
         <span>{total > rows.length ? L(`${total} matching · showing ${(q.data.offset ?? 0) + 1}–${(q.data.offset ?? 0) + rows.length}`, `${total} مطابقًا · يُعرض ${(q.data.offset ?? 0) + 1}–${(q.data.offset ?? 0) + rows.length}`) : L(`${total} matching`, `${total} مطابقًا`)}</span>
         {active && <button type="button" onClick={() => { setFrom(""); setTo(""); setWho(""); setField(""); }} className="underline hover:text-foreground">{L("Clear filters", "مسح الفلاتر")}</button>}
