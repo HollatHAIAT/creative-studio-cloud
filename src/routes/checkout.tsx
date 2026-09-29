@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { CreditCard, Landmark, Smartphone, Apple, Check } from "lucide-react";
@@ -44,6 +45,19 @@ function Checkout() {
   const [step, setStep] = useState(0);
   const [contact, setContact] = useState({ name: "", email: "", phone: "" });
   const [addr, setAddr] = useState({ line: "", city: "", country: "Saudi Arabia", postal: "" });
+  const arCo = useLocale().locale === "ar";
+  const [pickedId, setPickedId] = useState<string | null>(null);
+  type Saved = { id: string; label: string; full_name: string; phone: string; line1: string; line2: string; city: string; region: string; postal_code: string; country: string; is_default: boolean };
+  const saved = useQuery({ queryKey: ["addresses"], queryFn: async () => {
+    const { data } = await (supabase as any).from("shipping_addresses").select("*").order("is_default", { ascending: false }).order("created_at");
+    return (data ?? []) as Saved[];
+  } });
+  const applySaved = (a: Saved) => {
+    setPickedId(a.id);
+    setAddr({ line: [a.line1, a.line2, a.region].filter(Boolean).join("، "), city: a.city, country: a.country, postal: a.postal_code });
+    setContact((c) => ({ ...c, name: c.name || a.full_name, phone: c.phone || a.phone }));
+  };
+  useEffect(() => { const d = saved.data?.[0]; if (d && !pickedId && !addr.line) applySaved(d); }, [saved.data]); // eslint-disable-line react-hooks/exhaustive-deps
   const [method, setMethod] = useState<Method>("card");
   const [card, setCard] = useState({ number: "", exp: "", cvc: "" });
   const place = useServerFn(placeOrder);
@@ -97,6 +111,21 @@ function Checkout() {
           )}
           {step === 1 && (priced.needsShipping ? (
             <div className="grid gap-4 md:grid-cols-2">
+              {!!saved.data?.length && (
+                <fieldset className="md:col-span-2">
+                  <legend className="text-sm font-medium">{arCo ? "اختر عنوانًا محفوظًا" : "Choose a saved address"}</legend>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    {saved.data.map((a) => (
+                      <button type="button" key={a.id} onClick={() => applySaved(a)} aria-pressed={pickedId === a.id}
+                        className={`rounded-md border p-3 text-start text-sm ${pickedId === a.id ? "border-primary bg-primary/5" : "border-border"}`}>
+                        <span className="font-medium">{a.label || (arCo ? "عنوان" : "Address")}{a.is_default && <span className="ms-2 text-xs text-primary">{arCo ? "افتراضي" : "Default"}</span>}</span>
+                        <span className="block text-muted-foreground">{[a.full_name, a.line1, a.line2, a.city, a.country].filter(Boolean).join("، ")}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">{arCo ? "يمكنك تعديل الحقول أدناه لهذا الطلب فقط. " : "You can edit the fields below for this order only. "}<Link to="/profile" className="underline">{arCo ? "إدارة العناوين" : "Manage addresses"}</Link></p>
+                </fieldset>
+              )}
               <label className="text-sm md:col-span-2">{t("co.address")}<input className={field} maxLength={200} value={addr.line} onChange={(e) => setAddr({ ...addr, line: e.target.value })} /></label>
               <label className="text-sm">{t("co.city")}<input className={field} maxLength={100} value={addr.city} onChange={(e) => setAddr({ ...addr, city: e.target.value })} /></label>
               <label className="text-sm">{t("co.postal")}<input className={field} maxLength={20} value={addr.postal} onChange={(e) => setAddr({ ...addr, postal: e.target.value })} /></label>
