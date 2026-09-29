@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 import { useStaff } from "@/lib/auth";
 import { DEFAULT_SETTINGS, applySettings, usePlatformSettings, type PlatformSettings } from "@/lib/platform-settings";
+import { SettingsAuditAsk } from "@/components/SettingsAuditAsk";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({
@@ -76,6 +77,7 @@ function AdminSettings() {
           <button type="button" disabled={busy} onClick={() => { const d = Object.fromEntries(Object.entries(DEFAULT_SETTINGS).map(([k, v]) => [k, String(v)])) as Record<Key, string>; setF(d); void save(d); }} className="rounded-full border border-border px-5 py-2">{L("Restore defaults", "استعادة الافتراضي")}</button>
         </div>
       </form>
+      <SettingsAuditAsk />
       <SettingsAudit L={L} ar={locale === "ar"} labels={Object.fromEntries(fields.map((x) => [x.k, x.label]))} />
     </SiteShell>
   );
