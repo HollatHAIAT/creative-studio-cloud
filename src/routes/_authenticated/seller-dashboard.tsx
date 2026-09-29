@@ -47,7 +47,10 @@ function SellerDashboard() {
         ids.length ? sb.from("inquiries").select("id,listing_id,reply").in("listing_id", ids).is("reply", null) : { data: [] },
         dIds.length ? sb.from("listing_review_comments").select("id,draft_id,body,created_at,score,recommendation").in("draft_id", dIds).order("created_at", { ascending: false }).limit(8) : { data: [] },
       ]);
-      return { drafts: drafts.data ?? [], listings: listings.data ?? [], reviews: reviews.data ?? [], offers: offers.data ?? [], inquiries: inquiries.data ?? [], comments: comments.data ?? [] };
+      const to = new Date().toISOString().slice(0, 10), from = new Date(Date.now() - 90 * 864e5).toISOString().slice(0, 10);
+      const { data: vr } = await sb.rpc("seller_listing_views", { _from: from, _to: to });
+      const views: Record<string, number> = Object.fromEntries(((vr ?? []) as { listing_id: string; views: number }[]).map((r) => [r.listing_id, Number(r.views)]));
+      return { drafts: drafts.data ?? [], listings: listings.data ?? [], reviews: reviews.data ?? [], offers: offers.data ?? [], inquiries: inquiries.data ?? [], comments: comments.data ?? [], views };
     },
   });
   const d = q.data;
@@ -74,7 +77,7 @@ function SellerDashboard() {
               <div key={i} className={card}><p className="flex items-center gap-2 text-sm text-muted-foreground"><span aria-hidden className="text-primary">{icon}</span>{label}</p><p className="mt-1 font-display text-3xl">{n}</p></div>))}
           </section>
 
-          <SellerSales listings={d.listings.map((l: any) => ({ id: l.id, title: title(l) }))} views={{}} />
+          <SellerSales listings={d.listings.map((l: any) => ({ id: l.id, title: title(l) }))} views={d.views} />
           <OffersInbox listings={d.listings.map((l: any) => ({ id: l.id, title: title(l) }))} onChanged={() => void q.refetch()} />
 
           <section aria-labelledby="sd-drafts" className={card}>

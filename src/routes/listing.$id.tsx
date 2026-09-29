@@ -1,4 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { countView } from "@/lib/recently-viewed";
 import { SiteShell } from "@/components/SiteShell";
 import { getSellerListing } from "@/lib/seller-listings.functions";
 import { useLocale } from "@/lib/i18n";
@@ -27,6 +29,7 @@ export const Route = createFileRoute("/listing/$id")({
 function ListingPage() {
   const l = Route.useLoaderData();
   const { locale } = useLocale(); const ar = locale === "ar";
+  useEffect(() => { void countView(Route.useParams ? String((l as any).published_listing_id ?? (l as any).id) : ""); }, [l]);
   return (
     <SiteShell>
       <article className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-2">

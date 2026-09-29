@@ -10,6 +10,17 @@ export function trackView(id: string) {
     localStorage.setItem(KEY, JSON.stringify([id, ...prev.filter((x) => x !== id)].slice(0, MAX)));
     window.dispatchEvent(new Event("arwiqa:recent"));
   } catch { /* storage unavailable */ }
+  void countView(id);
+}
+
+/** Counts a view for seller analytics (once per visitor per artwork per day, deduped in the DB). */
+export async function countView(id: string) {
+  try {
+    let v = localStorage.getItem("arwiqa:visitor");
+    if (!v) { v = crypto.randomUUID(); localStorage.setItem("arwiqa:visitor", v); }
+    const { supabase } = await import("@/integrations/supabase/client");
+    await (supabase as any).rpc("record_listing_view", { _listing: id, _visitor: v });
+  } catch { /* analytics must never break the page */ }
 }
 
 /** Read after hydration to avoid server/client mismatch. */
