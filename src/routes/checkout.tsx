@@ -52,12 +52,12 @@ function Checkout() {
     const { data } = await (supabase as any).from("shipping_addresses").select("*").order("is_default", { ascending: false }).order("created_at");
     return (data ?? []) as Saved[];
   } });
-  const useSaved = (a: Saved) => {
+  const applySaved = (a: Saved) => {
     setPickedId(a.id);
     setAddr({ line: [a.line1, a.line2, a.region].filter(Boolean).join("، "), city: a.city, country: a.country, postal: a.postal_code });
     setContact((c) => ({ ...c, name: c.name || a.full_name, phone: c.phone || a.phone }));
   };
-  useEffect(() => { const d = saved.data?.[0]; if (d && !pickedId && !addr.line) useSaved(d); }, [saved.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { const d = saved.data?.[0]; if (d && !pickedId && !addr.line) applySaved(d); }, [saved.data]); // eslint-disable-line react-hooks/exhaustive-deps
   const [method, setMethod] = useState<Method>("card");
   const [card, setCard] = useState({ number: "", exp: "", cvc: "" });
   const place = useServerFn(placeOrder);
@@ -116,7 +116,7 @@ function Checkout() {
                   <legend className="text-sm font-medium">{arCo ? "اختر عنوانًا محفوظًا" : "Choose a saved address"}</legend>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     {saved.data.map((a) => (
-                      <button type="button" key={a.id} onClick={() => useSaved(a)} aria-pressed={pickedId === a.id}
+                      <button type="button" key={a.id} onClick={() => applySaved(a)} aria-pressed={pickedId === a.id}
                         className={`rounded-md border p-3 text-start text-sm ${pickedId === a.id ? "border-primary bg-primary/5" : "border-border"}`}>
                         <span className="font-medium">{a.label || (arCo ? "عنوان" : "Address")}{a.is_default && <span className="ms-2 text-xs text-primary">{arCo ? "افتراضي" : "Default"}</span>}</span>
                         <span className="block text-muted-foreground">{[a.full_name, a.line1, a.line2, a.city, a.country].filter(Boolean).join("، ")}</span>
