@@ -112,9 +112,17 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
         <label className="grid gap-1 text-xs"><span>{L("Administrator", "المدير")}</span><select value={who} onChange={(e) => setWho(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{admins.map((a) => <option key={a || "s"} value={a || "__system"}>{a || L("System", "النظام")}</option>)}</select></label>
         <label className="grid gap-1 text-xs"><span>{L("Setting", "الإعداد")}</span><select value={field} onChange={(e) => setField(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{Object.entries(labels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
       </div>
-      {q.data && q.data.length > 0 && <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
+      {q.data && q.data.length > 0 && <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
         <span>{L(`Showing ${rows.length} of ${q.data.length}`, `عرض ${rows.length} من ${q.data.length}`)}</span>
         {active && <button type="button" onClick={() => { setFrom(""); setTo(""); setWho(""); setField(""); }} className="underline hover:text-foreground">{L("Clear filters", "مسح الفلاتر")}</button>}
+        <button type="button" disabled={rows.length === 0} onClick={() => {
+          const esc = (v: unknown) => { const s = String(v ?? ""); return /[",\n\r]/.test(s) || /^[=+\-@]/.test(s) ? `"${(/^[=+\-@]/.test(s) ? "'" : "") + s.replace(/"/g, '""')}"` : s; };
+          const head = ["Timestamp (UTC)", "Administrator", "Setting key", "Setting", "Old value", "New value", "Entry ID"];
+          const lines = rows.map((r) => [r.created_at, r.actor_email ?? "System", r.field, labels[r.field] ?? r.field, r.old_value, r.new_value, r.id].map(esc).join(","));
+          const blob = new Blob(["\uFEFF" + [head.join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
+          const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+          a.download = `arwiqa-settings-audit-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+        }} className="ms-auto rounded-full border border-border px-4 py-1.5 text-sm text-foreground hover:border-primary disabled:opacity-50">{L(`Export CSV (${rows.length})`, `تصدير CSV (${rows.length})`)}</button>
       </div>}
       {q.isError ? <p className="mt-4 text-sm text-destructive">{L("Couldn't load the history.", "تعذّر تحميل السجل.")}</p>
         : !q.data ? <p className="mt-4 text-sm">…</p>
