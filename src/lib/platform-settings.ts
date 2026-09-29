@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { licenseRates } from "./license-rates";
 
 export type PlatformSettings = {
   return_days: number; print_ship_min_days: number; print_ship_max_days: number;
@@ -12,8 +13,6 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   commercial_print_limit: 5000, commercial_multiplier: 4, extended_multiplier: 10,
 };
 
-/** License rates read by variantsOf(); updated whenever settings load (browser) or before pricing (server). */
-export const licenseRates = { commercial: DEFAULT_SETTINGS.commercial_multiplier, extended: DEFAULT_SETTINGS.extended_multiplier };
 
 export function applySettings(s: PlatformSettings) {
   licenseRates.commercial = Number(s.commercial_multiplier);

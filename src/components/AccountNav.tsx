@@ -84,6 +84,7 @@ export function AccountNav() {
                 <DropdownMenuItem asChild><Link to="/admin/reviews">{locale === "ar" ? "الإشراف على التقييمات" : "Review moderation"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/auctions">{locale === "ar" ? "إدارة المزادات" : "Auction administration"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/listings">{locale === "ar" ? "مراجعة الإعلانات" : "Listing review"}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/admin/settings">{locale === "ar" ? "إعدادات المنصة" : "Platform settings"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/review-policy">{locale === "ar" ? "سياسة المراجعة" : "Review policy"}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/admin/policy-review">{locale === "ar" ? "مراجعة سياسات الإعلانات" : "Listing policy review"}</Link></DropdownMenuItem>
               </>)}

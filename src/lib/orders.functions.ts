@@ -26,6 +26,8 @@ export const placeOrder = createServerFn({ method: "POST" })
     // Duplicate submit (double click / network retry): return the order already created with this key.
     const { data: existing } = await supabase.from("orders").select("id, reference").eq("user_id", userId).eq("idempotency_key", data.idempotencyKey).maybeSingle();
     if (existing) return { ok: true as const, orderId: existing.id, reference: existing.reference };
+    const { data: ps } = await (supabase as any).from("platform_settings").select("commercial_multiplier, extended_multiplier").eq("id", 1).maybeSingle();
+    if (ps) { const { licenseRates } = await import("./license-rates"); licenseRates.commercial = Number(ps.commercial_multiplier); licenseRates.extended = Number(ps.extended_multiplier); }
     const priced = priceCart(data.items);
     if (priced.errors.length) return { ok: false as const, error: priced.errors.join("; ") };
     // Seller authorization: listing must be live; agent-sold listings need a valid, owner-approved license covering this format.

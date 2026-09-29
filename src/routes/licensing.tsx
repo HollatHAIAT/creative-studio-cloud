@@ -1,3 +1,4 @@
+import { usePlatformSettings, num } from "@/lib/platform-settings";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, X } from "lucide-react";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
@@ -19,11 +20,12 @@ export const Route = createFileRoute("/licensing")({
 
 function Licensing() {
   const { locale } = useLocale(); const ar = locale === "ar"; const L = (e: string, a: string) => (ar ? a : e);
+  const ps = usePlatformSettings();
   const tiers = [L("Personal", "شخصي"), L("Commercial", "تجاري"), L("Extended", "موسّع")];
   const rows: [string, boolean, boolean, boolean][] = [
     [L("Home, wallpaper, personal gifts", "المنزل وخلفيات الشاشة والهدايا الشخصية"), true, true, true],
     [L("Websites, social media, marketing", "المواقع ووسائل التواصل والتسويق"), false, true, true],
-    [L("Print runs up to 5,000 copies", "طباعة حتى ٥٬٠٠٠ نسخة"), false, true, true],
+    [L(`Print runs up to ${num(ps.commercial_print_limit, false)} copies`, `طباعة حتى ${num(ps.commercial_print_limit, true)} نسخة`), false, true, true],
     [L("Products for resale (merch, packaging)", "منتجات لإعادة البيع (هدايا وتغليف)"), false, false, true],
     [L("Unlimited print runs", "طباعة غير محدودة"), false, false, true],
   ];
@@ -45,7 +47,7 @@ function Licensing() {
             ))}</tbody>
           </table>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">{L("Commercial is priced at 4× and extended at 10× the personal license. Not allowed with any license: reselling the file itself, trademarks, or AI training.", "الترخيص التجاري بأربعة أضعاف الشخصي والموسّع بعشرة أضعافه. غير مسموح بأي ترخيص: إعادة بيع الملف نفسه أو تسجيله علامة تجارية أو تدريب نماذج الذكاء الاصطناعي عليه.")}</p>
+        <p className="mt-3 text-xs text-muted-foreground">{L(`Commercial is priced at ${ps.commercial_multiplier}× and extended at ${ps.extended_multiplier}× the personal license. Not allowed with any license: reselling the file itself, trademarks, or AI training.`, `الترخيص التجاري بـ${num(ps.commercial_multiplier, true)} أضعاف الشخصي والموسّع بـ${num(ps.extended_multiplier, true)} أضعافه. غير مسموح بأي ترخيص: إعادة بيع الملف نفسه أو تسجيله علامة تجارية أو تدريب نماذج الذكاء الاصطناعي عليه.`)}</p>
         <h2 className="mt-10 font-display text-2xl">{L("How it works", "كيف يعمل")}</h2>
         <ol className="mt-4 grid gap-3 md:grid-cols-4">{steps.map((s, i) => <li key={i} className="rounded-xl bg-muted p-4 text-sm"><span className="font-display text-primary">{i + 1}</span> {s}</li>)}</ol>
         <div className="mt-8 flex flex-wrap gap-3">

@@ -1,3 +1,4 @@
+import { licenseRates } from "./license-rates";
 import art1 from "@/assets/art1.jpg";
 import art2 from "@/assets/art2.jpg";
 import art3 from "@/assets/art3.jpg";

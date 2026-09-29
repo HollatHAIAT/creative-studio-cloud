@@ -1,3 +1,4 @@
+import { usePlatformSettings, num } from "@/lib/platform-settings";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell, SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -125,16 +126,18 @@ function Explore() {
 }
 
 const GUIDE = {
-  original: { en: ["Original artworks", "One-of-a-kind pieces shipped from the artist or gallery.", ["Pick a work and choose “Original”", "Pay by bank transfer at checkout", "The seller packs and ships with tracking", "Confirm delivery — 14-day return window"]],
-    ar: ["الأعمال الأصلية", "قطع فريدة تُشحن من الفنان أو المعرض مباشرة.", ["اختر العمل ثم «أصلي»", "ادفع بالتحويل البنكي عند الدفع", "يغلّف البائع العمل ويشحنه مع رقم تتبع", "أكّد الاستلام — مهلة إرجاع ١٤ يومًا"]] },
-  print: { en: ["Prints", "Numbered editions in several sizes and papers.", ["Choose a size and material", "Check the edition number still available", "Pay at checkout", "Printed and shipped within 5–7 days"]],
-    ar: ["المطبوعات", "نسخ مرقّمة بعدة مقاسات وخامات.", ["اختر المقاس والخامة", "تأكد من رقم الإصدار المتاح", "ادفع عند الدفع", "تُطبع وتُشحن خلال ٥–٧ أيام"]] },
+  original: { en: ["Original artworks", "One-of-a-kind pieces shipped from the artist or gallery.", ["Pick a work and choose “Original”", "Pay by bank transfer at checkout", "The seller packs and ships with tracking", "Confirm delivery — {R}-day return window"]],
+    ar: ["الأعمال الأصلية", "قطع فريدة تُشحن من الفنان أو المعرض مباشرة.", ["اختر العمل ثم «أصلي»", "ادفع بالتحويل البنكي عند الدفع", "يغلّف البائع العمل ويشحنه مع رقم تتبع", "أكّد الاستلام — مهلة إرجاع {R} يومًا"]] },
+  print: { en: ["Prints", "Numbered editions in several sizes and papers.", ["Choose a size and material", "Check the edition number still available", "Pay at checkout", "Printed and shipped within {A}–{B} days"]],
+    ar: ["المطبوعات", "نسخ مرقّمة بعدة مقاسات وخامات.", ["اختر المقاس والخامة", "تأكد من رقم الإصدار المتاح", "ادفع عند الدفع", "تُطبع وتُشحن خلال {A}–{B} أيام"]] },
   license: { en: ["Digital licenses", "Use artwork in your projects — personal, commercial or extended.", ["Choose the license that fits your use", "Pay at checkout", "Download the file from your order page", "Keep the license certificate with your project"]],
     ar: ["التراخيص الرقمية", "استخدم الأعمال في مشاريعك — شخصي أو تجاري أو موسّع.", ["اختر الترخيص المناسب لاستخدامك", "ادفع عند الدفع", "حمّل الملف من صفحة طلبك", "احتفظ بشهادة الترخيص مع مشروعك"]] },
 } as const;
 
 function FormatGuide({ format, ar }: { format: keyof typeof GUIDE; ar: boolean }) {
-  const [title, sub, steps] = GUIDE[format][ar ? "ar" : "en"];
+  const [title, sub, raw] = GUIDE[format][ar ? "ar" : "en"];
+  const ps = usePlatformSettings();
+  const steps = raw.map((x) => x.replace("{R}", num(ps.return_days, ar)).replace("{A}", num(ps.print_ship_min_days, ar)).replace("{B}", num(ps.print_ship_max_days, ar)));
   return (
     <section className="mb-8 rounded-2xl border border-border bg-card p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
