@@ -13,6 +13,19 @@ export function SettingsAuditAsk() {
   const [res, setRes] = useState<AuditAnswer | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const examples = [L("Who changed the return window last month?", "من غيّر مهلة الإرجاع الشهر الماضي؟"), L("Were any changes reverted?", "هل أُلغيت أي تغييرات؟"), L("Summarize license price changes", "لخّص تغييرات أسعار التراخيص")];
+  const [note, setNote] = useState<string | null>(null);
+  const n = (x: number) => x.toLocaleString(ar ? "ar-SA" : "en-US");
+  function jump(id: string) {
+    const el = document.getElementById(`audit-${id}`);
+    if (!el) { setNote(L("That entry isn't on the current Change history page. Use the filters or pages below to find it by its date and setting.", "هذا السجل ليس في الصفحة الحالية من سجل التغييرات. استخدم الفلاتر أو الصفحات أدناه للوصول إليه بتاريخه وإعداده.")); return; }
+    setNote(null); el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("bg-accent"); setTimeout(() => el.classList.remove("bg-accent"), 2000);
+  }
+  const Chips = ({ ids }: { ids: string[] }) => !res || ids.length === 0 ? null : (
+    <div className="mt-2 flex flex-wrap gap-1 text-xs"><span className="text-muted-foreground">{L("Evidence:", "الدليل:")}</span>{ids.map((id) => { const e = res.evidence[id]; return e ? (
+      <button key={id} type="button" onClick={() => jump(id)} title={`${e.who} · ${id}`} className="rounded-full border border-border bg-background px-2 py-0.5 hover:border-primary">
+        #{n(e.n)} · {e.field} · {e.from ?? "—"} → {e.to ?? "—"} · {e.who} · {new Date(e.created_at).toLocaleDateString(ar ? "ar-SA" : "en-GB")}
+      </button>) : null; })}</div>);
 
   async function submit(question: string) {
     if (question.trim().length < 3 || busy) return;
@@ -35,9 +48,12 @@ export function SettingsAuditAsk() {
       <div aria-live="polite" className="mt-4 text-sm">
         {err && <p role="alert" className="text-destructive">{err}</p>}
         {res && (<>
-          <p className="leading-relaxed">{ar ? res.summaryAr || res.summary : res.summary}</p>
-          {res.patterns.length > 0 && <div className="mt-4"><p className="font-medium">{L("Patterns", "الأنماط")}</p><ul className="mt-1 space-y-2">{res.patterns.map((p, i) => <li key={i} className="rounded-lg bg-muted p-3"><p>{ar ? p.patternAr || p.pattern : p.pattern}</p>{p.evidence && <p className="mt-1 text-xs text-muted-foreground">{ar ? p.evidenceAr || p.evidence : p.evidence}</p>}</li>)}</ul></div>}
-          {res.entries.length > 0 && <div className="mt-4"><p className="font-medium">{L("Relevant entries", "السجلات ذات الصلة")}</p><ul className="mt-1 space-y-1 text-muted-foreground">{res.entries.map((e, i) => <li key={i}><span className="text-foreground">{e.field}</span> · {ar ? e.changeAr || e.change : e.change} · {e.who} · {e.when ? new Date(e.when).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" }) : ""}</li>)}</ul></div>}
+          <p className="text-xs text-muted-foreground">{L(`Searched ${n(res.searched)} of ${n(res.total)} recorded changes.`, `بُحث في ${n(res.searched)} من ${n(res.total)} تغييرًا مسجّلًا.`)}</p>
+          <p className="mt-1 leading-relaxed">{ar ? res.summaryAr || res.summary : res.summary}</p>
+          <Chips ids={res.summaryIds} />
+          {res.patterns.length > 0 && <div className="mt-4"><p className="font-medium">{L("Patterns", "الأنماط")}</p><ul className="mt-1 space-y-2">{res.patterns.map((p, i) => <li key={i} className="rounded-lg bg-muted p-3"><p>{ar ? p.patternAr || p.pattern : p.pattern}</p>{p.evidence && <p className="mt-1 text-xs text-muted-foreground">{ar ? p.evidenceAr || p.evidence : p.evidence}</p>}<Chips ids={p.entryIds} /></li>)}</ul></div>}
+          {res.entries.length > 0 && <div className="mt-4"><p className="font-medium">{L("Relevant entries", "السجلات ذات الصلة")}</p><ul className="mt-1 space-y-2">{res.entries.map((e) => <li key={e.id}><Chips ids={[e.id]} /><p className="mt-1 text-xs text-muted-foreground">{ar ? e.whyAr || e.why : e.why}</p></li>)}</ul></div>}
+          {note && <p role="status" className="mt-3 rounded-lg bg-muted p-2 text-xs">{note}</p>}
         </>)}
       </div>
     </section>
