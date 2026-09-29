@@ -49,8 +49,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <header className={`sticky top-0 z-40 transition-all duration-300 ease-editorial ${scrolled ? "bg-background/85 backdrop-blur-md" : "bg-background"}`}>
         <div aria-hidden className="sadu-thin" />
         <div className={`mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 transition-all duration-300 ${scrolled ? "py-2.5" : "py-4"}`}>
-          <Link to="/" className="flex shrink-0 items-center gap-2 font-display text-2xl tracking-tight" aria-label="Arwiqa أروقة">
-            <span onPointerEnter={(e) => { const el = e.currentTarget; if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; el.classList.remove("is-replay"); void el.offsetWidth; el.classList.add("is-replay"); }} className={`logo-paint relative inline-block transition-all duration-300 ${scrolled ? "h-7 w-7" : "h-9 w-9"}`}><img src={logoMark} alt="" width={36} height={36} className="logo-paint-img h-full w-full object-contain" /><span aria-hidden className="logo-paint-brush" /></span><span>{t("brand.name")}</span>
+          <Link to="/" onKeyDown={(e) => { if (e.key !== "Enter" && e.key !== " ") return; if (e.key === " ") e.preventDefault(); replayLogo(e.currentTarget.querySelector<HTMLElement>(".logo-paint")); }} className="flex shrink-0 items-center gap-2 font-display text-2xl tracking-tight" aria-label="Arwiqa أروقة">
+            <span onPointerEnter={(e) => replayLogo(e.currentTarget)} className={`logo-paint relative inline-block transition-all duration-300 ${scrolled ? "h-7 w-7" : "h-9 w-9"}`}><img src={logoMark} alt="" width={36} height={36} className="logo-paint-img h-full w-full object-contain" /><span aria-hidden className="logo-paint-brush" /></span><span>{t("brand.name")}</span>
           </Link>
           <nav className="hidden items-center gap-7 text-sm lg:flex" aria-label={L("Main", "الرئيسية")}>
             {nav.map((n) => (
@@ -165,4 +165,10 @@ export function PageTitle({ eyebrow, title, sub }: { eyebrow: ReactNode; title: 
       </div>
     </div>
   );
+}
+
+/** Restart the brush-paint logo drawing; skipped when the visitor prefers reduced motion. */
+function replayLogo(el: HTMLElement | null) {
+  if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  el.classList.remove("is-replay"); void el.offsetWidth; el.classList.add("is-replay");
 }
