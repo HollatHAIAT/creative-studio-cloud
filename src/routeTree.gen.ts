@@ -41,6 +41,7 @@ import { Route as AuthenticatedMyReviewsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOrderHelpRouteImport } from './routes/_authenticated/order-help'
 import { Route as AuthenticatedOwnerApprovalsRouteImport } from './routes/_authenticated/owner-approvals'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedReviewInvitesRouteImport } from './routes/_authenticated/review-invites'
 import { Route as AuthenticatedRevisionCheckRouteImport } from './routes/_authenticated/revision-check'
 import { Route as AuthenticatedSavedSearchesRouteImport } from './routes/_authenticated/saved-searches'
@@ -235,6 +236,11 @@ const AuthenticatedOwnerApprovalsRoute =
     path: '/owner-approvals',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReviewInvitesRoute =
   AuthenticatedReviewInvitesRouteImport.update({
     id: '/review-invites',
@@ -435,6 +441,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
   '/owner-approvals': typeof AuthenticatedOwnerApprovalsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/review-invites': typeof AuthenticatedReviewInvitesRoute
   '/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -498,6 +505,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/order-help': typeof AuthenticatedOrderHelpRoute
   '/owner-approvals': typeof AuthenticatedOwnerApprovalsRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/review-invites': typeof AuthenticatedReviewInvitesRoute
   '/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -563,6 +571,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/order-help': typeof AuthenticatedOrderHelpRoute
   '/_authenticated/owner-approvals': typeof AuthenticatedOwnerApprovalsRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/review-invites': typeof AuthenticatedReviewInvitesRoute
   '/_authenticated/revision-check': typeof AuthenticatedRevisionCheckRoute
   '/_authenticated/saved-searches': typeof AuthenticatedSavedSearchesRoute
@@ -628,6 +637,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/order-help'
     | '/owner-approvals'
+    | '/profile'
     | '/review-invites'
     | '/revision-check'
     | '/saved-searches'
@@ -691,6 +701,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/order-help'
     | '/owner-approvals'
+    | '/profile'
     | '/review-invites'
     | '/revision-check'
     | '/saved-searches'
@@ -755,6 +766,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/order-help'
     | '/_authenticated/owner-approvals'
+    | '/_authenticated/profile'
     | '/_authenticated/review-invites'
     | '/_authenticated/revision-check'
     | '/_authenticated/saved-searches'
@@ -1043,6 +1055,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOwnerApprovalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/review-invites': {
       id: '/_authenticated/review-invites'
       path: '/review-invites'
@@ -1267,6 +1286,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOrderHelpRoute: typeof AuthenticatedOrderHelpRoute
   AuthenticatedOwnerApprovalsRoute: typeof AuthenticatedOwnerApprovalsRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReviewInvitesRoute: typeof AuthenticatedReviewInvitesRoute
   AuthenticatedRevisionCheckRoute: typeof AuthenticatedRevisionCheckRoute
   AuthenticatedSavedSearchesRoute: typeof AuthenticatedSavedSearchesRoute
@@ -1302,6 +1322,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOrderHelpRoute: AuthenticatedOrderHelpRoute,
   AuthenticatedOwnerApprovalsRoute: AuthenticatedOwnerApprovalsRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReviewInvitesRoute: AuthenticatedReviewInvitesRoute,
   AuthenticatedRevisionCheckRoute: AuthenticatedRevisionCheckRoute,
   AuthenticatedSavedSearchesRoute: AuthenticatedSavedSearchesRoute,
