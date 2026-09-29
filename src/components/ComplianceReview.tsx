@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ShieldCheck } from "lucide-react";
 import { reviewSettingsAudit, type ComplianceReview as R } from "@/lib/settings-audit-qa.functions";
+import { exportCompliancePdf, reportText } from "@/lib/compliance-pdf";
 
 type Filters = { from: string | null; to: string | null; actor: string | null; field: string | null };
 /** AI compliance review of every audit entry matching the filters (loaded server-side); findings link to entries. */
@@ -37,7 +38,10 @@ export function ComplianceReview({ filters, total, scope, L, ar, labels }: { fil
       <div aria-live="polite" className="text-sm">
         {err && <p role="alert" className="mt-3 text-destructive">{err}</p>}
         {res && <div className="mt-3 space-y-3">
-          <p className="text-xs text-muted-foreground">{L(`Reviewed ${n(res.reviewed)} of ${n(res.total)} matching entries.`, `رُوجع ${n(res.reviewed)} من ${n(res.total)} سجلًا مطابقًا.`)}</p>
+          <div className="flex flex-wrap items-center gap-2"><p className="text-xs text-muted-foreground">{L(`Reviewed ${n(res.reviewed)} of ${n(res.total)} matching entries.`, `رُوجع ${n(res.reviewed)} من ${n(res.total)} سجلًا مطابقًا.`)}</p>
+            <button type="button" onClick={() => { if (!exportCompliancePdf({ title: L("Compliance review", "مراجعة الامتثال"), subtitle: L(`Reviewed ${res.reviewed} of ${res.total} matching changes`, `رُوجع ${res.reviewed} من ${res.total} تغييرًا مطابقًا`), scope, summary: ar ? res.overviewAr || res.overview : res.overview, evidence: res.evidence, ar, labels, t: reportText(L),
+              sections: res.findings.map((f) => ({ badge: sev[f.severity], heading: ar ? f.titleAr || f.title : f.title, body: ar ? f.detailAr || f.detail : f.detail, entryIds: f.entryIds })),
+              list: { heading: L("Recommendations", "التوصيات"), items: res.recommendations.map((r) => ar ? r.textAr || r.text : r.text) } })) setErr(L("Allow pop-ups for this site to export the PDF.", "اسمح بالنوافذ المنبثقة لهذا الموقع لتصدير الملف.")); }} className="ms-auto rounded-full border border-border px-3 py-1 text-xs hover:border-primary">{L("Export PDF", "تصدير PDF")}</button></div>
           <p className="leading-relaxed">{ar ? res.overviewAr || res.overview : res.overview}</p>
           {res.findings.length > 0 && <ul className="space-y-2">{res.findings.map((f, i) => (
             <li key={i} className="rounded-lg bg-muted p-3">
