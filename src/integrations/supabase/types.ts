@@ -1950,6 +1950,48 @@ export type Database = {
         }
         Relationships: []
       }
+      support_tickets: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          order_ref: string | null
+          replied_at: string | null
+          replied_by: string | null
+          reply: string | null
+          status: string
+          subject: string
+          topic: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          order_ref?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          reply?: string | null
+          status?: string
+          subject: string
+          topic: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          order_ref?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          reply?: string | null
+          status?: string
+          subject?: string
+          topic?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ticket_scans: {
         Row: {
           code: string
@@ -2314,6 +2356,10 @@ export type Database = {
           booked: number
           slot: string
         }[]
+      }
+      staff_reply_support: {
+        Args: { _close: boolean; _reply: string; _ticket: string }
+        Returns: undefined
       }
       unsubscribe_saved_search_emails: {
         Args: { _token: string }

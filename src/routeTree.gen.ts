@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdvisorRouteImport } from './routes/advisor'
 import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
@@ -24,9 +25,11 @@ import { Route as ExhibitionsRouteImport } from './routes/exhibitions'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as HeritageRouteImport } from './routes/heritage'
+import { Route as LicensingRouteImport } from './routes/licensing'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as SuppliesRouteImport } from './routes/supplies'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AuthenticatedAltCheckerRouteImport } from './routes/_authenticated/alt-checker'
 import { Route as AuthenticatedAltWriterRouteImport } from './routes/_authenticated/alt-writer'
@@ -73,6 +76,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdvisorRoute = AdvisorRouteImport.update({
@@ -140,6 +148,11 @@ const HeritageRoute = HeritageRouteImport.update({
   path: '/heritage',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LicensingRoute = LicensingRouteImport.update({
+  id: '/licensing',
+  path: '/licensing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -153,6 +166,11 @@ const SellRoute = SellRouteImport.update({
 const SuppliesRoute = SuppliesRouteImport.update({
   id: '/supplies',
   path: '/supplies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -367,6 +385,7 @@ const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/advisor': typeof AdvisorRoute
   '/alerts': typeof AlertsRoute
   '/analytics': typeof AnalyticsRoute
@@ -380,9 +399,11 @@ export interface FileRoutesByFullPath {
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
   '/heritage': typeof HeritageRoute
+  '/licensing': typeof LicensingRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/supplies': typeof SuppliesRoute
+  '/support': typeof SupportRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/alt-writer': typeof AuthenticatedAltWriterRoute
@@ -424,6 +445,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/advisor': typeof AdvisorRoute
   '/alerts': typeof AlertsRoute
   '/analytics': typeof AnalyticsRoute
@@ -437,9 +459,11 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
   '/heritage': typeof HeritageRoute
+  '/licensing': typeof LicensingRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/supplies': typeof SuppliesRoute
+  '/support': typeof SupportRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/alt-writer': typeof AuthenticatedAltWriterRoute
@@ -483,6 +507,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/advisor': typeof AdvisorRoute
   '/alerts': typeof AlertsRoute
   '/analytics': typeof AnalyticsRoute
@@ -496,9 +521,11 @@ export interface FileRoutesById {
   '/explore': typeof ExploreRoute
   '/favorites': typeof FavoritesRoute
   '/heritage': typeof HeritageRoute
+  '/licensing': typeof LicensingRoute
   '/reports': typeof ReportsRoute
   '/sell': typeof SellRoute
   '/supplies': typeof SuppliesRoute
+  '/support': typeof SupportRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/alt-checker': typeof AuthenticatedAltCheckerRoute
   '/_authenticated/alt-writer': typeof AuthenticatedAltWriterRoute
@@ -542,6 +569,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/advisor'
     | '/alerts'
     | '/analytics'
@@ -555,9 +583,11 @@ export interface FileRouteTypes {
     | '/explore'
     | '/favorites'
     | '/heritage'
+    | '/licensing'
     | '/reports'
     | '/sell'
     | '/supplies'
+    | '/support'
     | '/unsubscribe'
     | '/alt-checker'
     | '/alt-writer'
@@ -599,6 +629,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/advisor'
     | '/alerts'
     | '/analytics'
@@ -612,9 +643,11 @@ export interface FileRouteTypes {
     | '/explore'
     | '/favorites'
     | '/heritage'
+    | '/licensing'
     | '/reports'
     | '/sell'
     | '/supplies'
+    | '/support'
     | '/unsubscribe'
     | '/alt-checker'
     | '/alt-writer'
@@ -657,6 +690,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/about'
     | '/advisor'
     | '/alerts'
     | '/analytics'
@@ -670,9 +704,11 @@ export interface FileRouteTypes {
     | '/explore'
     | '/favorites'
     | '/heritage'
+    | '/licensing'
     | '/reports'
     | '/sell'
     | '/supplies'
+    | '/support'
     | '/unsubscribe'
     | '/_authenticated/alt-checker'
     | '/_authenticated/alt-writer'
@@ -716,6 +752,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AdvisorRoute: typeof AdvisorRoute
   AlertsRoute: typeof AlertsRoute
   AnalyticsRoute: typeof AnalyticsRoute
@@ -729,9 +766,11 @@ export interface RootRouteChildren {
   ExploreRoute: typeof ExploreRoute
   FavoritesRoute: typeof FavoritesRoute
   HeritageRoute: typeof HeritageRoute
+  LicensingRoute: typeof LicensingRoute
   ReportsRoute: typeof ReportsRoute
   SellRoute: typeof SellRoute
   SuppliesRoute: typeof SuppliesRoute
+  SupportRoute: typeof SupportRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   ArtworkIdRoute: typeof ArtworkIdRoute
   AssetsIdRoute: typeof AssetsIdRoute
@@ -754,6 +793,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/advisor': {
@@ -847,6 +893,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HeritageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/licensing': {
+      id: '/licensing'
+      path: '/licensing'
+      fullPath: '/licensing'
+      preLoaderRoute: typeof LicensingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports': {
       id: '/reports'
       path: '/reports'
@@ -866,6 +919,13 @@ declare module '@tanstack/react-router' {
       path: '/supplies'
       fullPath: '/supplies'
       preLoaderRoute: typeof SuppliesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/unsubscribe': {
@@ -1242,6 +1302,7 @@ const ExhibitionsRouteWithChildren = ExhibitionsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   AdvisorRoute: AdvisorRoute,
   AlertsRoute: AlertsRoute,
   AnalyticsRoute: AnalyticsRoute,
@@ -1255,9 +1316,11 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreRoute: ExploreRoute,
   FavoritesRoute: FavoritesRoute,
   HeritageRoute: HeritageRoute,
+  LicensingRoute: LicensingRoute,
   ReportsRoute: ReportsRoute,
   SellRoute: SellRoute,
   SuppliesRoute: SuppliesRoute,
+  SupportRoute: SupportRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   ArtworkIdRoute: ArtworkIdRoute,
   AssetsIdRoute: AssetsIdRoute,

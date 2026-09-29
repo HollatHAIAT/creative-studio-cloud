@@ -96,9 +96,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
         </div>
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 text-sm opacity-90 md:grid-cols-4 [&_.text-foreground]:text-gold">
           <div><span className="inline-block rounded-full bg-background p-2"><img src={logoFull} alt="Arwiqa أروقة" width={80} height={80} loading="lazy" className="h-20 w-20 object-contain" /></span><p className="mt-2">{t("brand.tagline")}</p></div>
-          <div><p className="text-foreground">{t("footer.buy")}</p><p>{t("footer.originals")}</p><p>{t("footer.prints")}</p><p>{t("footer.licenses")}</p></div>
-          <div><p className="text-foreground">{t("footer.sell")}</p><p>{t("footer.storefronts")}</p><p>{t("nav.auctions")}</p><p>{t("nav.exhibitions")}</p></div>
-          <div><p className="text-foreground">{t("footer.company")}</p><p>{t("footer.about")}</p><p>{t("footer.licensing")}</p><p>{t("footer.support")}</p></div>
+          <nav aria-label={t("footer.buy")}><p className="text-foreground">{t("footer.buy")}</p><Link to="/explore" search={{ format: "original" }} className="block py-0.5 hover:text-gold hover:underline">{t("footer.originals")}</Link><Link to="/explore" search={{ format: "print" }} className="block py-0.5 hover:text-gold hover:underline">{t("footer.prints")}</Link><Link to="/explore" search={{ format: "license" }} className="block py-0.5 hover:text-gold hover:underline">{t("footer.licenses")}</Link></nav>
+          <nav aria-label={t("footer.sell")}><Link to="/sell" className="text-foreground hover:underline">{t("footer.sell")}</Link><Link to="/artists" className="block py-0.5 hover:text-gold hover:underline">{t("footer.storefronts")}</Link><Link to="/auctions" className="block py-0.5 hover:text-gold hover:underline">{t("nav.auctions")}</Link><Link to="/exhibitions" className="block py-0.5 hover:text-gold hover:underline">{t("nav.exhibitions")}</Link></nav>
+          <nav aria-label={t("footer.company")}><p className="text-foreground">{t("footer.company")}</p><Link to="/about" className="block py-0.5 hover:text-gold hover:underline">{t("footer.about")}</Link><Link to="/licensing" className="block py-0.5 hover:text-gold hover:underline">{t("footer.licensing")}</Link><Link to="/support" className="block py-0.5 hover:text-gold hover:underline">{t("footer.support")}</Link></nav>
         </div>
         <div aria-hidden className="sadu-band" />
       </footer>
