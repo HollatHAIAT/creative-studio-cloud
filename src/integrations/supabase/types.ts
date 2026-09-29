@@ -207,6 +207,7 @@ export type Database = {
           name: string
           owner_email: string | null
           owner_id: string
+          position: number
           shared: boolean
           to_date: string
           updated_at: string
@@ -220,6 +221,7 @@ export type Database = {
           name: string
           owner_email?: string | null
           owner_id?: string
+          position?: number
           shared?: boolean
           to_date?: string
           updated_at?: string
@@ -233,6 +235,7 @@ export type Database = {
           name?: string
           owner_email?: string | null
           owner_id?: string
+          position?: number
           shared?: boolean
           to_date?: string
           updated_at?: string
