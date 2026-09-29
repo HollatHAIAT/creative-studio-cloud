@@ -11,6 +11,7 @@ import { SettingsAuditAsk } from "@/components/SettingsAuditAsk";
 import { ComplianceReview } from "@/components/ComplianceReview";
 import { AuditPresets } from "@/components/AuditPresets";
 import { ControlCheck } from "@/components/ControlCheck";
+import { AuditNlSearch } from "@/components/AuditNlSearch";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({
@@ -137,6 +138,7 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
         <label className="grid gap-1 text-xs"><span>{L("Administrator", "المدير")}</span><select value={who} onChange={(e) => setWho(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{admins.map((a) => <option key={a || "s"} value={a || "__system"}>{a || L("System", "النظام")}</option>)}</select></label>
         <label className="grid gap-1 text-xs"><span>{L("Setting", "الإعداد")}</span><select value={field} onChange={(e) => setField(e.target.value)} className={ctl}><option value="">{L("All", "الكل")}</option>{Object.entries(labels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
       </div>
+      <AuditNlSearch apply={(p) => { setFrom(p.from); setTo(p.to); setWho(p.who); setField(p.field); }} L={L} ar={ar} />
       <AuditPresets current={{ from, to, who, field }} apply={(p) => { setFrom(p.from); setTo(p.to); setWho(p.who); setField(p.field); }} L={L} />
 
       {q.data && (total > 0 || active) && <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground" aria-live="polite">
