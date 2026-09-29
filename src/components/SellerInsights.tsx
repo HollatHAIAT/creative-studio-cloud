@@ -33,7 +33,6 @@ export function SellerSales({ listings, views }: { listings: { id: string; title
       return { cur: (cur.data ?? []) as Row[], prev: (prev.data ?? []) as Row[] };
     },
   });
-  const name = (id: string) => listings.find((l) => l.id === id)?.title ?? id;
   const pick = (r: Row[]) => r.filter((x) => pid === "all" || x.listing_id === pid);
   const cur = pick(q.data?.cur ?? []), prev = pick(q.data?.prev ?? []);
   const tot = (r: Row[]) => ({ units: r.reduce((s, x) => s + x.units, 0), revenue: r.reduce((s, x) => s + Number(x.revenue), 0) });
@@ -98,7 +97,7 @@ export function SellerSales({ listings, views }: { listings: { id: string; title
               {!byListing.length && <tr><td colSpan={5} className="py-3 text-muted-foreground">{L("No live artworks yet.", "لا أعمال منشورة بعد.")}</td></tr>}
             </tbody>
           </table>
-          <p className="mt-2 text-xs text-muted-foreground">{L("Views are counted on this device only until page-view tracking is added.", "تُحسب المشاهدات على هذا الجهاز فقط حتى تُضاف متابعة الزيارات.")} {name("")}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{L("Views and conversion appear once page-view tracking is connected.", "تظهر المشاهدات ونسبة التحويل عند ربط متابعة الزيارات.")}</p>
         </div>
       </>)}
     </section>

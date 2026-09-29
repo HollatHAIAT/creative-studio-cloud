@@ -7,16 +7,16 @@ import { useLocale } from "@/lib/i18n";
 export function StockEditor({ listingId, stock, low, onSaved }: { listingId: string; stock: number | null; low: number; onSaved: () => void }) {
   const { locale } = useLocale(); const L = (e: string, a: string) => (locale === "ar" ? a : e);
   const [v, setV] = useState(stock == null ? "" : String(stock)); const [lo, setLo] = useState(String(low));
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(false); const [why, setWhy] = useState("");
   const dirty = v !== (stock == null ? "" : String(stock)) || lo !== String(low);
   async function save() {
     const n = v.trim() === "" ? null : Number(v); const l = Number(lo);
     if ((n != null && (!Number.isInteger(n) || n < 0)) || !Number.isInteger(l) || l < 0) { toast.error(L("Use whole numbers of 0 or more.", "استخدم أعدادًا صحيحة من 0 فأكثر.")); return; }
     setBusy(true);
-    const { error } = await (supabase as any).rpc("set_listing_stock", { _listing: listingId, _stock: n, _low: l });
+    const { error } = await (supabase as any).rpc("set_listing_stock", { _listing: listingId, _stock: n, _low: l, _reason: why.trim() });
     setBusy(false);
     if (error) { toast.error(L("Couldn't save stock.", "تعذّر حفظ المخزون.")); return; }
-    toast.success(L("Stock saved", "حُفظ المخزون")); onSaved();
+    toast.success(L("Stock saved", "حُفظ المخزون")); setWhy(""); onSaved();
   }
   const state = stock == null ? null : stock === 0 ? "out" : stock <= low ? "low" : "ok";
   return (
@@ -27,6 +27,7 @@ export function StockEditor({ listingId, stock, low, onSaved }: { listingId: str
         <input type="number" min={0} value={lo} onChange={(e) => setLo(e.target.value)} aria-label={L("Low-stock level", "حد المخزون المنخفض")} className="w-14 rounded-lg border border-input bg-background px-2 py-1 text-sm" /></label>
       {state && <span className={`rounded-full px-2 py-0.5 text-xs ${state === "out" ? "bg-destructive/10 text-destructive" : state === "low" ? "bg-warning/15 text-warning" : "bg-success/15 text-success"}`}>
         {state === "out" ? L("Out of stock", "نفد") : state === "low" ? L("Low", "منخفض") : L("In stock", "متوفر")}</span>}
+      {dirty && <input value={why} onChange={(e) => setWhy(e.target.value)} maxLength={300} placeholder={L("Reason (optional)", "السبب (اختياري)")} aria-label={L("Reason for change", "سبب التغيير")} className="w-36 rounded-lg border border-input bg-background px-2 py-1 text-sm" />}
       {dirty && <button type="button" onClick={save} disabled={busy} className="rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground disabled:opacity-50">{busy ? "…" : L("Save", "احفظ")}</button>}
     </div>
   );
