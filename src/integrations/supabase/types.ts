@@ -1988,43 +1988,55 @@ export type Database = {
       }
       support_tickets: {
         Row: {
+          contact_email: string | null
+          contact_name: string | null
           created_at: string
           id: string
           message: string
           order_ref: string | null
+          reference: string
           replied_at: string | null
           replied_by: string | null
           reply: string | null
           status: string
           subject: string
           topic: string
-          user_id: string
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
+          contact_email?: string | null
+          contact_name?: string | null
           created_at?: string
           id?: string
           message: string
           order_ref?: string | null
+          reference?: string
           replied_at?: string | null
           replied_by?: string | null
           reply?: string | null
           status?: string
           subject: string
           topic: string
-          user_id?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
+          contact_email?: string | null
+          contact_name?: string | null
           created_at?: string
           id?: string
           message?: string
           order_ref?: string | null
+          reference?: string
           replied_at?: string | null
           replied_by?: string | null
           reply?: string | null
           status?: string
           subject?: string
           topic?: string
-          user_id?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -2396,6 +2408,30 @@ export type Database = {
       staff_reply_support: {
         Args: { _close: boolean; _reply: string; _ticket: string }
         Returns: undefined
+      }
+      submit_support_request: {
+        Args: {
+          _email: string
+          _message: string
+          _name: string
+          _order_ref: string
+          _subject: string
+          _topic: string
+        }
+        Returns: string
+      }
+      track_support_request: {
+        Args: { _email: string; _reference: string }
+        Returns: {
+          created_at: string
+          reference: string
+          replied_at: string
+          reply: string
+          status: string
+          subject: string
+          topic: string
+          updated_at: string
+        }[]
       }
       unsubscribe_saved_search_emails: {
         Args: { _token: string }

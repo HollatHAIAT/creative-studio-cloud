@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { fmt, toArtwork, seedListings } from "@/lib/data";
@@ -29,11 +30,20 @@ function Auctions() {
   const q = useDbAuctions();
   const now = useNow();
   const order = { live: 0, upcoming: 1, closed: 2 };
-  const list = (q.data?.auctions ?? []).map((a) => ({ a, art: toArtwork(seedListings.find((l) => l.id === a.listing_id)!) })).filter((x) => x.art)
-    .sort((x, y) => (now ? order[dbStatus(x.a, now)] - order[dbStatus(y.a, now)] : 0));
+  const [tab, setTab] = useState<"all" | "live" | "upcoming" | "closed">("all");
+  const { locale } = useLocale(); const ar = locale === "ar";
+  const all0 = (q.data?.auctions ?? []).map((a) => ({ a, art: toArtwork(seedListings.find((l) => l.id === a.listing_id)!) })).filter((x) => x.art)
+    .sort((x, y) => (now ? order[dbStatus(x.a, now)] - order[dbStatus(y.a, now)] || Date.parse(x.a.starts_at) - Date.parse(y.a.starts_at) : 0));
+  const count = (k: string) => all0.filter((x) => now && dbStatus(x.a, now) === k).length;
+  const list = tab === "all" || !now ? all0 : all0.filter((x) => dbStatus(x.a, now) === tab);
+  const tabs = [["all", ar ? "الكل" : "All", all0.length], ["live", ar ? "مباشر الآن" : "Live now", count("live")], ["upcoming", ar ? "قادمة" : "Upcoming", count("upcoming")], ["closed", ar ? "منتهية" : "Ended", count("closed")]] as const;
   return (
     <SiteShell>
       <PageTitle eyebrow={t("auc.eyebrow")} title={t("auc.title")} sub={t("auc.sub")} />
+      <div role="tablist" aria-label={ar ? "تصفية المزادات" : "Filter auctions"} className="mx-auto mb-6 flex max-w-7xl flex-wrap gap-2 px-6">
+        {tabs.map(([k, label, n]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`rounded-full border px-4 py-1.5 text-sm ${tab === k ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{label} <span className="opacity-70">{num(n)}</span></button>)}
+      </div>
+      {list.length === 0 && <p className="mx-auto max-w-7xl px-6 text-sm text-muted-foreground">{ar ? "لا مزادات في هذا القسم الآن." : "No auctions in this section right now."}</p>}
       <div className="mx-auto grid max-w-7xl gap-8 px-6 md:grid-cols-2 lg:grid-cols-3">
         {list.map(({ a, art }) => {
           const st = now ? dbStatus(a, now) : "live";
@@ -56,7 +66,7 @@ function Auctions() {
                     <p className="font-mono" dir="ltr">{now ? (st === "upcoming" ? countdown(tm.start - now) : st === "live" ? countdown(tm.end - now) : "—") : "…"}</p>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-muted-foreground">{num(all.length)} {t("auc.bids")}</p>
+                <p className="mt-3 text-xs text-muted-foreground">{num(all.length)} {t("auc.bids")}{st === "upcoming" && ` · ${new Date(tm.start).toLocaleString(ar ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" })}`}</p>
               </div>
             </Link>
           );

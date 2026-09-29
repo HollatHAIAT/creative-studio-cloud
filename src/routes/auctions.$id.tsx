@@ -91,6 +91,13 @@ function AuctionPage() {
           {a?.status === "awaiting_payment" && user && a.winner_user_id === user.id && (
             <p className="mt-3 rounded-2xl bg-success/10 p-3 text-sm">{locale === "ar" ? "فزت! ادفع خلال 48 ساعة من " : "You won! Pay within 48 hours from "}<Link to="/my-auctions" className="font-medium underline">{locale === "ar" ? "مزاداتي" : "My auctions"}</Link>.</p>)}
 
+          {st === "closed" && user && bids.some((b) => b.user_id === user.id) && a?.status !== "cancelled" && (
+            <p role="status" className={`mt-3 rounded-2xl p-3 text-sm ${a?.winner_user_id === user.id ? "bg-success/10" : "bg-muted"}`}>
+              {a?.winner_user_id === user.id ? (a.status === "sold" ? (locale === "ar" ? "فزت بهذا العمل ودُفع ثمنه." : "You won this lot and it's paid.") : (locale === "ar" ? "أنت الفائز." : "You're the winning bidder."))
+                : a?.status === "unsold" ? (locale === "ar" ? "انتهى المزاد دون بيع." : "The auction ended without a sale.")
+                : (locale === "ar" ? `لم تفز. أعلى مزايدة لك ${fmt(Math.max(...bids.filter((b) => b.user_id === user.id).map((b) => b.amount)))}.` : `You didn't win. Your highest bid was ${fmt(Math.max(...bids.filter((b) => b.user_id === user.id).map((b) => b.amount)))}.`)}
+            </p>)}
+
           <div className="mt-8 grid grid-cols-2 gap-4 rounded-sm border border-border bg-card p-6">
             <div><p className="text-xs text-muted-foreground">{top ? t("auc.current") : t("auc.start")}</p><p className="font-display text-4xl">{a ? fmt(top?.amount ?? a.start_bid) : "…"}</p></div>
             <div className="text-end">
@@ -115,6 +122,24 @@ function AuctionPage() {
               <p className="mt-2 text-xs text-muted-foreground">{t("auc.increment")}: {fmt(a.increment)}</p>
             </form>
           ) : <Link to="/auth" search={{ next: `/auctions/${id}` }} className="mt-6 inline-block rounded-full bg-primary px-6 py-3 text-primary-foreground">{t("bid.signin")}</Link>)}
+
+          {st === "upcoming" && a && <p className="mt-6 rounded-2xl bg-muted p-4 text-sm">{locale === "ar" ? "تبدأ المزايدة في " : "Bidding opens "}{new Date(tm.start).toLocaleString(locale === "ar" ? "ar-SA" : "en-GB", { dateStyle: "full", timeStyle: "short" })}.</p>}
+
+          <section aria-labelledby="lot-h" className="mt-10">
+            <h2 id="lot-h" className="font-display text-2xl">{locale === "ar" ? "تفاصيل القطعة" : "Lot details"}</h2>
+            <p className="mt-3 text-sm text-muted-foreground">{pick(art, "description")}</p>
+            <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+              {[
+                [locale === "ar" ? "الخامة" : "Medium", pick(art, "medium")],
+                [locale === "ar" ? "السنة" : "Year", String(art.year ?? "—")],
+                [locale === "ar" ? "سعر البداية" : "Starting bid", a ? fmt(a.start_bid) : "…"],
+                [locale === "ar" ? "الحد الأدنى للزيادة" : "Bid increment", a ? fmt(a.increment) : "…"],
+                [locale === "ar" ? "يبدأ" : "Starts", a ? new Date(tm.start).toLocaleString(locale === "ar" ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" }) : "…"],
+                [locale === "ar" ? "ينتهي" : "Ends", a ? new Date(tm.end).toLocaleString(locale === "ar" ? "ar-SA" : "en-GB", { dateStyle: "medium", timeStyle: "short" }) : "…"],
+              ].map(([k, v]) => <div key={k} className="rounded-xl bg-muted p-3"><dt className="text-xs text-muted-foreground">{k}</dt><dd className="font-medium">{v}</dd></div>)}
+            </dl>
+            <Link to="/artwork/$id" params={{ id: art.id }} className="mt-3 inline-block text-sm text-primary underline">{locale === "ar" ? "صفحة العمل الكاملة والمصدر" : "Full artwork page and provenance"}</Link>
+          </section>
 
           <h2 className="mt-10 font-display text-2xl">{t("auc.history")}</h2>
           <ul className="mt-3 divide-y divide-border border-y border-border">
