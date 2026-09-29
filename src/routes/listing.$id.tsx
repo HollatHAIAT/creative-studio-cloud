@@ -29,7 +29,7 @@ export const Route = createFileRoute("/listing/$id")({
 function ListingPage() {
   const l = Route.useLoaderData();
   const { locale } = useLocale(); const ar = locale === "ar";
-  useEffect(() => { void countView(Route.useParams ? String((l as any).published_listing_id ?? (l as any).id) : ""); }, [l]);
+  useEffect(() => { const id = (l as any)?.published_listing_id ?? (l as any)?.id; if (id) void countView(String(id)); }, [l]);
   return (
     <SiteShell>
       <article className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-2">
