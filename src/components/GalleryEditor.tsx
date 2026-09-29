@@ -53,7 +53,7 @@ export function GalleryEditor({ draftId, onSave, onMakeMain }: { draftId: string
     } finally { setBusy(false); }
   }
 
-  const move = (i: number, d: number) => { const n = [...items]; const j = i + d; if (j < 0 || j >= n.length) return; [n[i], n[j]] = [n[j], n[i]]; void persist(n); };
+  const move = (i: number, d: number) => { const n = [...items]; const j = i + d; if (j < 0 || j >= n.length) return; [n[i], n[j]] = [n[j]!, n[i]!]; void persist(n); };
   const remove = async (i: number) => { const r = items[i]; if (!r) return; await persist(items.filter((_, k) => k !== i)); await supabase.storage.from(BUCKET).remove([r.path]); };
   const setAlt = (i: number, k: "alt" | "altAr", v: string) => setItems((s) => s.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
 
