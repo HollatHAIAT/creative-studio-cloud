@@ -3,6 +3,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { getSellerListing } from "@/lib/seller-listings.functions";
 import { useLocale } from "@/lib/i18n";
 import { TrustPanel } from "@/components/TrustPanel";
+import { ListingGallery } from "@/components/ListingGallery";
 import { ArtworkAsk } from "@/components/ArtworkAsk";
 
 export const Route = createFileRoute("/listing/$id")({
@@ -29,7 +30,7 @@ function ListingPage() {
   return (
     <SiteShell>
       <article className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-2">
-        {l.imageUrl ? <img src={l.imageUrl} alt={ar ? l.altTextAr : l.altText} className="w-full rounded-2xl object-contain" /> : <div className="aspect-[4/5] rounded-2xl bg-muted" />}
+        <ListingGallery images={[...(l.imageUrl ? [{ url: l.imageUrl, alt: l.altText, altAr: l.altTextAr }] : []), ...l.gallery]} />
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">{l.medium}</p>
           <h1 className="font-display text-4xl">{ar ? l.titleAr : l.title}</h1>
