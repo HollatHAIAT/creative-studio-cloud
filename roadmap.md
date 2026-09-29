@@ -165,4 +165,4 @@
 - [ ] Buy at accepted-offer price in checkout
 - [ ] Seller listing pages: block purchase when stock reaches 0
 
-- [ ] Buyer auction flow: browse upcoming, lot details, bid, outcomes (check gaps vs existing)
+- [x] Buyer auction flow: tabs, lot details, bid outcomes
