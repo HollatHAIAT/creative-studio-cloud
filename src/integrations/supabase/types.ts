@@ -1090,6 +1090,27 @@ export type Database = {
           },
         ]
       }
+      listing_views: {
+        Row: {
+          created_at: string
+          day: string
+          listing_id: string
+          viewer_key: string
+        }
+        Insert: {
+          created_at?: string
+          day?: string
+          listing_id: string
+          viewer_key: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          listing_id?: string
+          viewer_key?: string
+        }
+        Relationships: []
+      }
       listings: {
         Row: {
           category: string
@@ -1259,6 +1280,7 @@ export type Database = {
           response: string | null
           status: string
           updated_at: string
+          used_order_id: string | null
           user_id: string
         }
         Insert: {
@@ -1270,6 +1292,7 @@ export type Database = {
           response?: string | null
           status?: string
           updated_at?: string
+          used_order_id?: string | null
           user_id?: string
         }
         Update: {
@@ -1281,6 +1304,7 @@ export type Database = {
           response?: string | null
           status?: string
           updated_at?: string
+          used_order_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1289,6 +1313,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_used_order_id_fkey"
+            columns: ["used_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -2617,6 +2648,10 @@ export type Database = {
         Args: { _invite: string }
         Returns: string
       }
+      record_listing_view: {
+        Args: { _listing: string; _visitor: string }
+        Returns: undefined
+      }
       reply_to_review: {
         Args: { _reply: string; _review: string }
         Returns: undefined
@@ -2632,6 +2667,13 @@ export type Database = {
       retry_payment: { Args: { _order: string }; Returns: undefined }
       revoke_auction_invite: { Args: { _invite: string }; Returns: undefined }
       saved_search_token: { Args: { _uid: string }; Returns: string }
+      seller_listing_views: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          listing_id: string
+          views: number
+        }[]
+      }
       seller_publish_direct: { Args: { _id: string }; Returns: string }
       seller_sales: {
         Args: { _from: string; _to: string }
