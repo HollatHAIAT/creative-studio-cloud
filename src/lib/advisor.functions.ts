@@ -3,7 +3,8 @@ import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import { seedListings, variantsOf, minPrice, creatorOf, mediumGroup } from "./data";
 
-export type Pick = { id: string; reason: string; reasonAr: string };
+export type SellerPick = { id: string; title: string; titleAr: string; price: number; imageUrl: string | null; medium: string };
+export type Pick = { id: string; reason: string; reasonAr: string; seller?: SellerPick };
 export type AdvisorResult = { picks: Pick[]; error?: string; noneLive?: boolean };
 
 /** Reads the streamed Responses SSE and returns the final output text. */
@@ -57,6 +58,20 @@ export const recommendArtworks = createServerFn({ method: "POST" })
       id: l.id, title: l.title, artist: creatorOf(l.creatorId)?.name, category: l.category, medium: l.medium, year: l.year,
       description: l.description, fromPrice: minPrice(l), options: [...new Set(variantsOf(l).map((v) => v.kind))], inAuction: !!l.auction,
     }));
+    // Seller-published listings (from the listing writer) join the same catalog.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: drafts } = await supabaseAdmin.from("listing_drafts")
+      .select("title,title_ar,description,medium,tags,image_path,published_listing_id,price,category")
+      .eq("status", "published").not("published_listing_id", "is", null).order("published_at", { ascending: false }).limit(80);
+    const sellers = new Map<string, SellerPick & { path: string | null }>();
+    for (const d of drafts ?? []) {
+      const price = Number(d.price ?? 0);
+      if (!inRange(price) || (data.categories.length && !data.categories.includes(d.category ?? "")) || (data.mediums.length && !data.mediums.includes(mediumGroup(d.medium)))) continue;
+      const id = d.published_listing_id!;
+      sellers.set(id, { id, title: d.title, titleAr: d.title_ar, price, medium: d.medium, imageUrl: null, path: d.image_path });
+      catalog.push({ id, title: d.title, artist: "Independent seller", category: (d.category ?? "") as any, medium: d.medium, year: undefined as any,
+        description: `${d.description} Tags: ${(d.tags ?? []).join(", ")}`.slice(0, 600), fromPrice: price, options: ["original"], inAuction: false });
+    }
     if (!catalog.length) return { picks: [], noneLive: true };
 
     const prompt = `You are an art advisor for the Arwiqa marketplace. Recommend up to 4 artworks from the catalog that best match the buyer's need. Only use ids from the catalog. Reply with ONLY JSON: {"picks":[{"id":"...","reason":"one short English sentence","reasonAr":"the same sentence in Arabic"}]}. If nothing fits, return {"picks":[]}.
@@ -87,6 +102,13 @@ ${data.need}`;
     if (!json) return { picks: [], error: "The advisor returned no answer." };
     try {
       const parsed = JSON.parse(json) as { picks?: Pick[] };
-      return { picks: (parsed.picks ?? []).filter((p) => catalog.some((c) => c.id === p.id)).slice(0, 4) };
+      const picks = (parsed.picks ?? []).filter((p) => catalog.some((c) => c.id === p.id)).slice(0, 4);
+      return { picks: await Promise.all(picks.map(async (p) => {
+        const sp = sellers.get(p.id);
+        if (!sp) return p;
+        const url = sp.path ? (await supabaseAdmin.storage.from("artwork-images").createSignedUrl(sp.path, 3600)).data?.signedUrl ?? null : null;
+        const { path: _p, ...rest } = sp;
+        return { ...p, seller: { ...rest, imageUrl: url } };
+      })) };
     } catch { return { picks: [], error: "The advisor returned an unreadable answer." }; }
   });

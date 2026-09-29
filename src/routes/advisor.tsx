@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles } from "lucide-react";
@@ -60,13 +60,13 @@ function Advisor() {
     setRes(r);
     if (r.error) throw new Error(r.error);
   });
-  const picks = (res?.picks ?? []).map((p) => ({ p, a: all.find((x) => x.id === p.id) })).filter((x) => x.a);
+  const picks = (res?.picks ?? []).map((p) => ({ p, a: all.find((x) => x.id === p.id) })).filter((x) => x.a || x.p.seller);
   const chip = (on: boolean) => `rounded-full border px-3 py-1 text-sm transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-foreground"}`;
 
   return (
     <SiteShell>
       <PageTitle eyebrow={ar ? "مستشار فني" : "Art advisor"} title={ar ? "صِف ما تبحث عنه" : "Describe what you need"}
-        sub={ar ? "اكتب المكان والذوق والميزانية، وسنقترح أعمالًا من المعروض حاليًا." : "Tell us the space, mood and budget — we'll suggest works from live listings."} />
+        sub={ar ? "اكتب المكان والذوق والميزانية، وسنقترح أعمالًا من المعروض حاليًا، ومنها إعلانات البائعين." : "Tell us the space, mood and budget — we'll suggest works from live listings, including sellers' own listings."} />
       <div className="mx-auto max-w-4xl px-6 pb-20">
         <form onSubmit={(e) => { e.preventDefault(); if (need.trim().length >= 3) void act.run(); }} className="space-y-3">
           <label htmlFor="need" className="sr-only">{ar ? "ما تبحث عنه" : "What you need"}</label>
@@ -114,7 +114,18 @@ function Advisor() {
               <div className="grid gap-8 sm:grid-cols-2">
                 {picks.map(({ p, a }) => (
                   <div key={p.id} className="space-y-3">
-                    <ArtCard a={a!} />
+                    {a ? <ArtCard a={a} /> : (
+                      <Link to="/listing/$id" params={{ id: p.id }} className="group block">
+                        <div className="aspect-[4/5] overflow-hidden rounded-md bg-muted">
+                          {p.seller!.imageUrl && <img src={p.seller!.imageUrl} alt={ar ? p.seller!.titleAr : p.seller!.title} className="h-full w-full object-cover transition group-hover:scale-105" />}
+                        </div>
+                        <div className="mt-3 flex items-baseline justify-between gap-3">
+                          <h3 className="font-display text-lg">{ar ? p.seller!.titleAr : p.seller!.title}</h3>
+                          <span className="text-sm">${p.seller!.price.toLocaleString()}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{ar ? "إعلان بائع" : "Seller listing"} · {p.seller!.medium}</p>
+                      </Link>
+                    )}
                     <p className="border-s-2 border-accent ps-3 text-sm text-muted-foreground">{ar ? p.reasonAr : p.reason}</p>
                   </div>
                 ))}
