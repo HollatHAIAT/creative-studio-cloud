@@ -28,7 +28,16 @@ export const placeOrder = createServerFn({ method: "POST" })
     if (existing) return { ok: true as const, orderId: existing.id, reference: existing.reference };
     const { data: ps } = await (supabase as any).from("platform_settings").select("commercial_multiplier, extended_multiplier").eq("id", 1).maybeSingle();
     if (ps) { const { licenseRates } = await import("./license-rates"); licenseRates.commercial = Number(ps.commercial_multiplier); licenseRates.extended = Number(ps.extended_multiplier); }
-    const priced = priceCart(data.items);
+    // Supplier products are priced from the database, never from the client.
+    const supplierIds = data.items.flatMap((i) => (i.kind === "supply" && /^[0-9a-f-]{36}$/.test(i.supplyId) ? [i.supplyId] : []));
+    let extra: import("./data").Supply[] = [];
+    if (supplierIds.length) {
+      const { SUPPLIER_PRODUCT_SELECT, rowToSupply } = await import("./supplier");
+      const { data: rows } = await (supabase as any).from("supplier_products").select(SUPPLIER_PRODUCT_SELECT).in("id", supplierIds).eq("status", "published");
+      extra = (rows ?? []).map(rowToSupply);
+      for (const i of data.items) if (i.kind === "supply") { const p = extra.find((x) => x.id === i.supplyId); if (p && (p.stock ?? 0) < i.qty) return { ok: false as const, error: (p.stock ?? 0) <= 0 ? "OUT_OF_STOCK" : "NOT_ENOUGH_STOCK" }; }
+    }
+    const priced = priceCart(data.items, extra);
     if (priced.errors.length) return { ok: false as const, error: priced.errors.join("; ") };
     // Seller authorization: listing must be live; agent-sold listings need a valid, owner-approved license covering this format.
     const usedOffers: string[] = [];
@@ -71,6 +80,7 @@ export const placeOrder = createServerFn({ method: "POST" })
       const { data: again } = await supabase.from("orders").select("id, reference").eq("user_id", userId).eq("idempotency_key", data.idempotencyKey).maybeSingle();
       if (again) return { ok: true as const, orderId: again.id, reference: again.reference };
     }
+    for (const code of ["OUT_OF_STOCK", "NOT_ENOUGH_STOCK", "LISTING_UNAVAILABLE"]) if (error?.message?.includes(code)) return { ok: false as const, error: code };
     if (error || !order) { console.error(error); return { ok: false as const, error: "Could not create order" }; }
 
     for (const l of priced.lines.filter((x) => x.kind === "ticket")) {
