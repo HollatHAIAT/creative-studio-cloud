@@ -1,0 +1,1 @@
+ALTER TABLE public.audit_filter_presets ADD COLUMN position integer NOT NULL DEFAULT 0;
