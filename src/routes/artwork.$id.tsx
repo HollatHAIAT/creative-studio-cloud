@@ -1,4 +1,5 @@
 import { TrustPanel } from "@/components/TrustPanel";
+import { ArtworkAsk } from "@/components/ArtworkAsk";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArtStage } from "@/components/ArtViewer";
 import { useEffect, useState } from "react";
@@ -135,6 +136,7 @@ function Detail() {
             onAdd={() => { if (!v) return false; addToCart(); return true; }} />
           <p className="mt-3 text-xs text-muted-foreground">{t("art.cert")}</p>
           <TrustPanel listingId={a.id} />
+          <ArtworkAsk listingId={a.id} />
 
           {auc && aucLive && (
             <div className="mt-8 flex items-center justify-between rounded-sm border border-primary p-5">
