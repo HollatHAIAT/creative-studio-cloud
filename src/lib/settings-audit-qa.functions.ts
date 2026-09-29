@@ -255,3 +255,55 @@ Reply with ONLY JSON: {"verdict":"","summary":"","summaryAr":"","assessments":[{
       } };
     } catch { return { error: "The AI returned an unreadable answer." }; }
   });
+
+export type NlFilters = { from: string; to: string; who: string; field: string; explanation: string; explanationAr: string; unmatched: string[] };
+const AUDIT_FIELDS = ["return_days", "print_ship_min_days", "print_ship_max_days", "commercial_print_limit", "commercial_multiplier", "extended_multiplier"];
+
+/** Admin only: turns a plain-language description into Change history filters (validated against real admins/settings). */
+export const translateAuditSearch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ text: z.string().trim().min(3).max(500), today: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(d))
+  .handler(async ({ data, context }): Promise<{ result?: NlFilters; error?: string }> => {
+    const sb = context.supabase as any;
+    const { data: admin } = await sb.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!admin) return { error: "Only admins can use this." };
+    const { data: actors } = await sb.rpc("admin_settings_audit_actors");
+    const admins: string[] = (actors ?? []).map((a: any) => (typeof a === "string" ? a : a?.actor_email ?? "")).filter(Boolean);
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) return { error: "AI is not configured." };
+    const prompt = `Translate an admin's description (English or Arabic) of a search into filters for a settings Change history.
+Today is ${data.today}. Filters (use "" when not mentioned):
+- from, to: YYYY-MM-DD inclusive dates. Resolve relative phrases ("last month" = the previous calendar month, "this week" = Monday to today, "last 30 days").
+- who: exactly one of these admin emails, or "__system" for system/automatic changes, or "": ${JSON.stringify(admins)}. Match by name or email fragment only if unambiguous.
+- field: exactly one of ${JSON.stringify(AUDIT_FIELDS)} or "". return_days=return/refund window; print_ship_*=print shipping time (min/max; pick min unless max is clear); commercial_print_limit=commercial print copies limit; commercial_multiplier / extended_multiplier = license prices.
+- unmatched: parts of the request these filters can't express (e.g. values, several settings at once, reasons).
+- explanation / explanationAr: one short sentence describing the applied filters.
+DESCRIPTION: ${JSON.stringify(data.text)}
+Reply with ONLY JSON: {"from":"","to":"","who":"","field":"","unmatched":[],"explanation":"","explanationAr":""}`;
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      body: JSON.stringify({ model: "openai/gpt-6-astra", stream: true, store: false,
+        reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
+        input: [{ role: "user", content: [{ type: "input_text", text: prompt }] }] }),
+    });
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      console.error(`Audit search AI failed [${res.status}]: ${msg}`);
+      if (res.status === 429) return { error: "Too many requests — please try again shortly." };
+      if (res.status === 403 && msg.includes("credit_limit")) return { error: "The workspace AI spending limit has been reached. A workspace admin can raise it in workspace settings." };
+      if (res.status === 402) return { error: "AI credits are used up for this workspace." };
+      return { error: `AI request failed (${res.status}).` };
+    }
+    let text = "";
+    try { text = await readText(res); } catch (e) { return { error: e instanceof Error ? e.message : "AI error" }; }
+    const json = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!json) return { error: "The AI returned no answer." };
+    try {
+      const r = z.object({ from: z.string().default(""), to: z.string().default(""), who: z.string().default(""), field: z.string().default(""), unmatched: z.array(z.string()).max(6).default([]), explanation: z.string().default(""), explanationAr: z.string().default("") }).parse(JSON.parse(json));
+      const date = (s: string) => (/^\d{4}-\d{2}-\d{2}$/.test(s) ? s : "");
+      let from = date(r.from), to = date(r.to);
+      if (from && to && from > to) [from, to] = [to, from];
+      return { result: { from, to, who: r.who === "__system" || admins.includes(r.who) ? r.who : "", field: AUDIT_FIELDS.includes(r.field) ? r.field : "", unmatched: r.unmatched, explanation: r.explanation, explanationAr: r.explanationAr } };
+    } catch { return { error: "The AI returned an unreadable answer." }; }
+  });
