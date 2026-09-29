@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Users, Pencil, ChevronUp, ChevronDown } from "lucide-react";
+import { Users, Pencil, Copy, ChevronUp, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type AuditPreset = { name: string; from: string; to: string; who: string; field: string };
@@ -62,6 +62,15 @@ export function AuditPresets({ current, apply, L }: { current: Omit<AuditPreset,
     const results = await Promise.all(next.map((r, k) => (supabase as any).from("audit_filter_presets").update({ position: k }).eq("id", r.id)));
     done(results.find((x: any) => x.error)?.error ?? null);
   }
+  async function duplicate(r: Row) {
+    if (mine.length >= 12) { setErr(L("You can keep up to 12 saved searches. Delete one first.", "يمكنك حفظ ١٢ بحثًا كحد أقصى. احذف واحدًا أولًا.")); return; }
+    const base = `${r.name.slice(0, 30)} ${L("(copy)", "(نسخة)")}`; let n = base;
+    for (let k = 2; mine.some((x) => x.name === n); k++) n = `${base} ${k}`;
+    const { data, error } = await (supabase as any).from("audit_filter_presets").insert({ owner_id: me.data, name: n, position: mine.length, from_date: r.from_date, to_date: r.to_date, actor: r.actor, field: r.field, shared: false }).select("id").single();
+    done(error); if (error) return;
+    use(r); await qc.invalidateQueries({ queryKey: KEY }); setEditing(data.id); setDraft(n);
+  }
+  const dupBtn = (r: Row) => <button type="button" onClick={() => void duplicate(r)} disabled={!me.data} aria-label={L(`Duplicate ${r.name}`, `انسخ ${r.name}`)} title={L("Duplicate as a new search", "انسخ كبحث جديد")} className="px-1 text-muted-foreground hover:text-primary"><Copy aria-hidden className="h-3 w-3" /></button>;
   const use = (r: Row) => apply({ name: r.name, from: r.from_date, to: r.to_date, who: r.actor, field: r.field });
   const pill = (r: Row) => `inline-flex items-center rounded-full border ${same(r) ? "border-primary bg-accent" : "border-border"}`;
 
@@ -80,6 +89,7 @@ export function AuditPresets({ current, apply, L }: { current: Omit<AuditPreset,
               ? <form onSubmit={(e) => { e.preventDefault(); void rename(r); }}><label htmlFor={`rn-${r.id}`} className="sr-only">{L("New name", "الاسم الجديد")}</label><input id={`rn-${r.id}`} autoFocus value={draft} maxLength={40} onChange={(e) => setDraft(e.target.value)} onBlur={() => void rename(r)} onKeyDown={(e) => { if (e.key === "Escape") setEditing(null); }} className="w-32 rounded-full bg-background px-2 py-0.5" /></form>
               : <button type="button" onClick={() => use(r)} aria-pressed={same(r)} className="px-3 py-1">{r.name}</button>}
             <button type="button" onClick={() => { setEditing(r.id); setDraft(r.name); }} aria-label={L(`Rename ${r.name}`, `أعد تسمية ${r.name}`)} title={L("Rename", "إعادة تسمية")} className="px-1 text-muted-foreground hover:text-primary"><Pencil aria-hidden className="h-3 w-3" /></button>
+            {dupBtn(r)}
             <button type="button" onClick={() => void toggleShare(r)} aria-pressed={r.shared} aria-label={r.shared ? L(`Stop sharing ${r.name}`, `إيقاف مشاركة ${r.name}`) : L(`Share ${r.name} with admins`, `شارك ${r.name} مع المشرفين`)} title={r.shared ? L("Shared with admins — click to stop", "مُشارك مع المشرفين — انقر للإيقاف") : L("Share with admins", "شارك مع المشرفين")} className={`px-1 ${r.shared ? "text-primary" : "text-muted-foreground"} hover:text-primary`}><Users aria-hidden className="h-3.5 w-3.5" /></button>
             <button type="button" onClick={() => { if (window.confirm(L(`Delete "${r.name}"?`, `حذف «${r.name}»؟`))) void remove(r); }} aria-label={L(`Delete ${r.name}`, `حذف ${r.name}`)} className="pe-2 text-muted-foreground hover:text-destructive">×</button>
           </span>
@@ -93,7 +103,7 @@ export function AuditPresets({ current, apply, L }: { current: Omit<AuditPreset,
       </div>
       {others.length > 0 && <div className="flex flex-wrap items-center gap-2">
         <span className="text-muted-foreground">{L("Shared by other admins:", "مُشارَكة من مشرفين آخرين:")}</span>
-        {others.map((r) => <span key={r.id} className={pill(r)}><button type="button" onClick={() => use(r)} aria-pressed={same(r)} title={r.owner_email ?? undefined} className="px-3 py-1">{r.name} <span className="text-muted-foreground">· {r.owner_email?.split("@")[0] ?? L("admin", "مشرف")}</span></button></span>)}
+        {others.map((r) => <span key={r.id} className={pill(r)}><button type="button" onClick={() => use(r)} aria-pressed={same(r)} title={r.owner_email ?? undefined} className="px-3 py-1">{r.name} <span className="text-muted-foreground">· {r.owner_email?.split("@")[0] ?? L("admin", "مشرف")}</span></button><span className="pe-2">{dupBtn(r)}</span></span>)}
       </div>}
       {err && <p role="alert" className="text-destructive">{err}</p>}
     </div>
