@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.audit_preset_stamp() FROM PUBLIC, anon, authenticated;
