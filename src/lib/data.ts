@@ -134,7 +134,9 @@ export const seedListings: Listing[] = [
 ];
 
 // ---------- Saudi art supplies (sample catalogue — replace with real products/brands) ----------
-export type Supply = { id: string; name: string; nameAr: string; maker: string; makerAr: string; city: string; cityAr: string; type: "paint" | "brush" | "canvas" | "calligraphy" | "clay" | "textile"; price: number; swatch: string; description: string; descriptionAr: string };
+export type Supply = { id: string; name: string; nameAr: string; maker: string; makerAr: string; city: string; cityAr: string; type: "paint" | "brush" | "canvas" | "calligraphy" | "clay" | "textile"; price: number; swatch: string; description: string; descriptionAr: string; supplierId?: string; stock?: number };
+/** Supplier-listed products loaded from the database (filled at runtime by useSupplierProducts). */
+export const supplierSupplies: Supply[] = [];
 export const supplyTypes = ["paint", "brush", "canvas", "calligraphy", "clay", "textile"] as const;
 export const supplies: Supply[] = [
   { id: "najdi-clay-red", name: "Najdi Clay Red — oil paint 60 ml", nameAr: "أحمر الطين النجدي — زيتي ٦٠ مل", maker: "Diriyah Pigments", makerAr: "أصباغ الدرعية", city: "Riyadh", cityAr: "الرياض", type: "paint", price: 9, swatch: "oklch(0.52 0.14 35)", description: "Earth pigment inspired by the mud walls of At-Turaif.", descriptionAr: "صبغة ترابية مستوحاة من جدران الطين في حي الطريف." },

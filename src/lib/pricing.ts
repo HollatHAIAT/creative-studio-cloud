@@ -1,4 +1,5 @@
-import { exhibitions, seedListings, supplies, variantsOf, type VariantKind } from "./data";
+import { exhibitions, seedListings, supplies, supplierSupplies, variantsOf, type VariantKind } from "./data";
+import type { Supply } from "./data";
 import type { CartItem } from "./store";
 
 export const VAT_RATE = 0.15;
@@ -10,7 +11,7 @@ export type PricedLine = {
 };
 
 /** Prices cart lines from the catalog — used by both the browser (display) and the server (authoritative). */
-export function priceCart(items: CartItem[]) {
+export function priceCart(items: CartItem[], extraSupplies: Supply[] = supplierSupplies) {
   const lines: PricedLine[] = [];
   const errors: string[] = [];
   for (const it of items) {
@@ -22,7 +23,7 @@ export function priceCart(items: CartItem[]) {
       const detail = [v.size, v.material, v.license].filter(Boolean).join(" · ");
       lines.push({ key: it.key, kind: v.kind, title: l.title, titleAr: l.titleAr ?? l.title, detail, unit: v.price, qty, amount: v.price * qty, ref: { listingId: l.id, variantId: v.id } });
     } else if (it.kind === "supply") {
-      const s = supplies.find((x) => x.id === it.supplyId);
+      const s = supplies.find((x) => x.id === it.supplyId) ?? extraSupplies.find((x) => x.id === it.supplyId);
       if (!s) { errors.push(`Unknown supply ${it.supplyId}`); continue; }
       const qty = Math.max(1, Math.min(20, Math.floor(it.qty)));
       lines.push({ key: it.key, kind: "supply", title: s.name, titleAr: s.nameAr, detail: `${s.maker} · ${s.city}`, unit: s.price, qty, amount: s.price * qty, ref: { supplyId: s.id } });
