@@ -1,3 +1,4 @@
+import { CmsSync } from "@/lib/cms";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -146,6 +147,7 @@ function RootComponent() {
       <BidsLiveProvider />
       <AccountSync />
       <SettingsSync />
+      <CmsSync />
       <Toaster position="bottom-right" />
     </QueryClientProvider>
   );
