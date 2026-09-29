@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { artists, categories, exhibitions, type Creator, type Exhibition } from "./data";
 
 export type CmsKind = "text" | "artist" | "category" | "exhibition" | "banner";
-export type CmsRow = { kind: CmsKind; key: string; data: Record<string, any>; published: boolean; sort: number; updated_at?: string };
+export type CmsRow = { kind: CmsKind; key: string; data: any; published: boolean; sort: number; updated_at?: string };
 export type Banner = { key: string; title: string; titleAr: string; body: string; bodyAr: string; image: string; link: string; cta: string; ctaAr: string };
 
 // Snapshots of the built-in content, so edits and deletions can always be re-applied from a clean base.
@@ -22,7 +22,7 @@ export function useCmsVersion() {
   return useSyncExternalStore((f) => { subs.add(f); return () => subs.delete(f); }, () => version, () => 0);
 }
 
-const clean = (o: Record<string, any>) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== "" && v != null));
+const clean = (o: Record<string, any>): any => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== "" && v != null));
 
 /** Rebuilds live content from the built-in base plus published CMS rows, then re-renders every text/data reader. */
 export function applyCms(rows: CmsRow[]) {

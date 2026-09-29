@@ -135,16 +135,16 @@ function Texts({ rows, L, canEdit }: { rows: CmsRow[]; L: (e: string, a: string)
 
 function Items({ kind, rows, L, canEdit }: { kind: Exclude<CmsKind, "text">; rows: CmsRow[]; L: (e: string, a: string) => string; canEdit: boolean }) {
   const { save, remove } = useSave();
-  const [editing, setEditing] = useState<{ key: string; data: Record<string, any>; published: boolean; sort: number; isNew: boolean; builtIn: boolean } | null>(null);
+  const [editing, setEditing] = useState<{ key: string; data: any; published: boolean; sort: number; isNew: boolean; builtIn: boolean } | null>(null);
   const mine = rows.filter((r) => r.kind === kind);
-  const base: { key: string; data: Record<string, any> }[] =
+  const base: { key: string; data: any }[] =
     kind === "artist" ? builtIn.artists.map((a) => ({ key: a.id, data: { ...a } }))
     : kind === "exhibition" ? builtIn.exhibitions.map((e) => ({ key: e.id, data: { ...e, slots: e.slots.join(", "), adultPrice: e.tickets[0]?.price ?? 0 } }))
     : kind === "category" ? builtIn.categories.map((c) => ({ key: c, data: { en: dictionaries.en[`cat.${c}`] ?? c, ar: dictionaries.ar[`cat.${c}`] ?? c } }))
     : [];
   const items = [...base.map((b) => { const o = mine.find((m) => m.key === b.key); return { key: b.key, data: { ...b.data, ...(o?.data ?? {}) }, published: o ? o.published : true, sort: o?.sort ?? 0, edited: !!o, builtIn: true }; }),
     ...mine.filter((m) => !base.some((b) => b.key === m.key)).map((m) => ({ key: m.key, data: m.data, published: m.published, sort: m.sort, edited: true, builtIn: false }))];
-  const label = (d: Record<string, any>, key: string) => (L(d.name ?? d.title ?? d.en ?? key, d.nameAr ?? d.titleAr ?? d.ar ?? key)) || key;
+  const label = (d: any, key: string) => (L(d.name ?? d.title ?? d.en ?? key, d.nameAr ?? d.titleAr ?? d.ar ?? key)) || key;
   const fields = FIELDS[kind];
 
   const submit = async () => {
