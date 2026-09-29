@@ -1529,6 +1529,42 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          commercial_multiplier: number
+          commercial_print_limit: number
+          extended_multiplier: number
+          id: number
+          print_ship_max_days: number
+          print_ship_min_days: number
+          return_days: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          commercial_multiplier?: number
+          commercial_print_limit?: number
+          extended_multiplier?: number
+          id?: number
+          print_ship_max_days?: number
+          print_ship_min_days?: number
+          return_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          commercial_multiplier?: number
+          commercial_print_limit?: number
+          extended_multiplier?: number
+          id?: number
+          print_ship_max_days?: number
+          print_ship_min_days?: number
+          return_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       refund_requests: {
         Row: {
           created_at: string
