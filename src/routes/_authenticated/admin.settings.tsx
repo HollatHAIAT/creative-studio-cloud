@@ -138,7 +138,7 @@ function SettingsAudit({ L, ar, labels }: { L: (e: string, a: string) => string;
         {active && <button type="button" onClick={() => { setFrom(""); setTo(""); setWho(""); setField(""); }} className="underline hover:text-foreground">{L("Clear filters", "مسح الفلاتر")}</button>}
         <button type="button" disabled={total === 0 || exporting} onClick={() => void exportAll()} className="ms-auto rounded-full border border-border px-4 py-1.5 text-sm text-foreground hover:border-primary disabled:opacity-50">{exporting ? L("Exporting…", "جارٍ التصدير…") : L(`Export CSV (${total})`, `تصدير CSV (${total})`)}</button>
       </div>}
-      {rows.length > 0 && <ComplianceReview rows={rows} L={L} ar={ar} labels={labels} scope={[from && `from ${from}`, to && `to ${to}`, who && `admin ${who === "__system" ? "system" : who}`, field && `setting ${field}`].filter(Boolean).join(", ") || "all entries"} />}
+      {rows.length > 0 && <ComplianceReview filters={{ from: from || null, to: to || null, actor: who || null, field: field || null }} total={q.data?.total ?? rows.length} L={L} ar={ar} labels={labels} scope={[from && `from ${from}`, to && `to ${to}`, who && `admin ${who === "__system" ? "system" : who}`, field && `setting ${field}`].filter(Boolean).join(", ") || "all entries"} />}
       {q.isError ? <p className="mt-4 text-sm text-destructive">{L("Couldn't load the history.", "تعذّر تحميل السجل.")}</p>
         : !q.data ? <p className="mt-4 text-sm">…</p>
         : rows.length === 0 && !active ? <p className="mt-4 text-sm text-muted-foreground">{L("No changes yet.", "لا تغييرات بعد.")}</p>
