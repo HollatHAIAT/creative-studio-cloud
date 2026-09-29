@@ -1670,6 +1670,42 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string
+          bio: string
+          bio_ar: string
+          city: string
+          created_at: string
+          display_name: string
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string
+          bio?: string
+          bio_ar?: string
+          city?: string
+          created_at?: string
+          display_name?: string
+          phone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string
+          bio?: string
+          bio_ar?: string
+          city?: string
+          created_at?: string
+          display_name?: string
+          phone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       refund_requests: {
         Row: {
           created_at: string
@@ -2087,6 +2123,87 @@ export type Database = {
           max_price?: number | null
           min_price?: number | null
           name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      seller_payout_accounts: {
+        Row: {
+          account_holder: string
+          bank_name: string
+          created_at: string
+          iban: string
+          swift: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_holder: string
+          bank_name: string
+          created_at?: string
+          iban: string
+          swift?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_holder?: string
+          bank_name?: string
+          created_at?: string
+          iban?: string
+          swift?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shipping_addresses: {
+        Row: {
+          city: string
+          country: string
+          created_at: string
+          full_name: string
+          id: string
+          is_default: boolean
+          label: string
+          line1: string
+          line2: string
+          phone: string
+          postal_code: string
+          region: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city: string
+          country?: string
+          created_at?: string
+          full_name: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          line1: string
+          line2?: string
+          phone?: string
+          postal_code?: string
+          region?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          city?: string
+          country?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          line1?: string
+          line2?: string
+          phone?: string
+          postal_code?: string
+          region?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
