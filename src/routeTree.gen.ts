@@ -63,6 +63,8 @@ import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin.content'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
+import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin.exports'
+import { Route as AuthenticatedAdminIncidentsRouteImport } from './routes/_authenticated/admin.incidents'
 import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin.listings'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as AuthenticatedAdminPolicyReviewRouteImport } from './routes/_authenticated/admin.policy-review'
@@ -357,6 +359,18 @@ const AuthenticatedAdminEmailsRoute =
     path: '/admin/emails',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminExportsRoute =
+  AuthenticatedAdminExportsRouteImport.update({
+    id: '/admin/exports',
+    path: '/admin/exports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminIncidentsRoute =
+  AuthenticatedAdminIncidentsRouteImport.update({
+    id: '/admin/incidents',
+    path: '/admin/incidents',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminListingsRoute =
   AuthenticatedAdminListingsRouteImport.update({
     id: '/admin/listings',
@@ -475,6 +489,8 @@ export interface FileRoutesByFullPath {
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/admin/incidents': typeof AuthenticatedAdminIncidentsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
@@ -541,6 +557,8 @@ export interface FileRoutesByTo {
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/admin/incidents': typeof AuthenticatedAdminIncidentsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
@@ -609,6 +627,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/_authenticated/admin/incidents': typeof AuthenticatedAdminIncidentsRoute
   '/_authenticated/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
@@ -677,6 +697,8 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/emails'
+    | '/admin/exports'
+    | '/admin/incidents'
     | '/admin/listings'
     | '/admin/orders'
     | '/admin/policy-review'
@@ -743,6 +765,8 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/emails'
+    | '/admin/exports'
+    | '/admin/incidents'
     | '/admin/listings'
     | '/admin/orders'
     | '/admin/policy-review'
@@ -810,6 +834,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/emails'
+    | '/_authenticated/admin/exports'
+    | '/_authenticated/admin/incidents'
     | '/_authenticated/admin/listings'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/policy-review'
@@ -1233,6 +1259,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/exports': {
+      id: '/_authenticated/admin/exports'
+      path: '/admin/exports'
+      fullPath: '/admin/exports'
+      preLoaderRoute: typeof AuthenticatedAdminExportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/incidents': {
+      id: '/_authenticated/admin/incidents'
+      path: '/admin/incidents'
+      fullPath: '/admin/incidents'
+      preLoaderRoute: typeof AuthenticatedAdminIncidentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/listings': {
       id: '/_authenticated/admin/listings'
       path: '/admin/listings'
@@ -1338,6 +1378,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
+  AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
+  AuthenticatedAdminIncidentsRoute: typeof AuthenticatedAdminIncidentsRoute
   AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminPolicyReviewRoute: typeof AuthenticatedAdminPolicyReviewRoute
@@ -1376,6 +1418,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
+  AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
+  AuthenticatedAdminIncidentsRoute: AuthenticatedAdminIncidentsRoute,
   AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminPolicyReviewRoute: AuthenticatedAdminPolicyReviewRoute,
