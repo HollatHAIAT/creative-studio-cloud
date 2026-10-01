@@ -194,3 +194,5 @@
 - [ ] In-app alerts to admins on role changes / sensitive actions
 - [ ] Periodic admin activity summary (sensitive changes, undone actions)
 - [ ] Hash-chained audit events + integrity verification / tamper detection
+- [ ] Retention/archiving of old audit events (still immutable, restorable for review)
+- [ ] Detect unusual access / repeated sensitive actions → alert admins, log reason
