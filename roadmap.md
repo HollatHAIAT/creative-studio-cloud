@@ -211,3 +211,5 @@
 - [ ] Download tracking (who/when) linked to the export record
 - [ ] Pre-expiry alerts; expired exports & blocked links shown in export log
 - [ ] Settings: alert lead time before expiry + chosen recipient staff
+- [ ] Delivery-status log for expiry alerts with automatic retry on failure
+- [ ] Secure export of filtered chart results (period/severity), logged in audit
