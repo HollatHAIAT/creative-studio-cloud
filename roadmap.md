@@ -182,3 +182,4 @@
 - [ ] Real email sending — blocked: needs a sender email domain from user
 - [ ] End-to-end journey tests
 - [ ] Real artist names/works/prices and support response time — blocked: user data
+- [ ] Replace email-based auto admin (claim_pending_role) with secure server-side role assignment
