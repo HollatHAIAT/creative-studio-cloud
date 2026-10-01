@@ -185,3 +185,4 @@
 - [ ] Replace email-based auto admin (claim_pending_role) with secure server-side role assignment
 - [ ] Automated tests: order tracking, payment retry, non-staff blocked from moderation tools
 - [ ] Buyer notifications on order status change + account notification preferences
+- [ ] End-to-end test of admin portal + CMS pages; finish incomplete admin journeys
