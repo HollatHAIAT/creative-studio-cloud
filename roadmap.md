@@ -197,3 +197,5 @@
 - [ ] Retention/archiving of old audit events (still immutable, restorable for review)
 - [ ] Detect unusual access / repeated sensitive actions → alert admins, log reason
 - [ ] Retention period per audit event type; archiving paused while a review/compliance hold is active
+- [ ] Alert severity levels, assignment to staff, resolution confirmation — every step logged
+- [ ] Scheduled integrity-check reports (range checked, gaps, failures)
