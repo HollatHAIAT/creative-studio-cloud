@@ -188,3 +188,8 @@
 - [ ] End-to-end test of admin portal + CMS pages; finish incomplete admin journeys
 - [ ] Admin audit log (roles, content, orders) with actor, time, before/after values
 - [ ] Confirm before sensitive admin actions; undo for content and order changes, logged
+- [ ] Audit log filters (actor, action type, period), search, CSV export, expandable before/after
+- [ ] Audit events immutable; staff-only reading; access attempts logged
+- [ ] Undo preview + conflict check before applying; result logged
+- [ ] In-app alerts to admins on role changes / sensitive actions
+- [ ] Periodic admin activity summary (sensitive changes, undone actions)
