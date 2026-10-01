@@ -14,12 +14,58 @@ export type Database = {
   }
   public: {
     Tables: {
-      admin_alerts: {
+      admin_alert_occurrences: {
         Row: {
-          assignee: string | null
+          alert_id: string
           created_at: string
           event_id: string | null
+          id: number
+          reason: string
+          reason_ar: string
+          severity: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          event_id?: string | null
+          id?: number
+          reason: string
+          reason_ar: string
+          severity: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          event_id?: string | null
+          id?: number
+          reason?: string
+          reason_ar?: string
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_alert_occurrences_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "admin_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          assignee: string | null
+          closed_at: string | null
+          created_at: string
+          escalated_at: string | null
+          escalation_level: number
+          event_id: string | null
           id: string
+          kind: string
+          last_seen_at: string
+          occurrences: number
           reason: string
           reason_ar: string
           resolution: string | null
@@ -29,10 +75,18 @@ export type Database = {
           subject_user: string | null
         }
         Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
           assignee?: string | null
+          closed_at?: string | null
           created_at?: string
+          escalated_at?: string | null
+          escalation_level?: number
           event_id?: string | null
           id?: string
+          kind?: string
+          last_seen_at?: string
+          occurrences?: number
           reason: string
           reason_ar: string
           resolution?: string | null
@@ -42,10 +96,18 @@ export type Database = {
           subject_user?: string | null
         }
         Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
           assignee?: string | null
+          closed_at?: string | null
           created_at?: string
+          escalated_at?: string | null
+          escalation_level?: number
           event_id?: string | null
           id?: string
+          kind?: string
+          last_seen_at?: string
+          occurrences?: number
           reason?: string
           reason_ar?: string
           resolution?: string | null
@@ -314,6 +376,89 @@ export type Database = {
           winner_user_id?: string | null
           winning_amount?: number | null
           winning_bid_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_export_downloads: {
+        Row: {
+          allowed: boolean
+          created_at: string
+          export_id: string
+          id: number
+          reason: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          allowed: boolean
+          created_at?: string
+          export_id: string
+          id?: number
+          reason?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          allowed?: boolean
+          created_at?: string
+          export_id?: string
+          id?: number
+          reason?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_export_downloads_export_id_fkey"
+            columns: ["export_id"]
+            isOneToOne: false
+            referencedRelation: "audit_exports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_exports: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          created_by_email: string | null
+          expires_at: string
+          expiry_alerted_at: string | null
+          filters: Json
+          format: string
+          id: string
+          kind: string
+          row_count: number
+          watermark: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          created_by_email?: string | null
+          expires_at: string
+          expiry_alerted_at?: string | null
+          filters?: Json
+          format: string
+          id?: string
+          kind: string
+          row_count: number
+          watermark: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          created_by_email?: string | null
+          expires_at?: string
+          expiry_alerted_at?: string | null
+          filters?: Json
+          format?: string
+          id?: string
+          kind?: string
+          row_count?: number
+          watermark?: string
         }
         Relationships: []
       }
@@ -739,6 +884,80 @@ export type Database = {
         }
         Relationships: []
       }
+      export_alert_deliveries: {
+        Row: {
+          attempts: number
+          channel: string
+          created_at: string
+          export_id: string
+          id: number
+          last_attempt_at: string | null
+          last_error: string | null
+          recipient: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          channel: string
+          created_at?: string
+          export_id: string
+          id?: number
+          last_attempt_at?: string | null
+          last_error?: string | null
+          recipient: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          created_at?: string
+          export_id?: string
+          id?: number
+          last_attempt_at?: string | null
+          last_error?: string | null
+          recipient?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "export_alert_deliveries_export_id_fkey"
+            columns: ["export_id"]
+            isOneToOne: false
+            referencedRelation: "audit_exports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      export_settings: {
+        Row: {
+          alert_lead_hours: number
+          expiry_hours: number
+          id: number
+          recipients: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          alert_lead_hours?: number
+          expiry_hours?: number
+          id?: number
+          recipients?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          alert_lead_hours?: number
+          expiry_hours?: number
+          id?: number
+          recipients?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -764,6 +983,89 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      incident_checklist_progress: {
+        Row: {
+          alert_id: string
+          created_at: string
+          done_by: string
+          id: number
+          note: string
+          step_index: number
+          step_text: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          done_by: string
+          id?: number
+          note?: string
+          step_index: number
+          step_text: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          done_by?: string
+          id?: number
+          note?: string
+          step_index?: number
+          step_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_checklist_progress_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "admin_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_checklist_templates: {
+        Row: {
+          kind: string
+          steps: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          kind: string
+          steps?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          kind?: string
+          steps?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      incident_escalation_rules: {
+        Row: {
+          after_minutes: number
+          notify: string[]
+          severity: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          after_minutes: number
+          notify?: string[]
+          severity: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          after_minutes?: number
+          notify?: string[]
+          severity?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       inquiries: {
         Row: {
@@ -2803,30 +3105,6 @@ export type Database = {
         Returns: string
       }
       admin_activity_summary: { Args: { _days: number }; Returns: Json }
-      admin_alert_update: {
-        Args: {
-          _assignee: string
-          _id: string
-          _note: string
-          _resolve: boolean
-        }
-        Returns: undefined
-      }
-      admin_alerts_list: {
-        Args: { _status: string }
-        Returns: {
-          assignee_email: string
-          created_at: string
-          event_id: string
-          id: string
-          reason: string
-          reason_ar: string
-          resolution: string
-          resolved_at: string
-          severity: string
-          status: string
-        }[]
-      }
       admin_auction_reserves: {
         Args: never
         Returns: {
@@ -2912,6 +3190,72 @@ export type Database = {
         Args: { _approve: boolean; _note: string; _request_id: string }
         Returns: undefined
       }
+      admin_export_create: {
+        Args: {
+          _content: string
+          _filters: Json
+          _format: string
+          _kind: string
+          _rows: number
+        }
+        Returns: string
+      }
+      admin_export_download: { Args: { _id: string }; Returns: Json }
+      admin_exports_list: {
+        Args: never
+        Returns: {
+          alerts: Json
+          created_at: string
+          created_by_email: string
+          downloads: Json
+          expired: boolean
+          expires_at: string
+          filters: Json
+          format: string
+          id: string
+          kind: string
+          row_count: number
+        }[]
+      }
+      admin_incident_action: {
+        Args: { _action: string; _assignee: string; _id: string; _note: string }
+        Returns: undefined
+      }
+      admin_incident_check_step: {
+        Args: { _id: string; _note: string; _step: number }
+        Returns: undefined
+      }
+      admin_incident_config: { Args: never; Returns: Json }
+      admin_incidents: {
+        Args: {
+          _assignee: string
+          _from: string
+          _severity: string
+          _status: string
+          _to: string
+        }
+        Returns: {
+          acknowledged_at: string
+          assignee: string
+          assignee_email: string
+          checklist: Json
+          closed_at: string
+          created_at: string
+          done: Json
+          escalation_level: number
+          history: Json
+          id: string
+          kind: string
+          last_seen_at: string
+          occurrences: number
+          reason: string
+          reason_ar: string
+          resolution: string
+          resolved_at: string
+          severity: string
+          status: string
+        }[]
+      }
       admin_lift_block: {
         Args: { _reason: string; _uid: string }
         Returns: undefined
@@ -2936,6 +3280,18 @@ export type Database = {
       admin_retry_reminder_email: { Args: { _id: string }; Returns: undefined }
       admin_review_listing: {
         Args: { _approve: boolean; _id: string; _note: string }
+        Returns: undefined
+      }
+      admin_set_checklist: {
+        Args: { _kind: string; _steps: Json }
+        Returns: undefined
+      }
+      admin_set_escalation_rule: {
+        Args: { _minutes: number; _notify: string[]; _severity: string }
+        Returns: undefined
+      }
+      admin_set_export_settings: {
+        Args: { _expiry: number; _lead: number; _recipients: string[] }
         Returns: undefined
       }
       admin_set_listing_guidance: {
@@ -3024,6 +3380,7 @@ export type Database = {
         Args: { e: Database["public"]["Tables"]["admin_audit_events"]["Row"] }
         Returns: string
       }
+      audit_hourly_job: { Args: never; Returns: undefined }
       audit_is_archived: {
         Args: { _at: string; _cat: string }
         Returns: boolean
