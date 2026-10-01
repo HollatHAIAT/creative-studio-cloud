@@ -186,3 +186,5 @@
 - [ ] Automated tests: order tracking, payment retry, non-staff blocked from moderation tools
 - [ ] Buyer notifications on order status change + account notification preferences
 - [ ] End-to-end test of admin portal + CMS pages; finish incomplete admin journeys
+- [ ] Admin audit log (roles, content, orders) with actor, time, before/after values
+- [ ] Confirm before sensitive admin actions; undo for content and order changes, logged
