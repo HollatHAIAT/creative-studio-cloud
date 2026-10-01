@@ -14,6 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_alerts: {
+        Row: {
+          assignee: string | null
+          created_at: string
+          event_id: string | null
+          id: string
+          reason: string
+          reason_ar: string
+          resolution: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+          subject_user: string | null
+        }
+        Insert: {
+          assignee?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          reason: string
+          reason_ar: string
+          resolution?: string | null
+          resolved_at?: string | null
+          severity: string
+          status?: string
+          subject_user?: string | null
+        }
+        Update: {
+          assignee?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          reason?: string
+          reason_ar?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          subject_user?: string | null
+        }
+        Relationships: []
+      }
+      admin_audit_access: {
+        Row: {
+          action: string
+          allowed: boolean
+          created_at: string
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          allowed: boolean
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          allowed?: boolean
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      admin_audit_events: {
+        Row: {
+          action: string
+          actor: string | null
+          actor_email: string | null
+          after: Json | null
+          before: Json | null
+          category: string
+          created_at: string
+          hash: string
+          id: string
+          note: string
+          prev_hash: string
+          revert_of: string | null
+          seq: number
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          actor_email?: string | null
+          after?: Json | null
+          before?: Json | null
+          category: string
+          created_at?: string
+          hash: string
+          id?: string
+          note?: string
+          prev_hash: string
+          revert_of?: string | null
+          seq?: number
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          actor_email?: string | null
+          after?: Json | null
+          before?: Json | null
+          category?: string
+          created_at?: string
+          hash?: string
+          id?: string
+          note?: string
+          prev_hash?: string
+          revert_of?: string | null
+          seq?: number
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
       asset_files: {
         Row: {
           asset_id: string
@@ -239,6 +359,93 @@ export type Database = {
           shared?: boolean
           to_date?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      audit_holds: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string
+          id: string
+          reason: string
+          released_at: string | null
+          released_by: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          reason: string
+          released_at?: string | null
+          released_by?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          reason?: string
+          released_at?: string | null
+          released_by?: string | null
+        }
+        Relationships: []
+      }
+      audit_integrity_reports: {
+        Row: {
+          checked: number
+          failures: Json
+          first_seq: number | null
+          gaps: Json
+          id: string
+          last_seq: number | null
+          ok: boolean
+          ran_at: string
+          trigger: string
+        }
+        Insert: {
+          checked: number
+          failures?: Json
+          first_seq?: number | null
+          gaps?: Json
+          id?: string
+          last_seq?: number | null
+          ok: boolean
+          ran_at?: string
+          trigger: string
+        }
+        Update: {
+          checked?: number
+          failures?: Json
+          first_seq?: number | null
+          gaps?: Json
+          id?: string
+          last_seq?: number | null
+          ok?: boolean
+          ran_at?: string
+          trigger?: string
+        }
+        Relationships: []
+      }
+      audit_retention: {
+        Row: {
+          category: string
+          days: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category: string
+          days: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          days?: number
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -2595,6 +2802,31 @@ export type Database = {
         Args: { _draft: string; _uid: string }
         Returns: string
       }
+      admin_activity_summary: { Args: { _days: number }; Returns: Json }
+      admin_alert_update: {
+        Args: {
+          _assignee: string
+          _id: string
+          _note: string
+          _resolve: boolean
+        }
+        Returns: undefined
+      }
+      admin_alerts_list: {
+        Args: { _status: string }
+        Returns: {
+          assignee_email: string
+          created_at: string
+          event_id: string
+          id: string
+          reason: string
+          reason_ar: string
+          resolution: string
+          resolved_at: string
+          severity: string
+          status: string
+        }[]
+      }
       admin_auction_reserves: {
         Args: never
         Returns: {
@@ -2602,6 +2834,67 @@ export type Database = {
           reserve: number
         }[]
       }
+      admin_audit_facets: { Args: never; Returns: Json }
+      admin_audit_hold: {
+        Args: { _category: string; _reason: string; _release: string }
+        Returns: string
+      }
+      admin_audit_reports: {
+        Args: { _limit: number }
+        Returns: {
+          checked: number
+          failures: Json
+          first_seq: number | null
+          gaps: Json
+          id: string
+          last_seq: number | null
+          ok: boolean
+          ran_at: string
+          trigger: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "audit_integrity_reports"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_audit_search: {
+        Args: {
+          _action: string
+          _actor: string
+          _archived: string
+          _category: string
+          _from: string
+          _limit: number
+          _offset: number
+          _q: string
+          _to: string
+        }
+        Returns: {
+          action: string
+          actor_email: string
+          after: Json
+          archived: boolean
+          before: Json
+          category: string
+          created_at: string
+          id: string
+          note: string
+          revert_of: string
+          reverted_by: string
+          seq: number
+          target_id: string
+          target_type: string
+          total: number
+        }[]
+      }
+      admin_audit_undo: {
+        Args: { _id: string; _note: string }
+        Returns: string
+      }
+      admin_audit_undo_preview: { Args: { _id: string }; Returns: Json }
+      admin_audit_verify: { Args: never; Returns: Json }
       admin_block_user: {
         Args: { _reason: string; _uid: string; _until: string }
         Returns: string
@@ -2657,6 +2950,10 @@ export type Database = {
         Args: { _allowed: boolean; _listing: string }
         Returns: undefined
       }
+      admin_set_retention: {
+        Args: { _category: string; _days: number }
+        Returns: undefined
+      }
       admin_set_role: {
         Args: {
           _grant: boolean
@@ -2702,6 +2999,13 @@ export type Database = {
           total: number
         }[]
       }
+      admin_staff_list: {
+        Args: never
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       admin_unpublish_listing: {
         Args: { _id: string; _reason: string }
         Returns: undefined
@@ -2712,6 +3016,33 @@ export type Database = {
       }
       approve_listing_as_owner: { Args: { _draft: string }; Returns: undefined }
       auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
+      audit_gate: {
+        Args: { _action: string; _need_admin?: boolean }
+        Returns: boolean
+      }
+      audit_hash: {
+        Args: { e: Database["public"]["Tables"]["admin_audit_events"]["Row"] }
+        Returns: string
+      }
+      audit_is_archived: {
+        Args: { _at: string; _cat: string }
+        Returns: boolean
+      }
+      audit_summary_data: { Args: { _days: number }; Returns: Json }
+      audit_verify_run: { Args: { _trigger: string }; Returns: Json }
+      audit_weekly_job: { Args: never; Returns: undefined }
+      audit_write: {
+        Args: {
+          _action: string
+          _after: Json
+          _before: Json
+          _category: string
+          _note: string
+          _tid: string
+          _ttype: string
+        }
+        Returns: string
+      }
       award_auction: { Args: { _auction: string }; Returns: undefined }
       caller_is_staff: { Args: never; Returns: boolean }
       can_manage_auction: { Args: { _auction: string }; Returns: boolean }
@@ -2792,6 +3123,17 @@ export type Database = {
         Returns: undefined
       }
       my_org_role: { Args: { _org: string }; Returns: string }
+      notify_admins: {
+        Args: {
+          _b: string
+          _bar: string
+          _except: string
+          _link: string
+          _t: string
+          _tar: string
+        }
+        Returns: undefined
+      }
       org_rank: { Args: { _role: string }; Returns: number }
       ownership_heritage_issues: {
         Args: { d: Database["public"]["Tables"]["listing_drafts"]["Row"] }
@@ -2814,6 +3156,16 @@ export type Database = {
       }
       queue_reviewer_invite_email: {
         Args: { _invite: string }
+        Returns: string
+      }
+      raise_admin_alert: {
+        Args: {
+          _event: string
+          _reason: string
+          _reason_ar: string
+          _severity: string
+          _subject: string
+        }
         Returns: string
       }
       record_listing_view: {
