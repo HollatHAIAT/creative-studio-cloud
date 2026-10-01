@@ -213,3 +213,6 @@
 - [ ] Settings: alert lead time before expiry + chosen recipient staff
 - [ ] Delivery-status log for expiry alerts with automatic retry on failure
 - [ ] Secure export of filtered chart results (period/severity), logged in audit
+- [ ] Manual resend of an expiry alert from the delivery log; attempt + result logged
+- [ ] Delivery log filters (status, staff member, period) with per-attempt details
+- [ ] Chart exports include a clear period/severity summary and file creation time
