@@ -183,3 +183,5 @@
 - [ ] End-to-end journey tests
 - [ ] Real artist names/works/prices and support response time — blocked: user data
 - [ ] Replace email-based auto admin (claim_pending_role) with secure server-side role assignment
+- [ ] Automated tests: order tracking, payment retry, non-staff blocked from moderation tools
+- [ ] Buyer notifications on order status change + account notification preferences
