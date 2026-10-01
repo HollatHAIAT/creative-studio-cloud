@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { LayoutDashboard, Users, ListChecks, ShoppingBag, Gavel, Flag, Star, Mail, ShieldCheck, ScanLine, Settings, FileSearch, Languages, ExternalLink, FileText, Menu, X } from "lucide-react";
+import { LayoutDashboard, Users, ListChecks, ShoppingBag, Gavel, Flag, Star, Mail, ShieldCheck, ScanLine, Settings, FileSearch, Languages, ExternalLink, FileText, Menu, X, History, Siren, FileDown } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import logoMark from "@/assets/arwiqa-mark.png";
 
@@ -19,6 +19,9 @@ const items = [
   { to: "/admin/emails", en: "Emails", ar: "الرسائل البريدية", icon: Mail },
   { to: "/admin/scan", en: "Ticket scan", ar: "مسح التذاكر", icon: ScanLine },
   { to: "/admin/settings", en: "Platform settings", ar: "إعدادات المنصة", icon: Settings },
+  { to: "/admin/audit", en: "Audit log", ar: "سجل التدقيق", icon: History },
+  { to: "/admin/incidents", en: "Incidents", ar: "الحوادث", icon: Siren },
+  { to: "/admin/exports", en: "Exports", ar: "الملفات المصدّرة", icon: FileDown },
 ] as const;
 
 /** Separate back-office frame for every /admin page — no public header or footer. */

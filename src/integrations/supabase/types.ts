@@ -14,6 +14,188 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_alert_occurrences: {
+        Row: {
+          alert_id: string
+          created_at: string
+          event_id: string | null
+          id: number
+          reason: string
+          reason_ar: string
+          severity: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          event_id?: string | null
+          id?: number
+          reason: string
+          reason_ar: string
+          severity: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          event_id?: string | null
+          id?: number
+          reason?: string
+          reason_ar?: string
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_alert_occurrences_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "admin_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          assignee: string | null
+          closed_at: string | null
+          created_at: string
+          escalated_at: string | null
+          escalation_level: number
+          event_id: string | null
+          id: string
+          kind: string
+          last_seen_at: string
+          occurrences: number
+          reason: string
+          reason_ar: string
+          resolution: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+          subject_user: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          assignee?: string | null
+          closed_at?: string | null
+          created_at?: string
+          escalated_at?: string | null
+          escalation_level?: number
+          event_id?: string | null
+          id?: string
+          kind?: string
+          last_seen_at?: string
+          occurrences?: number
+          reason: string
+          reason_ar: string
+          resolution?: string | null
+          resolved_at?: string | null
+          severity: string
+          status?: string
+          subject_user?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          assignee?: string | null
+          closed_at?: string | null
+          created_at?: string
+          escalated_at?: string | null
+          escalation_level?: number
+          event_id?: string | null
+          id?: string
+          kind?: string
+          last_seen_at?: string
+          occurrences?: number
+          reason?: string
+          reason_ar?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          subject_user?: string | null
+        }
+        Relationships: []
+      }
+      admin_audit_access: {
+        Row: {
+          action: string
+          allowed: boolean
+          created_at: string
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          allowed: boolean
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          allowed?: boolean
+          created_at?: string
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      admin_audit_events: {
+        Row: {
+          action: string
+          actor: string | null
+          actor_email: string | null
+          after: Json | null
+          before: Json | null
+          category: string
+          created_at: string
+          hash: string
+          id: string
+          note: string
+          prev_hash: string
+          revert_of: string | null
+          seq: number
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          actor_email?: string | null
+          after?: Json | null
+          before?: Json | null
+          category: string
+          created_at?: string
+          hash: string
+          id?: string
+          note?: string
+          prev_hash: string
+          revert_of?: string | null
+          seq?: number
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          actor_email?: string | null
+          after?: Json | null
+          before?: Json | null
+          category?: string
+          created_at?: string
+          hash?: string
+          id?: string
+          note?: string
+          prev_hash?: string
+          revert_of?: string | null
+          seq?: number
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
       asset_files: {
         Row: {
           asset_id: string
@@ -197,6 +379,89 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_export_downloads: {
+        Row: {
+          allowed: boolean
+          created_at: string
+          export_id: string
+          id: number
+          reason: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          allowed: boolean
+          created_at?: string
+          export_id: string
+          id?: number
+          reason?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          allowed?: boolean
+          created_at?: string
+          export_id?: string
+          id?: number
+          reason?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_export_downloads_export_id_fkey"
+            columns: ["export_id"]
+            isOneToOne: false
+            referencedRelation: "audit_exports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_exports: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          created_by_email: string | null
+          expires_at: string
+          expiry_alerted_at: string | null
+          filters: Json
+          format: string
+          id: string
+          kind: string
+          row_count: number
+          watermark: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          created_by_email?: string | null
+          expires_at: string
+          expiry_alerted_at?: string | null
+          filters?: Json
+          format: string
+          id?: string
+          kind: string
+          row_count: number
+          watermark: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          created_by_email?: string | null
+          expires_at?: string
+          expiry_alerted_at?: string | null
+          filters?: Json
+          format?: string
+          id?: string
+          kind?: string
+          row_count?: number
+          watermark?: string
+        }
+        Relationships: []
+      }
       audit_filter_presets: {
         Row: {
           actor: string
@@ -239,6 +504,93 @@ export type Database = {
           shared?: boolean
           to_date?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      audit_holds: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string
+          id: string
+          reason: string
+          released_at: string | null
+          released_by: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          reason: string
+          released_at?: string | null
+          released_by?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          reason?: string
+          released_at?: string | null
+          released_by?: string | null
+        }
+        Relationships: []
+      }
+      audit_integrity_reports: {
+        Row: {
+          checked: number
+          failures: Json
+          first_seq: number | null
+          gaps: Json
+          id: string
+          last_seq: number | null
+          ok: boolean
+          ran_at: string
+          trigger: string
+        }
+        Insert: {
+          checked: number
+          failures?: Json
+          first_seq?: number | null
+          gaps?: Json
+          id?: string
+          last_seq?: number | null
+          ok: boolean
+          ran_at?: string
+          trigger: string
+        }
+        Update: {
+          checked?: number
+          failures?: Json
+          first_seq?: number | null
+          gaps?: Json
+          id?: string
+          last_seq?: number | null
+          ok?: boolean
+          ran_at?: string
+          trigger?: string
+        }
+        Relationships: []
+      }
+      audit_retention: {
+        Row: {
+          category: string
+          days: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category: string
+          days: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          days?: number
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -532,6 +884,118 @@ export type Database = {
         }
         Relationships: []
       }
+      export_alert_attempts: {
+        Row: {
+          attempted_at: string
+          by_user: string | null
+          delivery_id: number
+          error: string | null
+          id: number
+          manual: boolean
+          ok: boolean
+        }
+        Insert: {
+          attempted_at?: string
+          by_user?: string | null
+          delivery_id: number
+          error?: string | null
+          id?: number
+          manual?: boolean
+          ok: boolean
+        }
+        Update: {
+          attempted_at?: string
+          by_user?: string | null
+          delivery_id?: number
+          error?: string | null
+          id?: number
+          manual?: boolean
+          ok?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "export_alert_attempts_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "export_alert_deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      export_alert_deliveries: {
+        Row: {
+          attempts: number
+          channel: string
+          created_at: string
+          export_id: string
+          id: number
+          last_attempt_at: string | null
+          last_error: string | null
+          recipient: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          channel: string
+          created_at?: string
+          export_id: string
+          id?: number
+          last_attempt_at?: string | null
+          last_error?: string | null
+          recipient: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          created_at?: string
+          export_id?: string
+          id?: number
+          last_attempt_at?: string | null
+          last_error?: string | null
+          recipient?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "export_alert_deliveries_export_id_fkey"
+            columns: ["export_id"]
+            isOneToOne: false
+            referencedRelation: "audit_exports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      export_settings: {
+        Row: {
+          alert_lead_hours: number
+          expiry_hours: number
+          id: number
+          recipients: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          alert_lead_hours?: number
+          expiry_hours?: number
+          id?: number
+          recipients?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          alert_lead_hours?: number
+          expiry_hours?: number
+          id?: number
+          recipients?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -557,6 +1021,89 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      incident_checklist_progress: {
+        Row: {
+          alert_id: string
+          created_at: string
+          done_by: string
+          id: number
+          note: string
+          step_index: number
+          step_text: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          done_by: string
+          id?: number
+          note?: string
+          step_index: number
+          step_text: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          done_by?: string
+          id?: number
+          note?: string
+          step_index?: number
+          step_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_checklist_progress_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "admin_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_checklist_templates: {
+        Row: {
+          kind: string
+          steps: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          kind: string
+          steps?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          kind?: string
+          steps?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      incident_escalation_rules: {
+        Row: {
+          after_minutes: number
+          notify: string[]
+          severity: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          after_minutes: number
+          notify?: string[]
+          severity: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          after_minutes?: number
+          notify?: string[]
+          severity?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       inquiries: {
         Row: {
@@ -2595,6 +3142,31 @@ export type Database = {
         Args: { _draft: string; _uid: string }
         Returns: string
       }
+      admin_activity_summary: { Args: { _days: number }; Returns: Json }
+      admin_alert_deliveries: {
+        Args: {
+          _from: string
+          _recipient: string
+          _status: string
+          _to: string
+        }
+        Returns: {
+          attempts: number
+          channel: string
+          created_at: string
+          expires_at: string
+          export_format: string
+          export_id: string
+          export_kind: string
+          history: Json
+          id: number
+          last_error: string
+          recipient: string
+          recipient_email: string
+          sent_at: string
+          status: string
+        }[]
+      }
       admin_auction_reserves: {
         Args: never
         Returns: {
@@ -2602,6 +3174,67 @@ export type Database = {
           reserve: number
         }[]
       }
+      admin_audit_facets: { Args: never; Returns: Json }
+      admin_audit_hold: {
+        Args: { _category: string; _reason: string; _release: string }
+        Returns: string
+      }
+      admin_audit_reports: {
+        Args: { _limit: number }
+        Returns: {
+          checked: number
+          failures: Json
+          first_seq: number | null
+          gaps: Json
+          id: string
+          last_seq: number | null
+          ok: boolean
+          ran_at: string
+          trigger: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "audit_integrity_reports"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_audit_search: {
+        Args: {
+          _action: string
+          _actor: string
+          _archived: string
+          _category: string
+          _from: string
+          _limit: number
+          _offset: number
+          _q: string
+          _to: string
+        }
+        Returns: {
+          action: string
+          actor_email: string
+          after: Json
+          archived: boolean
+          before: Json
+          category: string
+          created_at: string
+          id: string
+          note: string
+          revert_of: string
+          reverted_by: string
+          seq: number
+          target_id: string
+          target_type: string
+          total: number
+        }[]
+      }
+      admin_audit_undo: {
+        Args: { _id: string; _note: string }
+        Returns: string
+      }
+      admin_audit_undo_preview: { Args: { _id: string }; Returns: Json }
+      admin_audit_verify: { Args: never; Returns: Json }
       admin_block_user: {
         Args: { _reason: string; _uid: string; _until: string }
         Returns: string
@@ -2619,6 +3252,72 @@ export type Database = {
         Args: { _approve: boolean; _note: string; _request_id: string }
         Returns: undefined
       }
+      admin_export_create: {
+        Args: {
+          _content: string
+          _filters: Json
+          _format: string
+          _kind: string
+          _rows: number
+        }
+        Returns: string
+      }
+      admin_export_download: { Args: { _id: string }; Returns: Json }
+      admin_exports_list: {
+        Args: never
+        Returns: {
+          alerts: Json
+          created_at: string
+          created_by_email: string
+          downloads: Json
+          expired: boolean
+          expires_at: string
+          filters: Json
+          format: string
+          id: string
+          kind: string
+          row_count: number
+        }[]
+      }
+      admin_incident_action: {
+        Args: { _action: string; _assignee: string; _id: string; _note: string }
+        Returns: undefined
+      }
+      admin_incident_check_step: {
+        Args: { _id: string; _note: string; _step: number }
+        Returns: undefined
+      }
+      admin_incident_config: { Args: never; Returns: Json }
+      admin_incidents: {
+        Args: {
+          _assignee: string
+          _from: string
+          _severity: string
+          _status: string
+          _to: string
+        }
+        Returns: {
+          acknowledged_at: string
+          assignee: string
+          assignee_email: string
+          checklist: Json
+          closed_at: string
+          created_at: string
+          done: Json
+          escalation_level: number
+          history: Json
+          id: string
+          kind: string
+          last_seen_at: string
+          occurrences: number
+          reason: string
+          reason_ar: string
+          resolution: string
+          resolved_at: string
+          severity: string
+          status: string
+        }[]
+      }
       admin_lift_block: {
         Args: { _reason: string; _uid: string }
         Returns: undefined
@@ -2635,6 +3334,7 @@ export type Database = {
         Args: { _category: string; _id: string; _price: number }
         Returns: string
       }
+      admin_resend_alert_delivery: { Args: { _id: number }; Returns: boolean }
       admin_resend_reviewer_invite: {
         Args: { _invite: string }
         Returns: string
@@ -2643,6 +3343,18 @@ export type Database = {
       admin_retry_reminder_email: { Args: { _id: string }; Returns: undefined }
       admin_review_listing: {
         Args: { _approve: boolean; _id: string; _note: string }
+        Returns: undefined
+      }
+      admin_set_checklist: {
+        Args: { _kind: string; _steps: Json }
+        Returns: undefined
+      }
+      admin_set_escalation_rule: {
+        Args: { _minutes: number; _notify: string[]; _severity: string }
+        Returns: undefined
+      }
+      admin_set_export_settings: {
+        Args: { _expiry: number; _lead: number; _recipients: string[] }
         Returns: undefined
       }
       admin_set_listing_guidance: {
@@ -2655,6 +3367,10 @@ export type Database = {
       }
       admin_set_reply_permission: {
         Args: { _allowed: boolean; _listing: string }
+        Returns: undefined
+      }
+      admin_set_retention: {
+        Args: { _category: string; _days: number }
         Returns: undefined
       }
       admin_set_role: {
@@ -2702,6 +3418,13 @@ export type Database = {
           total: number
         }[]
       }
+      admin_staff_list: {
+        Args: never
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       admin_unpublish_listing: {
         Args: { _id: string; _reason: string }
         Returns: undefined
@@ -2712,6 +3435,34 @@ export type Database = {
       }
       approve_listing_as_owner: { Args: { _draft: string }; Returns: undefined }
       auction_reserve_met: { Args: { _auction_id: string }; Returns: boolean }
+      audit_gate: {
+        Args: { _action: string; _need_admin?: boolean }
+        Returns: boolean
+      }
+      audit_hash: {
+        Args: { e: Database["public"]["Tables"]["admin_audit_events"]["Row"] }
+        Returns: string
+      }
+      audit_hourly_job: { Args: never; Returns: undefined }
+      audit_is_archived: {
+        Args: { _at: string; _cat: string }
+        Returns: boolean
+      }
+      audit_summary_data: { Args: { _days: number }; Returns: Json }
+      audit_verify_run: { Args: { _trigger: string }; Returns: Json }
+      audit_weekly_job: { Args: never; Returns: undefined }
+      audit_write: {
+        Args: {
+          _action: string
+          _after: Json
+          _before: Json
+          _category: string
+          _note: string
+          _tid: string
+          _ttype: string
+        }
+        Returns: string
+      }
       award_auction: { Args: { _auction: string }; Returns: undefined }
       caller_is_staff: { Args: never; Returns: boolean }
       can_manage_auction: { Args: { _auction: string }; Returns: boolean }
@@ -2760,6 +3511,10 @@ export type Database = {
         Args: { _body: string; _rating: number; _review: string }
         Returns: undefined
       }
+      export_alert_try: {
+        Args: { _delivery: number; _manual: boolean }
+        Returns: boolean
+      }
       has_purchased: {
         Args: { _listing: string; _uid: string }
         Returns: boolean
@@ -2792,6 +3547,17 @@ export type Database = {
         Returns: undefined
       }
       my_org_role: { Args: { _org: string }; Returns: string }
+      notify_admins: {
+        Args: {
+          _b: string
+          _bar: string
+          _except: string
+          _link: string
+          _t: string
+          _tar: string
+        }
+        Returns: undefined
+      }
       org_rank: { Args: { _role: string }; Returns: number }
       ownership_heritage_issues: {
         Args: { d: Database["public"]["Tables"]["listing_drafts"]["Row"] }
@@ -2814,6 +3580,16 @@ export type Database = {
       }
       queue_reviewer_invite_email: {
         Args: { _invite: string }
+        Returns: string
+      }
+      raise_admin_alert: {
+        Args: {
+          _event: string
+          _reason: string
+          _reason_ar: string
+          _severity: string
+          _subject: string
+        }
         Returns: string
       }
       record_listing_view: {

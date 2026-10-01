@@ -59,9 +59,12 @@ import { Route as CollectionsSaudiBanksRouteImport } from './routes/collections.
 import { Route as ExhibitionsIdRouteImport } from './routes/exhibitions.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as AuthenticatedAdminAuctionsRouteImport } from './routes/_authenticated/admin.auctions'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin.content'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
+import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin.exports'
+import { Route as AuthenticatedAdminIncidentsRouteImport } from './routes/_authenticated/admin.incidents'
 import { Route as AuthenticatedAdminListingsRouteImport } from './routes/_authenticated/admin.listings'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as AuthenticatedAdminPolicyReviewRouteImport } from './routes/_authenticated/admin.policy-review'
@@ -333,6 +336,11 @@ const AuthenticatedAdminAuctionsRoute =
     path: '/admin/auctions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminContentRoute =
   AuthenticatedAdminContentRouteImport.update({
     id: '/admin/content',
@@ -349,6 +357,18 @@ const AuthenticatedAdminEmailsRoute =
   AuthenticatedAdminEmailsRouteImport.update({
     id: '/admin/emails',
     path: '/admin/emails',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminExportsRoute =
+  AuthenticatedAdminExportsRouteImport.update({
+    id: '/admin/exports',
+    path: '/admin/exports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminIncidentsRoute =
+  AuthenticatedAdminIncidentsRouteImport.update({
+    id: '/admin/incidents',
+    path: '/admin/incidents',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminListingsRoute =
@@ -465,9 +485,12 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/admin/incidents': typeof AuthenticatedAdminIncidentsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
@@ -530,9 +553,12 @@ export interface FileRoutesByTo {
   '/listing/$id': typeof ListingIdRoute
   '/assets': typeof AssetsIndexRoute
   '/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/admin/incidents': typeof AuthenticatedAdminIncidentsRoute
   '/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
@@ -597,9 +623,12 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRoute
   '/assets/': typeof AssetsIndexRoute
   '/_authenticated/admin/auctions': typeof AuthenticatedAdminAuctionsRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
+  '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/_authenticated/admin/incidents': typeof AuthenticatedAdminIncidentsRoute
   '/_authenticated/admin/listings': typeof AuthenticatedAdminListingsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/policy-review': typeof AuthenticatedAdminPolicyReviewRoute
@@ -664,9 +693,12 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets/'
     | '/admin/auctions'
+    | '/admin/audit'
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/emails'
+    | '/admin/exports'
+    | '/admin/incidents'
     | '/admin/listings'
     | '/admin/orders'
     | '/admin/policy-review'
@@ -729,9 +761,12 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets'
     | '/admin/auctions'
+    | '/admin/audit'
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/emails'
+    | '/admin/exports'
+    | '/admin/incidents'
     | '/admin/listings'
     | '/admin/orders'
     | '/admin/policy-review'
@@ -795,9 +830,12 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/assets/'
     | '/_authenticated/admin/auctions'
+    | '/_authenticated/admin/audit'
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/emails'
+    | '/_authenticated/admin/exports'
+    | '/_authenticated/admin/incidents'
     | '/_authenticated/admin/listings'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/policy-review'
@@ -1193,6 +1231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuctionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/content': {
       id: '/_authenticated/admin/content'
       path: '/admin/content'
@@ -1212,6 +1257,20 @@ declare module '@tanstack/react-router' {
       path: '/admin/emails'
       fullPath: '/admin/emails'
       preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/exports': {
+      id: '/_authenticated/admin/exports'
+      path: '/admin/exports'
+      fullPath: '/admin/exports'
+      preLoaderRoute: typeof AuthenticatedAdminExportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/incidents': {
+      id: '/_authenticated/admin/incidents'
+      path: '/admin/incidents'
+      fullPath: '/admin/incidents'
+      preLoaderRoute: typeof AuthenticatedAdminIncidentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/listings': {
@@ -1315,9 +1374,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSupplierRoute: typeof AuthenticatedSupplierRoute
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
   AuthenticatedAdminAuctionsRoute: typeof AuthenticatedAdminAuctionsRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
+  AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
+  AuthenticatedAdminIncidentsRoute: typeof AuthenticatedAdminIncidentsRoute
   AuthenticatedAdminListingsRoute: typeof AuthenticatedAdminListingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminPolicyReviewRoute: typeof AuthenticatedAdminPolicyReviewRoute
@@ -1352,9 +1414,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSupplierRoute: AuthenticatedSupplierRoute,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
   AuthenticatedAdminAuctionsRoute: AuthenticatedAdminAuctionsRoute,
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
+  AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
+  AuthenticatedAdminIncidentsRoute: AuthenticatedAdminIncidentsRoute,
   AuthenticatedAdminListingsRoute: AuthenticatedAdminListingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminPolicyReviewRoute: AuthenticatedAdminPolicyReviewRoute,
