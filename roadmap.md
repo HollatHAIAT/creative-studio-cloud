@@ -193,3 +193,4 @@
 - [ ] Undo preview + conflict check before applying; result logged
 - [ ] In-app alerts to admins on role changes / sensitive actions
 - [ ] Periodic admin activity summary (sensitive changes, undone actions)
+- [ ] Hash-chained audit events + integrity verification / tamper detection
