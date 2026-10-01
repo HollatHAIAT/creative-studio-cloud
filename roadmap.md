@@ -199,3 +199,15 @@
 - [ ] Retention period per audit event type; archiving paused while a review/compliance hold is active
 - [ ] Alert severity levels, assignment to staff, resolution confirmation — every step logged
 - [ ] Scheduled integrity-check reports (range checked, gaps, failures)
+- [ ] Incident actions: acknowledge, assign, investigate, close — each logged
+- [ ] Escalation to more staff if unhandled within a set time — logged
+- [ ] Group repeated alerts for the same activity into one incident, keeping every event/reason
+- [ ] Incident dashboard: counts by severity/status, avg response & close time, filter by period/staff
+- [ ] Time charts comparing periods/severities; click through to filtered incident list
+- [ ] Customisable checklists per incident type; step completion logged
+- [ ] Secure CSV/PDF export of incidents + action history (staff only)
+- [ ] Audit every export (staff, format, filters, row count)
+- [ ] Watermark + expiry on exports; blocked after expiry
+- [ ] Download tracking (who/when) linked to the export record
+- [ ] Pre-expiry alerts; expired exports & blocked links shown in export log
+- [ ] Settings: alert lead time before expiry + chosen recipient staff
