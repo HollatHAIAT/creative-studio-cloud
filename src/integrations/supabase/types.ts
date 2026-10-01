@@ -884,6 +884,44 @@ export type Database = {
         }
         Relationships: []
       }
+      export_alert_attempts: {
+        Row: {
+          attempted_at: string
+          by_user: string | null
+          delivery_id: number
+          error: string | null
+          id: number
+          manual: boolean
+          ok: boolean
+        }
+        Insert: {
+          attempted_at?: string
+          by_user?: string | null
+          delivery_id: number
+          error?: string | null
+          id?: number
+          manual?: boolean
+          ok: boolean
+        }
+        Update: {
+          attempted_at?: string
+          by_user?: string | null
+          delivery_id?: number
+          error?: string | null
+          id?: number
+          manual?: boolean
+          ok?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "export_alert_attempts_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "export_alert_deliveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       export_alert_deliveries: {
         Row: {
           attempts: number
@@ -3105,6 +3143,30 @@ export type Database = {
         Returns: string
       }
       admin_activity_summary: { Args: { _days: number }; Returns: Json }
+      admin_alert_deliveries: {
+        Args: {
+          _from: string
+          _recipient: string
+          _status: string
+          _to: string
+        }
+        Returns: {
+          attempts: number
+          channel: string
+          created_at: string
+          expires_at: string
+          export_format: string
+          export_id: string
+          export_kind: string
+          history: Json
+          id: number
+          last_error: string
+          recipient: string
+          recipient_email: string
+          sent_at: string
+          status: string
+        }[]
+      }
       admin_auction_reserves: {
         Args: never
         Returns: {
@@ -3272,6 +3334,7 @@ export type Database = {
         Args: { _category: string; _id: string; _price: number }
         Returns: string
       }
+      admin_resend_alert_delivery: { Args: { _id: number }; Returns: boolean }
       admin_resend_reviewer_invite: {
         Args: { _invite: string }
         Returns: string
@@ -3447,6 +3510,10 @@ export type Database = {
       edit_my_review: {
         Args: { _body: string; _rating: number; _review: string }
         Returns: undefined
+      }
+      export_alert_try: {
+        Args: { _delivery: number; _manual: boolean }
+        Returns: boolean
       }
       has_purchased: {
         Args: { _listing: string; _uid: string }
