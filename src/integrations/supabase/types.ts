@@ -1623,21 +1623,6 @@ export type Database = {
           },
         ]
       }
-      pending_admins: {
-        Row: {
-          created_at: string
-          email: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-        }
-        Relationships: []
-      }
       platform_settings: {
         Row: {
           commercial_multiplier: number
@@ -2747,7 +2732,6 @@ export type Database = {
           visit_date: string
         }[]
       }
-      claim_pending_role: { Args: never; Returns: boolean }
       close_auction: { Args: { _auction: string }; Returns: undefined }
       close_expired_blocks: { Args: never; Returns: undefined }
       consume_accepted_offer: {
