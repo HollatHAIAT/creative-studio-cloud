@@ -196,3 +196,4 @@
 - [ ] Hash-chained audit events + integrity verification / tamper detection
 - [ ] Retention/archiving of old audit events (still immutable, restorable for review)
 - [ ] Detect unusual access / repeated sensitive actions → alert admins, log reason
+- [ ] Retention period per audit event type; archiving paused while a review/compliance hold is active
