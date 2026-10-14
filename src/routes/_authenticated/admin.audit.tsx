@@ -76,7 +76,7 @@ function Audit() {
   };
   const setRetention = async (cat: string, cur: number) => {
     const v = prompt(L(`Retention for ${cat} (days, 30–36500):`, `مدة الاحتفاظ لـ ${CAT_AR[cat] ?? cat} (بالأيام 30–36500):`), String(cur)); if (!v) return;
-    const n = parseInt(v, 10); if (!(n >= 30 && n <= 36500)) return toast.error(L("Invalid number", "رقم غير صالح"));
+    const n = parseInt(v, 10); if (!(n >= 30 && n <= 36500)) { toast.error(L("Invalid number", "رقم غير صالح")); return; }
     if (!confirm(L(`Change ${cat} retention from ${cur} to ${n} days?`, `تغيير مدة الاحتفاظ من ${cur} إلى ${n} يوم؟`))) return;
     try { await rpc("admin_set_retention", { _category: cat, _days: n }); toast.success(L("Saved", "تم الحفظ")); refresh(); } catch (e) { err(e); }
   };

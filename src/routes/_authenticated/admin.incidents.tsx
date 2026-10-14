@@ -72,7 +72,7 @@ function Incidents() {
   const act = async (i: Inc, action: string) => {
     try {
       let assignee: string | null = null; let note = "";
-      if (action === "assign") { const pick = prompt(L("Assign to (staff email):", "إسناد إلى (بريد الموظف):"), staffQ.data?.[0]?.email ?? ""); const s = staffQ.data?.find((x) => x.email === pick?.trim()); if (!s) return toast.error(L("Not a staff member", "ليس من فريق العمل")); assignee = s.user_id; }
+      if (action === "assign") { const pick = prompt(L("Assign to (staff email):", "إسناد إلى (بريد الموظف):"), staffQ.data?.[0]?.email ?? ""); const s = staffQ.data?.find((x) => x.email === pick?.trim()); if (!s) { toast.error(L("Not a staff member", "ليس من فريق العمل")); return; } assignee = s.user_id; }
       if (action === "resolve") { note = prompt(L("How was it handled? (required)", "كيف تمت المعالجة؟ (مطلوب)"))?.trim() ?? ""; if (note.length < 3) return; }
       if (!confirm(L(`Confirm: ${action} this incident? The step is logged.`, `تأكيد: ${action} لهذه الحادثة؟ ستُسجَّل الخطوة.`))) return;
       await rpc("admin_incident_action", { _id: i.id, _action: action, _assignee: assignee, _note: note }); toast.success(L("Done", "تم")); refresh();
@@ -105,7 +105,7 @@ function Incidents() {
     const m = prompt(L(`Escalate ${r.severity} after how many minutes? (15–10080)`, `التصعيد لمستوى ${SEV_AR[r.severity]} بعد كم دقيقة؟ (15–10080)`), String(r.after_minutes)); if (!m) return;
     const emails = prompt(L("Extra staff to notify (emails, comma-separated; blank = all staff):", "مشرفون إضافيون للإشعار (بريد مفصول بفواصل، فارغ = الجميع):"), r.notify.map((u) => staffQ.data?.find((s) => s.user_id === u)?.email ?? u).join(", ")) ?? "";
     const ids = emails.split(",").map((e) => e.trim()).filter(Boolean).map((e) => staffQ.data?.find((s) => s.email === e)?.user_id);
-    if (ids.some((x) => !x)) return toast.error(L("Unknown staff email", "بريد غير معروف"));
+    if (ids.some((x) => !x)) { toast.error(L("Unknown staff email", "بريد غير معروف")); return; }
     if (!confirm(L("Save this escalation rule?", "حفظ قاعدة التصعيد؟"))) return;
     try { await rpc("admin_set_escalation_rule", { _severity: r.severity, _minutes: +m, _notify: ids }); refresh(); } catch (e) { err(e); }
   };
@@ -113,7 +113,7 @@ function Incidents() {
     const en = prompt(L("Steps in English, one per line separated by |", "الخطوات بالإنجليزية مفصولة بـ |"), steps.map((s) => s.en).join(" | ")); if (en == null) return;
     const arT = prompt(L("Same steps in Arabic, separated by |", "الخطوات نفسها بالعربية مفصولة بـ |"), steps.map((s) => s.ar).join(" | ")); if (arT == null) return;
     const e = en.split("|").map((x) => x.trim()).filter(Boolean), a = arT.split("|").map((x) => x.trim()).filter(Boolean);
-    if (e.length !== a.length) return toast.error(L("Both languages need the same number of steps", "يجب تساوي عدد الخطوات باللغتين"));
+    if (e.length !== a.length) { toast.error(L("Both languages need the same number of steps", "يجب تساوي عدد الخطوات باللغتين")); return; }
     try { await rpc("admin_set_checklist", { _kind: kind, _steps: e.map((x, i) => ({ en: x, ar: a[i] })) }); refresh(); } catch (er) { err(er); }
   };
 
@@ -147,7 +147,7 @@ function Incidents() {
             <div className="mb-2 flex items-center justify-between"><h2 className="text-sm font-medium">{L("Incidents per period (click a bar to open)", "الحوادث لكل فترة (اضغط على عمود للفتح)")}</h2>
               <span className="flex gap-1"><button onClick={() => void exportChart("csv")} className="rounded border border-border px-2 py-0.5 text-xs">CSV</button><button onClick={() => void exportChart("pdf")} className="rounded border border-border px-2 py-0.5 text-xs">PDF</button></span></div>
             <div className="h-64" dir="ltr"><ResponsiveContainer><BarChart data={series}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="period" fontSize={11} /><YAxis allowDecimals={false} fontSize={11} /><Tooltip /><Legend />
-              {SEVS.map((s) => <Bar key={s} dataKey={s} name={ar ? SEV_AR[s] : s} stackId="a" fill={SEV_COLOR[s]} cursor="pointer" onClick={onBar(s) as never} />)}</BarChart></ResponsiveContainer></div>
+              {SEVS.map((s) => <Bar key={s} dataKey={s} name={(ar ? SEV_AR[s] : s) ?? s} stackId="a" fill={SEV_COLOR[s]} cursor="pointer" onClick={onBar(s) as never} />)}</BarChart></ResponsiveContainer></div>
           </div>
           <div className="rounded-md border border-border bg-card p-3">
             <h2 className="mb-2 text-sm font-medium">{L("Average response and close time (hours)", "متوسط زمن الاستجابة والإغلاق (ساعات)")}</h2>
