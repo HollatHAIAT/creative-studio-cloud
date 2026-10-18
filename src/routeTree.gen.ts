@@ -19,6 +19,7 @@ import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as AuctionsRouteImport } from './routes/auctions'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ExhibitionsRouteImport } from './routes/exhibitions'
@@ -124,6 +125,11 @@ const AuthRoute = AuthRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -445,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/auctions': typeof AuctionsRouteWithChildren
   '/auth': typeof AuthRoute
   '/checkout': typeof CheckoutRoute
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRouteWithChildren
@@ -513,6 +520,7 @@ export interface FileRoutesByTo {
   '/auctions': typeof AuctionsRouteWithChildren
   '/auth': typeof AuthRoute
   '/checkout': typeof CheckoutRoute
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRouteWithChildren
@@ -583,6 +591,7 @@ export interface FileRoutesById {
   '/auctions': typeof AuctionsRouteWithChildren
   '/auth': typeof AuthRoute
   '/checkout': typeof CheckoutRoute
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/delivery': typeof DeliveryRoute
   '/exhibitions': typeof ExhibitionsRouteWithChildren
@@ -653,6 +662,7 @@ export interface FileRouteTypes {
     | '/auctions'
     | '/auth'
     | '/checkout'
+    | '/compare'
     | '/dashboard'
     | '/delivery'
     | '/exhibitions'
@@ -721,6 +731,7 @@ export interface FileRouteTypes {
     | '/auctions'
     | '/auth'
     | '/checkout'
+    | '/compare'
     | '/dashboard'
     | '/delivery'
     | '/exhibitions'
@@ -790,6 +801,7 @@ export interface FileRouteTypes {
     | '/auctions'
     | '/auth'
     | '/checkout'
+    | '/compare'
     | '/dashboard'
     | '/delivery'
     | '/exhibitions'
@@ -860,6 +872,7 @@ export interface RootRouteChildren {
   AuctionsRoute: typeof AuctionsRouteWithChildren
   AuthRoute: typeof AuthRoute
   CheckoutRoute: typeof CheckoutRoute
+  CompareRoute: typeof CompareRoute
   DashboardRoute: typeof DashboardRoute
   DeliveryRoute: typeof DeliveryRoute
   ExhibitionsRoute: typeof ExhibitionsRouteWithChildren
@@ -949,6 +962,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -1482,6 +1502,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuctionsRoute: AuctionsRouteWithChildren,
   AuthRoute: AuthRoute,
   CheckoutRoute: CheckoutRoute,
+  CompareRoute: CompareRoute,
   DashboardRoute: DashboardRoute,
   DeliveryRoute: DeliveryRoute,
   ExhibitionsRoute: ExhibitionsRouteWithChildren,
