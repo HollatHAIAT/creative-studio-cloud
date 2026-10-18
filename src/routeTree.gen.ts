@@ -76,8 +76,10 @@ import { Route as AuthenticatedAdminScanRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authenticated/admin.suppliers'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminWatchRouteImport } from './routes/_authenticated/admin.watch'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
+import { Route as ApiPublicJobsWatchPagesRouteImport } from './routes/api/public/jobs/watch-pages'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -436,6 +438,11 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminWatchRoute = AuthenticatedAdminWatchRouteImport.update({
+  id: '/admin/watch',
+  path: '/admin/watch',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOrdersIndexRoute =
   AuthenticatedOrdersIndexRouteImport.update({
     id: '/orders/',
@@ -446,6 +453,11 @@ const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
   id: '/orders/$id',
   path: '/orders/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicJobsWatchPagesRoute = ApiPublicJobsWatchPagesRouteImport.update({
+  id: '/api/public/jobs/watch-pages',
+  path: '/api/public/jobs/watch-pages',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -515,8 +527,10 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/watch': typeof AuthenticatedAdminWatchRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
+  '/api/public/jobs/watch-pages': typeof ApiPublicJobsWatchPagesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -585,8 +599,10 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/watch': typeof AuthenticatedAdminWatchRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
+  '/api/public/jobs/watch-pages': typeof ApiPublicJobsWatchPagesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -657,8 +673,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/suppliers': typeof AuthenticatedAdminSuppliersRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/watch': typeof AuthenticatedAdminWatchRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
+  '/api/public/jobs/watch-pages': typeof ApiPublicJobsWatchPagesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -729,8 +747,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/suppliers'
     | '/admin/users'
+    | '/admin/watch'
     | '/orders/$id'
     | '/orders/'
+    | '/api/public/jobs/watch-pages'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -799,8 +819,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/suppliers'
     | '/admin/users'
+    | '/admin/watch'
     | '/orders/$id'
     | '/orders'
+    | '/api/public/jobs/watch-pages'
   id:
     | '__root__'
     | '/'
@@ -870,8 +892,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/suppliers'
     | '/_authenticated/admin/users'
+    | '/_authenticated/admin/watch'
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/'
+    | '/api/public/jobs/watch-pages'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -903,6 +927,7 @@ export interface RootRouteChildren {
   CollectionsSaudiBanksRoute: typeof CollectionsSaudiBanksRoute
   ListingIdRoute: typeof ListingIdRoute
   AssetsIndexRoute: typeof AssetsIndexRoute
+  ApiPublicJobsWatchPagesRoute: typeof ApiPublicJobsWatchPagesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1376,6 +1401,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/watch': {
+      id: '/_authenticated/admin/watch'
+      path: '/admin/watch'
+      fullPath: '/admin/watch'
+      preLoaderRoute: typeof AuthenticatedAdminWatchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/': {
       id: '/_authenticated/orders/'
       path: '/orders'
@@ -1389,6 +1421,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/orders/$id'
       preLoaderRoute: typeof AuthenticatedOrdersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/jobs/watch-pages': {
+      id: '/api/public/jobs/watch-pages'
+      path: '/api/public/jobs/watch-pages'
+      fullPath: '/api/public/jobs/watch-pages'
+      preLoaderRoute: typeof ApiPublicJobsWatchPagesRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -1430,6 +1469,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSuppliersRoute: typeof AuthenticatedAdminSuppliersRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminWatchRoute: typeof AuthenticatedAdminWatchRoute
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
 }
@@ -1471,6 +1511,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSuppliersRoute: AuthenticatedAdminSuppliersRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminWatchRoute: AuthenticatedAdminWatchRoute,
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
 }
@@ -1542,6 +1583,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsSaudiBanksRoute: CollectionsSaudiBanksRoute,
   ListingIdRoute: ListingIdRoute,
   AssetsIndexRoute: AssetsIndexRoute,
+  ApiPublicJobsWatchPagesRoute: ApiPublicJobsWatchPagesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
