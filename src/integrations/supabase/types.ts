@@ -3141,6 +3141,80 @@ export type Database = {
         }
         Relationships: []
       }
+      watch_changes: {
+        Row: {
+          added: string[]
+          checked_at: string
+          id: string
+          page_id: string
+          removed: string[]
+          seen_at: string | null
+        }
+        Insert: {
+          added?: string[]
+          checked_at?: string
+          id?: string
+          page_id: string
+          removed?: string[]
+          seen_at?: string | null
+        }
+        Update: {
+          added?: string[]
+          checked_at?: string
+          id?: string
+          page_id?: string
+          removed?: string[]
+          seen_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watch_changes_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "watch_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      watch_pages: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          label: string
+          last_checked_at: string | null
+          last_content: string | null
+          last_error: string | null
+          url: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          last_checked_at?: string | null
+          last_content?: string | null
+          last_error?: string | null
+          url: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          last_checked_at?: string | null
+          last_content?: string | null
+          last_error?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
