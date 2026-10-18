@@ -17,6 +17,14 @@ describe.skipIf(!url || !key)("supplier approval", () => {
     const { data } = await db().from("supplier_products").select("id, supplier_accounts(status)").limit(200);
     for (const p of data ?? []) expect(p.supplier_accounts?.status).toBe("active");
   });
+  it("visitors cannot read supplier contact details", async () => {
+    const { error } = await db().from("supplier_accounts").select("phone, email").limit(1);
+    expect(error).not.toBeNull();
+  });
+  it("visitors can read approved shop names without staff checks failing", async () => {
+    const { error } = await db().from("supplier_accounts").select("name, city").limit(1);
+    expect(error).toBeNull();
+  });
   it("visitors cannot approve a supplier", async () => {
     const { error } = await db().rpc("admin_review_supplier", { _user: "00000000-0000-0000-0000-000000000000", _decision: "active", _note: "" });
     expect(error).not.toBeNull();
