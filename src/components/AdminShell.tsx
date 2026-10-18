@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { LayoutDashboard, Users, ListChecks, ShoppingBag, Gavel, Flag, Star, Mail, ShieldCheck, ScanLine, Settings, FileSearch, Languages, ExternalLink, FileText, Menu, X, History, Siren, FileDown } from "lucide-react";
+import { LayoutDashboard, Users, ListChecks, ShoppingBag, Gavel, Flag, Star, Mail, ShieldCheck, ScanLine, Settings, FileSearch, Languages, ExternalLink, FileText, Menu, X, History, Siren, FileDown, Store } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import logoMark from "@/assets/arwiqa-mark.png";
 
 const items = [
   { to: "/admin/dashboard", en: "Overview", ar: "نظرة عامة", icon: LayoutDashboard },
   { to: "/admin/users", en: "Users & roles", ar: "المستخدمون والأدوار", icon: Users },
+  { to: "/admin/suppliers", en: "Supplier approvals", ar: "موافقات الموردين", icon: Store },
   { to: "/admin/content", en: "Site content", ar: "إدارة المحتوى", icon: FileText },
   { to: "/admin/listings", en: "Listings", ar: "الإعلانات", icon: ListChecks },
   { to: "/admin/policy-review", en: "Policy review", ar: "مراجعة السياسات", icon: FileSearch },

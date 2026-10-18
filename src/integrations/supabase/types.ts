@@ -2782,6 +2782,9 @@ export type Database = {
           name: string
           name_ar: string
           phone: string
+          review_note: string
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           updated_at: string
           user_id: string
@@ -2796,6 +2799,9 @@ export type Database = {
           name: string
           name_ar?: string
           phone?: string
+          review_note?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -2810,6 +2816,9 @@ export type Database = {
           name?: string
           name_ar?: string
           phone?: string
+          review_note?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -3343,6 +3352,10 @@ export type Database = {
       admin_retry_reminder_email: { Args: { _id: string }; Returns: undefined }
       admin_review_listing: {
         Args: { _approve: boolean; _id: string; _note: string }
+        Returns: undefined
+      }
+      admin_review_supplier: {
+        Args: { _decision: string; _note?: string; _user: string }
         Returns: undefined
       }
       admin_set_checklist: {

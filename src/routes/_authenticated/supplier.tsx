@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/supplier")({
 });
 
 const sb = supabase as any;
-type Acc = { name: string; name_ar: string; city: string; city_ar: string; phone: string; email: string; about: string; about_ar: string; status?: string };
+type Acc = { name: string; name_ar: string; city: string; city_ar: string; phone: string; email: string; about: string; about_ar: string; status?: string; review_note?: string };
 type Prod = { id?: string; name: string; name_ar: string; description: string; description_ar: string; type: string; price: number; stock: number; low_stock_at: number; swatch: string; status: string };
 type Line = { id: string; order_id: string; title: string; title_ar: string; qty: number; amount: number; ship_to: any; buyer_name: string; status: string; tracking: string; created_at: string };
 const EMPTY_ACC: Acc = { name: "", name_ar: "", city: "", city_ar: "", phone: "", email: "", about: "", about_ar: "" };
@@ -50,6 +50,8 @@ function SupplierPortal() {
       <div className="mx-auto max-w-6xl px-6 pb-20">
         {!a ? <AccountForm L={L} uid={acc.data!.uid} email={acc.data!.email} initial={null} /> : (
           <>
+            {a.status === "pending" && <p role="status" className="mb-4 rounded-md border border-gold/50 bg-gold/10 p-3 text-sm">{L("Your shop is waiting for staff approval. You can prepare products now; they'll appear on the supplies page once approved.", "متجرك بانتظار موافقة الفريق. يمكنك تجهيز منتجاتك الآن، وستظهر في صفحة المستلزمات بعد الموافقة.")}</p>}
+            {a.status === "rejected" && <p role="alert" className="mb-4 rounded-md border border-destructive/40 p-3 text-sm text-destructive">{L("Your shop needs changes before approval: ", "متجرك يحتاج إلى تعديلات قبل الموافقة: ")}<strong>{a.review_note}</strong> {L("Update your account details and save to resubmit.", "حدّث بيانات حسابك واحفظها لإعادة الإرسال.")}</p>}
             {a.status === "suspended" && <p role="alert" className="mb-4 flex items-center gap-2 rounded-md border border-destructive/40 p-3 text-sm text-destructive"><AlertTriangle aria-hidden className="h-4 w-4" />{L("Your supplier account is suspended. Your products are hidden. Contact support.", "حساب المورّد موقوف وتم إخفاء منتجاتك. تواصل مع الدعم.")}</p>}
             <nav aria-label={L("Portal sections", "أقسام البوابة")} className="mb-6 flex gap-1 overflow-x-auto border-b border-border">
               {([["orders", L("Orders", "الطلبات"), ClipboardList], ["products", L("Products & stock", "المنتجات والمخزون"), Package], ["account", L("Account", "الحساب"), Store]] as const).map(([k, label, Icon]) => (
@@ -70,10 +72,11 @@ function AccountForm({ L, uid, email, initial }: { L: (e: string, a: string) => 
   const set = (k: keyof Acc) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setF({ ...f, [k]: e.target.value });
   const save = async () => {
     if (f.name.trim().length < 2) { toast.error(L("Enter your shop name.", "أدخل اسم المتجر.")); return; }
-    const row = { user_id: uid, name: f.name.trim(), name_ar: f.name_ar.trim(), city: f.city.trim(), city_ar: f.city_ar.trim(), phone: f.phone.trim(), email: f.email.trim(), about: f.about.trim(), about_ar: f.about_ar.trim() };
+    const row: Record<string, string> = { user_id: uid, name: f.name.trim(), name_ar: f.name_ar.trim(), city: f.city.trim(), city_ar: f.city_ar.trim(), phone: f.phone.trim(), email: f.email.trim(), about: f.about.trim(), about_ar: f.about_ar.trim() };
+    if (initial?.status === "rejected") row["status"] = "pending";
     const { error } = initial ? await sb.from("supplier_accounts").update(row).eq("user_id", uid) : await sb.from("supplier_accounts").insert(row);
     if (error) { toast.error(error.message); return; }
-    toast.success(initial ? L("Account saved", "تم حفظ الحساب") : L("Welcome! Your supplier account is ready.", "أهلًا! حساب المورّد جاهز.")); qc.invalidateQueries({ queryKey: ["supplier-account"] });
+    toast.success(initial ? (initial.status === "rejected" ? L("Resubmitted for approval", "أُعيد الإرسال للموافقة") : L("Account saved", "تم حفظ الحساب")) : L("Thanks! Your shop was sent for staff approval.", "شكرًا! أُرسل متجرك لموافقة الفريق.")); qc.invalidateQueries({ queryKey: ["supplier-account"] });
   };
   return (
     <form onSubmit={(e) => { e.preventDefault(); void save(); }} className={card}>
