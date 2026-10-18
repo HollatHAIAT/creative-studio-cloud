@@ -182,37 +182,37 @@
 - [ ] Real email sending — blocked: needs a sender email domain from user
 - [ ] End-to-end journey tests
 - [ ] Real artist names/works/prices and support response time — blocked: user data
-- [ ] Replace email-based auto admin (claim_pending_role) with secure server-side role assignment
-- [ ] Automated tests: order tracking, payment retry, non-staff blocked from moderation tools
-- [ ] Buyer notifications on order status change + account notification preferences
-- [ ] End-to-end test of admin portal + CMS pages; finish incomplete admin journeys
-- [ ] Admin audit log (roles, content, orders) with actor, time, before/after values
-- [ ] Confirm before sensitive admin actions; undo for content and order changes, logged
-- [ ] Audit log filters (actor, action type, period), search, CSV export, expandable before/after
-- [ ] Audit events immutable; staff-only reading; access attempts logged
-- [ ] Undo preview + conflict check before applying; result logged
-- [ ] In-app alerts to admins on role changes / sensitive actions
-- [ ] Periodic admin activity summary (sensitive changes, undone actions)
-- [ ] Hash-chained audit events + integrity verification / tamper detection
-- [ ] Retention/archiving of old audit events (still immutable, restorable for review)
-- [ ] Detect unusual access / repeated sensitive actions → alert admins, log reason
-- [ ] Retention period per audit event type; archiving paused while a review/compliance hold is active
-- [ ] Alert severity levels, assignment to staff, resolution confirmation — every step logged
-- [ ] Scheduled integrity-check reports (range checked, gaps, failures)
-- [ ] Incident actions: acknowledge, assign, investigate, close — each logged
-- [ ] Escalation to more staff if unhandled within a set time — logged
-- [ ] Group repeated alerts for the same activity into one incident, keeping every event/reason
-- [ ] Incident dashboard: counts by severity/status, avg response & close time, filter by period/staff
-- [ ] Time charts comparing periods/severities; click through to filtered incident list
-- [ ] Customisable checklists per incident type; step completion logged
-- [ ] Secure CSV/PDF export of incidents + action history (staff only)
-- [ ] Audit every export (staff, format, filters, row count)
-- [ ] Watermark + expiry on exports; blocked after expiry
-- [ ] Download tracking (who/when) linked to the export record
-- [ ] Pre-expiry alerts; expired exports & blocked links shown in export log
-- [ ] Settings: alert lead time before expiry + chosen recipient staff
-- [ ] Delivery-status log for expiry alerts with automatic retry on failure
-- [ ] Secure export of filtered chart results (period/severity), logged in audit
-- [ ] Manual resend of an expiry alert from the delivery log; attempt + result logged
-- [ ] Delivery log filters (status, staff member, period) with per-attempt details
-- [ ] Chart exports include a clear period/severity summary and file creation time
+- [x] Replace email-based auto admin (claim_pending_role) with secure server-side role assignment
+- [x] Automated tests: order tracking, payment retry, non-staff blocked from moderation tools
+- [x] Buyer notifications on order status change + account notification preferences
+- [x] End-to-end test of admin portal + CMS pages; finish incomplete admin journeys
+- [x] Admin audit log (roles, content, orders) with actor, time, before/after values
+- [x] Confirm before sensitive admin actions; undo for content and order changes, logged
+- [x] Audit log filters (actor, action type, period), search, CSV export, expandable before/after
+- [x] Audit events immutable; staff-only reading; access attempts logged
+- [x] Undo preview + conflict check before applying; result logged
+- [x] In-app alerts to admins on role changes / sensitive actions
+- [x] Periodic admin activity summary (sensitive changes, undone actions)
+- [x] Hash-chained audit events + integrity verification / tamper detection
+- [x] Retention/archiving of old audit events (still immutable, restorable for review)
+- [x] Detect unusual access / repeated sensitive actions → alert admins, log reason
+- [x] Retention period per audit event type; archiving paused while a review/compliance hold is active
+- [x] Alert severity levels, assignment to staff, resolution confirmation — every step logged
+- [x] Scheduled integrity-check reports (range checked, gaps, failures)
+- [x] Incident actions: acknowledge, assign, investigate, close — each logged
+- [x] Escalation to more staff if unhandled within a set time — logged
+- [x] Group repeated alerts for the same activity into one incident, keeping every event/reason
+- [x] Incident dashboard: counts by severity/status, avg response & close time, filter by period/staff
+- [x] Time charts comparing periods/severities; click through to filtered incident list
+- [x] Customisable checklists per incident type; step completion logged
+- [x] Secure CSV/PDF export of incidents + action history (staff only)
+- [x] Audit every export (staff, format, filters, row count)
+- [x] Watermark + expiry on exports; blocked after expiry
+- [x] Download tracking (who/when) linked to the export record
+- [x] Pre-expiry alerts; expired exports & blocked links shown in export log
+- [x] Settings: alert lead time before expiry + chosen recipient staff
+- [x] Delivery-status log for expiry alerts with automatic retry on failure
+- [x] Secure export of filtered chart results (period/severity), logged in audit
+- [x] Manual resend of an expiry alert from the delivery log; attempt + result logged
+- [x] Delivery log filters (status, staff member, period) with per-attempt details
+- [x] Chart exports include a clear period/severity summary and file creation time
