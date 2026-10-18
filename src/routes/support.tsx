@@ -28,7 +28,7 @@ const TOPICS = ["order", "payment", "shipping", "licensing", "selling", "auction
 const TOPIC_AR: Record<string, string> = { order: "طلب", payment: "دفع", shipping: "شحن", licensing: "ترخيص", selling: "البيع", auction: "مزاد", exhibition: "معرض", account: "الحساب", other: "أخرى" };
 
 function Support() {
-  const { locale } = useLocale(); const ar = locale === "ar"; const L = (e: string, a: string) => (ar ? a : e);
+  const { locale, t } = useLocale(); const ar = locale === "ar"; const L = (e: string, a: string) => (ar ? a : e);
   const [uid, setUid] = useState<string | null | undefined>(undefined);
   const [staff, setStaff] = useState(false);
   const [tickets, setTickets] = useState<Ticket[]>([]);
