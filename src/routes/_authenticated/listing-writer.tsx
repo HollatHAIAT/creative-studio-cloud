@@ -204,12 +204,13 @@ function ListingWriter() {
             ))}
           </div>
           {mode === "ai" ? (<>
-            <ActionButton state={write.state} disabled={!path} onClick={() => write.run()} onRetry={write.retry}
+            <ActionButton state={write.state} disabled={!path && notes.trim().length < 15} onClick={() => write.run()} onRetry={write.retry}
               loadingLabel={L("Writing copy…", "جارٍ الكتابة…")} successLabel={L("Copy ready", "النص جاهز")}
               errorLabel={err || L("Couldn't write copy.", "تعذّرت الكتابة.")} retryLabel={L("Try again", "حاول مجدداً")}
               className="w-full rounded-full bg-primary px-5 py-3 text-primary-foreground">
               {copy ? L("Rewrite copy", "أعد الكتابة") : L("Write listing copy", "اكتب نص الإعلان")}
             </ActionButton>
+            {!path && <p className="text-xs text-muted-foreground">{L("No photo? Describe the work in the notes (15+ characters) and the AI will write from your words only.", "بلا صورة؟ صف العمل في الملاحظات (١٥ حرفًا على الأقل) وسيكتب الذكاء الاصطناعي من كلماتك فقط.")}</p>}
             {write.state === "error" && (
               <p className="text-sm">{L("The AI isn't available right now.", "الذكاء الاصطناعي غير متاح الآن.")}{" "}
                 <button type="button" onClick={startManual} className="font-medium text-primary underline">{L("Write it myself instead", "سأكتبه بنفسي بدلاً من ذلك")}</button></p>)}

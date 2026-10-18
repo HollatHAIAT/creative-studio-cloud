@@ -19,23 +19,26 @@ const Copy = z.object({
 export const generateListingCopy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({
-    path: z.string().min(3).max(300),
+    path: z.string().max(300).default(""),
     notes: z.string().max(600).default(""),
     medium: z.string().max(100).default(""),
-  }).parse(d))
+  }).refine((v) => v.path.length >= 3 || v.notes.trim().length >= 15, "Add a photo, or describe the artwork in at least 15 characters.").parse(d))
   .handler(async ({ data, context }): Promise<ListingCopyResult> => {
     // Seller can only analyze images in their own folder.
-    if (!data.path.startsWith(`${context.userId}/`)) return { error: "You can only describe your own uploads." };
+    if (data.path && !data.path.startsWith(`${context.userId}/`)) return { error: "You can only describe your own uploads." };
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { error: "AI is not configured." };
 
-    const { data: blob, error: dlErr } = await context.supabase.storage.from("artwork-images").download(data.path);
-    if (dlErr || !blob || blob.size === 0) return { error: "The uploaded image couldn't be read. Please upload it again." };
-    const mime = blob.type || "image/jpeg";
-    if (!/^image\/(png|jpeg|webp|gif)$/.test(mime)) return { error: "Please upload a PNG, JPG, WEBP or GIF image." };
-    const b64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
+    let imagePart: { type: "input_image"; image_url: string } | null = null;
+    if (data.path) {
+      const { data: blob, error: dlErr } = await context.supabase.storage.from("artwork-images").download(data.path);
+      if (dlErr || !blob || blob.size === 0) return { error: "The uploaded image couldn't be read. Please upload it again." };
+      const mime = blob.type || "image/jpeg";
+      if (!/^image\/(png|jpeg|webp|gif)$/.test(mime)) return { error: "Please upload a PNG, JPG, WEBP or GIF image." };
+      imagePart = { type: "input_image", image_url: `data:${mime};base64,${Buffer.from(await blob.arrayBuffer()).toString("base64")}` };
+    }
 
-    const prompt = `You write listing copy for Arwiqa, a Saudi art marketplace. Look at the artwork image and write:
+    const prompt = `You write listing copy for Arwiqa, a Saudi art marketplace. ${imagePart ? "Look at the artwork image and write:" : "There is no photo: write ONLY from the seller's details below, never invent visual details they did not mention, and make the alt text a short neutral summary of what they described. Write:"}
 - title: evocative, max 6 words (English) and titleAr (Arabic)
 - description: 60-110 words, describe composition, palette, mood, technique; no invented facts about the artist, no prices (English) and descriptionAr (natural Arabic, not literal)
 - altText: objective accessibility alt text, max 140 characters, describe what is visible, don't start with "Image of" (English) and altTextAr (Arabic)
@@ -51,7 +54,7 @@ Reply with ONLY JSON: {"title":"","titleAr":"","description":"","descriptionAr":
         reasoning: { effort: "low", summary: "auto" }, include: ["reasoning.encrypted_content"],
         input: [{ role: "user", content: [
           { type: "input_text", text: prompt },
-          { type: "input_image", image_url: `data:${mime};base64,${b64}` },
+          ...(imagePart ? [imagePart] : []),
         ] }],
       }),
     });
