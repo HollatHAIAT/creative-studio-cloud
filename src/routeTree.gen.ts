@@ -78,6 +78,7 @@ import { Route as AuthenticatedAdminSuppliersRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
+import { Route as ApiPublicJobsWatchPagesRouteImport } from './routes/api/public/jobs/watch-pages'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -447,6 +448,11 @@ const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
   path: '/orders/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicJobsWatchPagesRoute = ApiPublicJobsWatchPagesRouteImport.update({
+  id: '/api/public/jobs/watch-pages',
+  path: '/api/public/jobs/watch-pages',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -517,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
+  '/api/public/jobs/watch-pages': typeof ApiPublicJobsWatchPagesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -587,6 +594,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
+  '/api/public/jobs/watch-pages': typeof ApiPublicJobsWatchPagesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -659,6 +667,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
+  '/api/public/jobs/watch-pages': typeof ApiPublicJobsWatchPagesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -731,6 +740,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/orders/$id'
     | '/orders/'
+    | '/api/public/jobs/watch-pages'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -801,6 +811,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/orders/$id'
     | '/orders'
+    | '/api/public/jobs/watch-pages'
   id:
     | '__root__'
     | '/'
@@ -872,6 +883,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/'
+    | '/api/public/jobs/watch-pages'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -903,6 +915,7 @@ export interface RootRouteChildren {
   CollectionsSaudiBanksRoute: typeof CollectionsSaudiBanksRoute
   ListingIdRoute: typeof ListingIdRoute
   AssetsIndexRoute: typeof AssetsIndexRoute
+  ApiPublicJobsWatchPagesRoute: typeof ApiPublicJobsWatchPagesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1390,6 +1403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/jobs/watch-pages': {
+      id: '/api/public/jobs/watch-pages'
+      path: '/api/public/jobs/watch-pages'
+      fullPath: '/api/public/jobs/watch-pages'
+      preLoaderRoute: typeof ApiPublicJobsWatchPagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1542,6 +1562,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsSaudiBanksRoute: CollectionsSaudiBanksRoute,
   ListingIdRoute: ListingIdRoute,
   AssetsIndexRoute: AssetsIndexRoute,
+  ApiPublicJobsWatchPagesRoute: ApiPublicJobsWatchPagesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
