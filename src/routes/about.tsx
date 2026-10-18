@@ -25,14 +25,14 @@ function About() {
       <div className="mx-auto grid max-w-7xl gap-6 px-6 md:grid-cols-4">
         {pillars.map(([k, to]) => (
           <Link key={to} to={to} className="rounded-2xl border border-border bg-card p-6 transition hover:border-primary">
-            <p className="font-display text-2xl">{t(`about.${k}.title`)}</p><p className="mt-2 text-sm text-muted-foreground">{t(`about.${k}.body`)}</p>
+            <p className="font-display text-2xl">{t(`about.${k}.title` as const)}</p><p className="mt-2 text-sm text-muted-foreground">{t(`about.${k}.body` as const)}</p>
           </Link>
         ))}
       </div>
       <section className="mx-auto mt-12 max-w-3xl space-y-4 px-6 leading-relaxed">
         <h2 className="font-display text-2xl">{t("about.commit.title")}</h2>
         <ul className="ms-5 list-disc space-y-2">
-          {[1, 2, 3, 4].map((i) => <li key={i}>{t(`about.commit.${i}`)}</li>)}
+          {([1, 2, 3, 4] as const).map((i) => <li key={i}>{t(`about.commit.${i}` as const)}</li>)}
         </ul>
         <div className="flex flex-wrap gap-3 pt-4">
           <Link to="/support" className="rounded-full bg-primary px-5 py-2 text-primary-foreground">{t("about.cta.support")}</Link>

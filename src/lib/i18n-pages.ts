@@ -1,6 +1,6 @@
 // Editable texts for the About, Licensing and FAQ pages. Admins override them in /admin/content → Page texts.
 // "{n}" is replaced at render time with a value from the platform settings.
-const P: Record<string, [string, string]> = {
+const P = {
   "about.eyebrow": ["Company", "الشركة"],
   "about.title": ["Global art, crafted by Saudi hands", "فنٌّ عالمي بأيادٍ سعودية"],
   "about.sub": ["Arwiqa (أروقة, “galleries”) connects collectors worldwide with artists, galleries and heritage makers — with special strength in Saudi and Gulf art, calligraphy, Sadu, Al-Qatt Al-Asiri and pottery.", "أروقة سوق عالمي يربط المقتنين حول العالم بالفنانين والمعارض وصنّاع التراث، بقوة خاصة في الفن السعودي والخليجي والخط العربي والسدو والقط العسيري والفخار."],
@@ -38,9 +38,10 @@ const P: Record<string, [string, string]> = {
   "faq.q4": ["I won an auction — what now?", "فزت بمزاد — ماذا الآن؟"], "faq.a4": ["You'll get a notification with a payment deadline. Pay from My auctions before it expires, or it passes to the next bidder.", "يصلك إشعار بمهلة الدفع. ادفع من «مزاداتي» قبل انتهائها، وإلا ينتقل العمل للمزايد التالي."],
   "faq.q5": ["How do exhibition tickets work?", "كيف تعمل تذاكر المعارض؟"], "faq.a5": ["Book a date and slot; each ticket gets a code scanned at the entrance.", "احجز التاريخ والفترة، ولكل تذكرة رمز يُمسح عند الدخول."],
   "faq.q6": ["How do I start selling?", "كيف أبدأ البيع؟"], "faq.a6": ["Use the AI listing writer, choose a review path, then manage stock and offers from the seller dashboard.", "استخدم كاتب الإعلان بالذكاء الاصطناعي، واختر مسار المراجعة، ثم أدِر المخزون والعروض من لوحة البائع."],
-};
+} as const satisfies Record<string, readonly [string, string]>;
+type PK = keyof typeof P;
 
-export const pageEn = Object.fromEntries(Object.entries(P).map(([k, v]) => [k, v[0]])) as Record<string, string>;
-export const pageAr = Object.fromEntries(Object.entries(P).map(([k, v]) => [k, v[1]])) as Record<string, string>;
+export const pageEn = Object.fromEntries(Object.entries(P).map(([k, v]) => [k, v[0]])) as Record<PK, string>;
+export const pageAr = Object.fromEntries(Object.entries(P).map(([k, v]) => [k, v[1]])) as Record<PK, string>;
 /** Fills {n}/{c}/{e} placeholders. */
 export const fill = (s: string, vals: Record<string, string>) => s.replace(/\{(\w+)\}/g, (m, k) => vals[k] ?? m);

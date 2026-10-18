@@ -65,7 +65,7 @@ function Support() {
 
   const ps = usePlatformSettings();
   const faqTo = ["/orders", "/orders", "/orders", "/my-auctions", "/exhibitions", "/sell"];
-  const faq: [string, string, string][] = faqTo.map((to, i) => [t(`faq.q${i + 1}`), fill(t(`faq.a${i + 1}`), { n: num(ps.return_days, ar) }), to]);
+  const faq: [string, string, string][] = faqTo.map((to, i) => [t(`faq.q${i + 1}` as "faq.q1"), fill(t(`faq.a${i + 1}` as "faq.a1"), { n: num(ps.return_days, ar) }), to]);
 
   return (
     <SiteShell>
