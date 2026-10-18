@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Store, Package, ClipboardList, Plus, AlertTriangle } from "lucide-react";
+import { Store, Package, ClipboardList, Plus, AlertTriangle, Sparkles } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { writeSupplierListing } from "@/lib/supplier-copy.functions";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
@@ -102,6 +104,20 @@ function Products({ L, ar }: { L: (e: string, a: string) => string; ar: boolean 
   } });
   const [edit, setEdit] = useState<Prod | null>(null);
   const [stockEdits, setStockEdits] = useState<Record<string, number>>({});
+  const [details, setDetails] = useState(""); const [writing, setWriting] = useState(false); const [aiErr, setAiErr] = useState("");
+  const writeFn = useServerFn(writeSupplierListing);
+  const aiWrite = async () => {
+    if (!edit) return;
+    if ((edit.name || edit.description) && !confirm(L("Replace the current name and descriptions with the AI version?", "استبدال الاسم والوصف الحاليين بنسخة الذكاء الاصطناعي؟"))) return;
+    setWriting(true); setAiErr("");
+    try {
+      const r = await writeFn({ data: { details, type: edit.type, name: edit.name } });
+      if (r.error || !r.copy) { setAiErr(r.error ?? L("Couldn't write the listing.", "تعذّرت الكتابة.")); return; }
+      setEdit((e) => e && { ...e, name: r.copy!.name, name_ar: r.copy!.nameAr, description: r.copy!.description, description_ar: r.copy!.descriptionAr });
+      toast.success(L("Listing written — review and edit before saving.", "كُتب الإعلان — راجعه وعدّله قبل الحفظ."));
+    } catch { setAiErr(L("Couldn't write the listing.", "تعذّرت الكتابة.")); }
+    finally { setWriting(false); }
+  };
   const refresh = () => { qc.invalidateQueries({ queryKey: ["supplier-products-mine"] }); qc.invalidateQueries({ queryKey: ["supplier-products-public"] }); };
   const save = async () => {
     if (!edit) return;
@@ -121,6 +137,14 @@ function Products({ L, ar }: { L: (e: string, a: string) => string; ar: boolean 
   if (edit) return (
     <form onSubmit={(e) => { e.preventDefault(); void save(); }} className={card}>
       <h2 className="font-display text-2xl">{edit.id ? L("Edit product", "تعديل المنتج") : L("New product", "منتج جديد")}</h2>
+      <div className="mt-4 rounded-xl border border-primary/40 bg-primary/5 p-4">
+        <label className="block text-sm font-medium">{L("Write it for me with AI", "اكتبه لي بالذكاء الاصطناعي")}
+          <textarea rows={3} maxLength={1500} value={details} onChange={(e) => setDetails(e.target.value)} placeholder={L("Rough details in any language: e.g. 12 acrylic tubes 75 ml, made in Italy, lightfast, for canvas and wood", "تفاصيل سريعة بأي لغة: مثال ١٢ أنبوب أكريليك ٧٥ مل، صنع في إيطاليا، ثابت أمام الضوء، للكانفس والخشب")} className={input} /></label>
+        <button type="button" onClick={() => void aiWrite()} disabled={writing || details.trim().length < 10} className="mt-2 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50">
+          <Sparkles aria-hidden className="h-4 w-4" />{writing ? L("Writing…", "جارٍ الكتابة…") : L("Write Arabic & English listing", "اكتب الإعلان بالعربية والإنجليزية")}</button>
+        {aiErr && <p role="alert" className="mt-2 text-sm text-destructive">{aiErr}</p>}
+        <p className="mt-1 text-xs text-muted-foreground">{L("Uses only the facts you give. The result fills the fields below for you to check.", "يستخدم المعلومات التي تقدّمها فقط، ويملأ الحقول أدناه لتراجعها.")}</p>
+      </div>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <label className="text-sm">{L("Name (English)", "الاسم (إنجليزي)")}<input dir="ltr" required maxLength={160} value={edit.name} onChange={t("name")} className={input} /></label>
         <label className="text-sm">{L("Name (Arabic)", "الاسم (عربي)")}<input dir="rtl" required maxLength={160} value={edit.name_ar} onChange={t("name_ar")} className={input} /></label>
