@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { actions, useStore } from "./store";
 import { en2, ar2 } from "./i18n-extra";
+import { pageEn, pageAr } from "./i18n-pages";
 import { textOverrides, useCmsVersion } from "./cms";
 
 export type Locale = "en" | "ar";
@@ -56,6 +57,7 @@ const en = {
   "form.licenses": "Digital licenses", "form.personal": "Personal", "form.commercial": "Commercial", "form.extended": "Extended",
   "form.remove": "Remove", "form.needOption": "Add at least one option to sell (original, print or license)",
   ...en2,
+  ...pageEn,
 };
 export type Key = keyof typeof en;
 
@@ -110,6 +112,7 @@ const ar: Record<Key, string> = {
   "form.licenses": "التراخيص الرقمية", "form.personal": "شخصي", "form.commercial": "تجاري", "form.extended": "موسّع",
   "form.remove": "إزالة", "form.needOption": "أضف خيار بيع واحدًا على الأقل (أصلي أو مطبوعة أو ترخيص)",
   ...ar2,
+  ...pageAr,
 };
 
 const dicts = { en, ar };

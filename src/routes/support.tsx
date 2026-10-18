@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SiteShell, PageTitle } from "@/components/SiteShell";
 import { useLocale } from "@/lib/i18n";
+import { fill } from "@/lib/i18n-pages";
 import { supabase } from "@/integrations/supabase/client";
 
 const sb = supabase as any;
@@ -63,21 +64,15 @@ function Support() {
   }
 
   const ps = usePlatformSettings();
-  const faq: [string, string, string][] = [
-    [L("How do I pay?", "كيف أدفع؟"), L("By bank transfer to a Saudi bank. Your order page shows the details and reference; staff confirm the payment.", "بالتحويل إلى بنك سعودي. تظهر التفاصيل والرقم المرجعي في صفحة طلبك، ويؤكد الفريق الدفع."), "/orders"],
-    [L("Where is my order?", "أين طلبي؟"), L("Open My orders to see the status timeline and tracking once shipped.", "افتح «طلباتي» لترى مراحل الطلب ورقم التتبع بعد الشحن."), "/orders"],
-    [L("Can I return an artwork?", "هل يمكنني إرجاع عمل؟"), L(`Request a return or refund from the order page within ${num(ps.return_days, false)} days of delivery.`, `اطلب الإرجاع أو الاسترداد من صفحة الطلب خلال ${num(ps.return_days, true)} يومًا من الاستلام.`), "/orders"],
-    [L("I won an auction — what now?", "فزت بمزاد — ماذا الآن؟"), L("You'll get a notification with a payment deadline. Pay from My auctions before it expires, or it passes to the next bidder.", "يصلك إشعار بمهلة الدفع. ادفع من «مزاداتي» قبل انتهائها، وإلا ينتقل العمل للمزايد التالي."), "/my-auctions"],
-    [L("How do exhibition tickets work?", "كيف تعمل تذاكر المعارض؟"), L("Book a date and slot; each ticket gets a code scanned at the entrance.", "احجز التاريخ والفترة، ولكل تذكرة رمز يُمسح عند الدخول."), "/exhibitions"],
-    [L("How do I start selling?", "كيف أبدأ البيع؟"), L("Use the AI listing writer, choose a review path, then manage stock and offers from the seller dashboard.", "استخدم كاتب الإعلان بالذكاء الاصطناعي، واختر مسار المراجعة، ثم أدِر المخزون والعروض من لوحة البائع."), "/sell"],
-  ];
+  const faqTo = ["/orders", "/orders", "/orders", "/my-auctions", "/exhibitions", "/sell"];
+  const faq: [string, string, string][] = faqTo.map((to, i) => [t(`faq.q${i + 1}`), fill(t(`faq.a${i + 1}`), { n: num(ps.return_days, ar) }), to]);
 
   return (
     <SiteShell>
       <PageTitle eyebrow={L("Company", "الشركة")} title={L("Support", "الدعم")} sub={L("Quick answers first — and a direct line to our team.", "إجابات سريعة أولًا، وخط مباشر مع فريقنا.")} />
       <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-2">
         <section aria-labelledby="faq-h">
-          <h2 id="faq-h" className="font-display text-2xl">{L("Common questions", "أسئلة شائعة")}</h2>
+          <h2 id="faq-h" className="font-display text-2xl">{t("faq.title")}</h2>
           <div className="mt-4 space-y-2">{faq.map(([q, a, to]) => (
             <details key={q} className="rounded-xl border border-border p-4">
               <summary className="cursor-pointer font-medium">{q}</summary>
