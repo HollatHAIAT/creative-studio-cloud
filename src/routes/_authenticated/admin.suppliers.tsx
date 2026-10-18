@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Check, X, Ban, Sparkles } from "lucide-react";
@@ -42,6 +42,14 @@ function Suppliers() {
     if (filter !== "all") r = r.eq("status", filter);
     const { data, error } = await r; if (error) throw error; return data as Row[];
   } });
+  // Deep link from a staff notification: /admin/suppliers#supplier-<id> scrolls to and highlights that shop.
+  const [focus, setFocus] = useState<string | null>(null);
+  useEffect(() => { const h = window.location.hash.match(/^#supplier-([0-9a-f-]{36})$/); if (h) setFocus(h[1]!); }, []);
+  useEffect(() => {
+    if (!focus || !q.data) return;
+    if (!q.data.some((r) => r.user_id === focus)) { if (filter !== "all") setFilter("all"); return; }
+    document.getElementById(`supplier-${focus}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [focus, q.data, filter]);
   const decide = async (r: Row, decision: "active" | "rejected" | "suspended") => {
     const note = (notes[r.user_id] ?? "").trim();
     if (decision === "rejected" && note.length < 5) { toast.error(L("Write what the supplier needs to change.", "اكتب ما يجب على المورّد تعديله.")); return; }
@@ -63,7 +71,7 @@ function Suppliers() {
           : q.error ? <p role="alert" className="text-destructive">{L("Couldn't load suppliers.", "تعذّر تحميل الموردين.")}</p>
           : !q.data?.length ? <p className="text-muted-foreground">{L("Nothing here.", "لا يوجد شيء هنا.")}</p>
           : <ul className="space-y-4">{q.data.map((r) => (
-            <li key={r.user_id} className="rounded-2xl border border-border bg-card p-5">
+            <li key={r.user_id} id={`supplier-${r.user_id}`} className={`scroll-mt-24 rounded-2xl border bg-card p-5 ${focus === r.user_id ? "border-primary ring-2 ring-primary/40" : "border-border"}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div><p className="font-display text-xl">{ar ? r.name_ar || r.name : r.name}</p>
                   <p className="text-sm text-muted-foreground">{[r.city, r.email, r.phone].filter(Boolean).join(" · ")} · {L("applied", "قدّم")} {new Date(r.created_at).toLocaleDateString(ar ? "ar-SA" : "en-GB")}</p></div>
