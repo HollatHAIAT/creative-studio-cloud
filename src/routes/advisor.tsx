@@ -68,6 +68,7 @@ function Advisor() {
       <PageTitle eyebrow={ar ? "مستشار فني" : "Art advisor"} title={ar ? "صِف ما تبحث عنه" : "Describe what you need"}
         sub={ar ? "اكتب المكان والذوق والميزانية، وسنقترح أعمالًا من المعروض حاليًا، ومنها إعلانات البائعين." : "Tell us the space, mood and budget — we'll suggest works from live listings, including sellers' own listings."} />
       <div className="mx-auto max-w-4xl px-6 pb-20">
+        <Link to="/compare" className="mb-4 inline-block text-sm text-primary underline">{ar ? "تفكّر في عدة أعمال؟ قارنها جنبًا إلى جنب" : "Deciding between a few works? Compare them side by side"}</Link>
         <form onSubmit={(e) => { e.preventDefault(); if (need.trim().length >= 3) void act.run(); }} className="space-y-3">
           <label htmlFor="need" className="sr-only">{ar ? "ما تبحث عنه" : "What you need"}</label>
           <textarea id="need" value={need} onChange={(e) => setNeed(e.target.value)} maxLength={1000} rows={4}
