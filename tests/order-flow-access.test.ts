@@ -63,3 +63,20 @@ describe.skipIf(!url || !key)("moderation tools are blocked for unauthorised use
     expect(error).not.toBeNull();
   });
 });
+
+describe.skipIf(!url || !key)("audit log is locked for unauthorised users", () => {
+  for (const t of ["admin_audit_events", "admin_alerts", "audit_exports", "audit_export_downloads", "audit_integrity_reports"]) {
+    it(`visitors cannot read ${t}`, async () => {
+      const { data, error } = await db().from(t as never).select("*").limit(1);
+      expect(error !== null || (data ?? []).length === 0).toBe(true);
+    });
+  }
+  it("visitors cannot search, verify, undo or export", async () => {
+    for (const [n, a] of [["admin_audit_search", { _from: null, _to: null, _actor: "", _category: "", _action: "", _q: "", _archived: "all", _limit: 1, _offset: 0 }],
+      ["admin_audit_verify", {}], ["admin_audit_undo", { _id: ID, _note: "" }], ["admin_export_download", { _id: ID }],
+      ["admin_export_create", { _kind: "audit", _format: "csv", _filters: {}, _content: "x", _rows: 1 }]] as const) {
+      const r = await rpc(n, a as Record<string, unknown>);
+      expect(r.error !== null || r.data == null || (Array.isArray(r.data) && r.data.length === 0)).toBe(true);
+    }
+  });
+});
