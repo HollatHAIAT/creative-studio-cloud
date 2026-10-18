@@ -6,13 +6,14 @@ export type SellerListing = {
   altText: string; altTextAr: string; medium: string; tags: string[]; category: string; price: number; imageUrl: string | null; gallery: { url: string; alt: string; altAr: string }[]; publishedAt: string | null;
 };
 
-async function load(filter: { id?: string }): Promise<SellerListing[]> {
+async function load(filter: { id?: string; ids?: string[] }): Promise<SellerListing[]> {
   // Only staff-published listings are exposed; images come from a private bucket via short-lived links.
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   let q = supabaseAdmin.from("listing_drafts")
     .select("title,title_ar,description,description_ar,alt_text,alt_text_ar,medium,tags,image_path,gallery,published_listing_id,published_at,price,category")
     .eq("status", "published").order("published_at", { ascending: false }).limit(60);
   if (filter.id) q = q.eq("published_listing_id", filter.id);
+  if (filter.ids) q = q.in("published_listing_id", filter.ids);
   const { data } = await q;
   return Promise.all((data ?? []).map(async (d) => ({
     id: d.published_listing_id!, title: d.title, titleAr: d.title_ar, description: d.description, descriptionAr: d.description_ar,
@@ -35,3 +36,8 @@ export const listSellerListings = createServerFn({ method: "GET" }).handler(() =
 export const getSellerListing = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ id: z.string().regex(/^sl-[a-f0-9]{10}$/) }).parse(d))
   .handler(async ({ data }) => (await load({ id: data.id }))[0] ?? null);
+
+/** Wishlist: the published seller listings among the given saved ids (unpublished ones simply drop out). */
+export const getSellerListingsByIds = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ ids: z.array(z.string().regex(/^sl-[a-f0-9]{10}$/)).max(60) }).parse(d))
+  .handler(({ data }) => (data.ids.length ? load({ ids: data.ids }) : Promise.resolve([])));

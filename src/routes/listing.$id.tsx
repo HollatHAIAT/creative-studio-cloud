@@ -7,6 +7,8 @@ import { useLocale } from "@/lib/i18n";
 import { TrustPanel } from "@/components/TrustPanel";
 import { ListingGallery } from "@/components/ListingGallery";
 import { ArtworkAsk } from "@/components/ArtworkAsk";
+import { Heart } from "lucide-react";
+import { actions, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/listing/$id")({
   loader: async ({ params }) => {
@@ -29,6 +31,7 @@ export const Route = createFileRoute("/listing/$id")({
 function ListingPage() {
   const l = Route.useLoaderData();
   const { locale } = useLocale(); const ar = locale === "ar";
+  const saved = useStore().favorites.includes(l.id);
   useEffect(() => { const id = (l as any)?.published_listing_id ?? (l as any)?.id; if (id) void countView(String(id)); }, [l]);
   return (
     <SiteShell>
@@ -37,7 +40,14 @@ function ListingPage() {
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">{l.medium}</p>
           <h1 className="font-display text-4xl">{ar ? l.titleAr : l.title}</h1>
-          <p className="text-2xl">${l.price.toLocaleString()}</p>
+          <div className="flex items-center gap-4">
+            <p className="text-2xl">${l.price.toLocaleString()}</p>
+            <button type="button" aria-pressed={saved} onClick={() => actions.toggleFavorite(l.id)}
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm ${saved ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+              <Heart aria-hidden className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
+              {saved ? (ar ? "في قائمة أمنياتك" : "In your wishlist") : (ar ? "أضف إلى قائمة الأمنيات" : "Save to wishlist")}
+            </button>
+          </div>
           <p className="whitespace-pre-line leading-relaxed">{ar ? l.descriptionAr : l.description}</p>
           {l.tags.length > 0 && <ul className="flex flex-wrap gap-2">{l.tags.map((t) => <li key={t} className="rounded-full bg-muted px-3 py-1 text-xs">{t}</li>)}</ul>}
           <p className="text-sm text-muted-foreground">{ar ? "للشراء، استخدم «اسأل البائع» أو تواصل مع فريق أروقة." : "To buy, contact the Arwiqa team — seller checkout for new listings is coming soon."}</p>
