@@ -153,7 +153,7 @@ function ListingWriter() {
   const write = useAction(async () => {
     if (!path) return;
     setErr("");
-    const r = await gen({ data: { path, medium, notes } });
+    const r = await gen({ data: { path: path ?? "", medium, notes } });
     if (r.error || !r.copy) { setErr(r.error ?? ""); throw new Error(r.error); }
     setCopy(r.copy);
   });
