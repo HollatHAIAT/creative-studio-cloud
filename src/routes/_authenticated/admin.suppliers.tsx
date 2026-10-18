@@ -87,7 +87,7 @@ function Suppliers() {
                     {(rv.rules.length > 0 || (rv.review?.missing.length ?? 0) > 0) && <div><p className="text-xs font-medium text-destructive">{L("Missing information", "معلومات ناقصة")}</p>
                       <ul className="ms-5 list-disc">{[...rv.rules, ...(rv.review?.missing ?? [])].map((m, i) => <li key={i}>{t2(m)}</li>)}</ul></div>}
                     {rv.rules.length === 0 && rv.review && rv.review.missing.length === 0 && <p className="text-success">{L("No missing information found.", "لا توجد معلومات ناقصة.")}</p>}
-                    {rv.review && rv.review.concerns.length > 0 && <div><p className="text-xs font-medium text-muted-foreground">{L("Worth checking", "يستحق التحقق")}</p><ul className="ms-5 list-disc">{rv.review.concerns.map((c, i) => <li key={i}>{t2(c)}</li>)}</ul></div>}
+                    {rv.review && rv.review.concerns.length > 0 && <div><p className="text-xs font-medium text-muted-foreground">{L("Worth checking", "يستحق التحقق")}</p><ul className="ms-5 list-disc">{rv.review.concerns.map((c: Bi, i: number) => <li key={i}>{t2(c)}</li>)}</ul></div>}
                     {rv.review && <p className="rounded-md bg-background p-2"><span className="font-medium">{L("AI suggestion: ", "اقتراح الذكاء الاصطناعي: ")}{rv.review.suggestion === "approve" ? L("approve", "موافقة") : L("ask for changes", "طلب تعديلات")}</span> — {t2(rv.review.suggestionWhy)}</p>}
                     {rv.error && <p role="alert" className="text-destructive">{rv.error}</p>}
                     <p className="text-xs text-muted-foreground">{L("Advice only — the decision is yours.", "للاستئناس فقط — القرار لك.")}</p>

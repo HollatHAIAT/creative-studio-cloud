@@ -7,7 +7,7 @@ export type Bi = { en: string; ar: string };
 export type SupplierReview = { summary: Bi; range: Bi; missing: Bi[]; concerns: Bi[]; suggestion: "approve" | "needs_changes"; suggestionWhy: Bi };
 
 /** Rule-based gaps the AI can't overlook; shown alongside its summary. */
-export function missingInfo(acc: Record<string, any>, products: Record<string, any>[]): Bi[] {
+export function missingInfo(acc: any, products: any[]): Bi[] {
   const m: Bi[] = [];
   if (!acc.name_ar?.trim()) m.push({ en: "Arabic shop name", ar: "اسم المتجر بالعربية" });
   if (!acc.city?.trim()) m.push({ en: "City", ar: "المدينة" });
