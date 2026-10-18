@@ -29,6 +29,13 @@
       "when": 1792323339133,
       "tag": "0003_anon_supplier_read_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792323379247,
+      "tag": "0004_hide_supplier_contact_from_visitors",
+      "breakpoints": true
     }
   ]
 }
