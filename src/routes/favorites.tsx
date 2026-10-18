@@ -19,11 +19,12 @@ export const Route = createFileRoute("/favorites")({
 
 function Favorites() {
   const { favorites } = useStore();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const list = useListings().filter((l) => favorites.includes(l.id));
   return (
     <SiteShell>
       <PageTitle eyebrow={t("fav.eyebrow")} title={t("fav.title")} />
+      {list.length >= 2 && <div className="mx-auto max-w-7xl px-6"><Link to="/compare" className="inline-block rounded-full border border-primary px-4 py-1.5 text-sm text-primary">{(locale === "ar" ? "قارن مفضلاتك جنبًا إلى جنب" : "Compare your favorites side by side")}</Link></div>}
       <div className="mx-auto max-w-7xl px-6">
         {list.length === 0 ? (
           <p className="text-muted-foreground">{t("fav.empty")} <Link to="/explore" className="underline">{t("nav.explore")}</Link></p>
