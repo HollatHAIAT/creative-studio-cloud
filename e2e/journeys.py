@@ -17,7 +17,7 @@ async def main():
         b = await p.chromium.launch(headless=True)
         page = await (await b.new_context(viewport={"width": 1280, "height": 1800})).new_page()
         errors: list[str] = []
-        page.on("pageerror", lambda e: errors.append(str(e)))
+        page.on("pageerror", lambda e: errors.append(f"{page.url}: {str(e)[:300]}"))
 
         async def browse_to_artwork():
             await page.goto(f"{BASE}/explore"); await page.wait_for_load_state("networkidle")
